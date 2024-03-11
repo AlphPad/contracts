@@ -1,0 +1,53 @@
+// SaleBuyerAccount Contract
+// 
+// Manages individual buyer accounts for a sale, tracking purchases, bids, and claims. This contract
+// extends AccountBase, inheriting core functionalities like destruction checks and access validations.
+// It is responsible for handling buy, claim, and claim refund operations for a buyer in a sale.
+Contract SaleBuyerAccount (
+    parentContractAddress: Address,
+    accountHolder: Address,
+    mut amountBuy: U256,
+    mut amountBid: U256,
+    mut amountClaimed: U256,
+    mut amountClaimedRefund: U256
+) extends AccountBase(parentContractAddress, accountHolder) {
+    
+    // Error codes specific to claiming operations in this contract.
+    enum ErrorCodes {
+        ClaimMoreThanBuy = 1101
+        ClaimMoreThanBid = 1102
+    }
+
+    // Record a purchase and bid amount for the buyer.
+    @using(updateFields = true)
+    pub fn buy(addAmountBuy: U256, addAmountBid: U256) -> () { 
+        assertIsParentTheCaller(callerAddress!())
+        amountBuy = amountBuy + addAmountBuy
+        amountBid = amountBid + addAmountBid
+    }
+
+    // Allow the buyer to claim a portion of their purchase.
+    // Ensures that the total claimed does not exceed the amount bought.
+    @using(updateFields = true)
+    pub fn claim(claimAmount: U256) -> () {
+        assertIsParentTheCaller(callerAddress!())
+        assert!(amountClaimed + claimAmount <= amountBuy, ErrorCodes.ClaimMoreThanBuy)
+        amountClaimed = amountClaimed + claimAmount
+    }
+
+    // Allow the buyer to claim a refund on their bid.
+    // Ensures that the total refund claimed does not exceed the amount bid.
+    @using(updateFields = true)
+    pub fn claimRefund(claimAmount: U256) -> () {
+        assertIsParentTheCaller(callerAddress!())
+        assert!(amountClaimedRefund + claimAmount <= amountBid, ErrorCodes.ClaimMoreThanBid)
+        amountClaimedRefund = amountClaimedRefund + claimAmount
+    }
+
+    // Getters for various amounts related to the buyer's account.
+    pub fn getAmountBuy() -> U256 { return amountBuy }
+    pub fn getAmountBid() -> U256 { return amountBid }
+    pub fn getAmountClaimed() -> U256 { return amountClaimed }
+    pub fn getAmountClaimedRefund() -> U256 { return amountClaimedRefund }
+    pub fn isSafeToDestroy() -> Bool { return amountClaimed == amountBuy || amountClaimedRefund == amountBid }
+}

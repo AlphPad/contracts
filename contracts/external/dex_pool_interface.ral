@@ -1,0 +1,14 @@
+/// Interface: DexPoolInterface
+///
+/// Provides an interface for reading price info from dex.
+Interface DexPoolInterface {
+    pub fn getPrice0CumulativeLast() -> U256
+    
+    pub fn getPrice1CumulativeLast() -> U256
+
+    pub fn getTokenPair() -> (ByteVec, ByteVec)
+
+    pub fn getReserves() -> (U256, U256)
+    
+    pub fn getBlockTimeStampLast() -> U256
+}

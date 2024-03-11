@@ -1,0 +1,10 @@
+/// Interface: AccountInterface
+///
+/// Provides a standard interface for account-type subcontracts,
+/// focusing on lifecycle management functionalities.
+Interface AccountInterface {
+    
+    // Destroys the account subcontract, ensuring proper cleanup and termination.
+    @using(assetsInContract = true)
+    pub fn destroy() -> ()
+}

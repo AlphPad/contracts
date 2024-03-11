@@ -1,0 +1,146 @@
+// Reward Distribution Contract
+// Manages a rotating schedule of reward distribution over fixed epochs.
+// Rewards are split across these epochs, updating as the contract operates.
+Contract RewardDistributor (
+    rewardTokenId: ByteVec,             // Token ID for reward distribution
+    stakingContract: Staking,           // The Staking contract to send rewards to
+    genesisDate: U256,                  // Start date of the reward program
+    epochDuration: U256,                // Duration of each epoch
+    totalEpochs: U256,                  // Total number of epochs in the cycle
+    upgradeDelay: U256,                 // The delay period required between initiating and applying an upgrade.
+    mut accumulatedRewards: U256,       // Total rewards accumulated over time
+    mut totalRewards: ByteVec,          // Rewards allocated per epoch
+    mut currentHarvestEpoch: U256,      // Last harvested epoch number
+    mut currentHarvestTotal: U256,      // Total rewards for the last harvested epoch
+    mut currentHarvestDistributed: U256,// Amount distributed in the last harvested epoch
+    mut owner: Address,                 // Current owner's address of the contract.
+    mut newOwner: Address,              // Address of the new owner, set during ownership transfer process.
+    mut upgradeCommenced: U256,         // Timestamp marking the start of an upgrade process.
+    mut newCode: ByteVec,               // New contract code to be migrated to.
+    mut newImmFieldsEncoded: ByteVec,   // Encoded immutable fields for the new contract.
+    mut newMutFieldsEncoded: ByteVec    // Encoded mutable fields for the new contract.
+) extends Upgradable(upgradeDelay, owner, newOwner, upgradeCommenced, newCode, newImmFieldsEncoded, newMutFieldsEncoded) {
+
+    // Event declarations for tracking contract activities
+    event EpochChanged(epoch: U256, rewardsTransfered: U256, updatedBy: Address)
+    event RewardHarvested(epoch: U256, harvestedAmount: U256, harvestedBy: Address)
+    event RewardAdded(addedAmount: U256, addedBy: Address)
+
+    // Error codes for contract operations
+    enum ErrorCodes {
+        RewardsNotInitialized = 201
+        HarvestValueTooSmall = 202
+        EpochsIsZero = 203
+    }
+
+    // Harvests rewards for the current epoch. Transfers vested rewards to the staking contract.
+    @using(assetsInContract = true, updateFields = true, checkExternalCaller = false)
+    pub fn harvest() -> () {
+
+        // Check if rewards are initialized
+        assert!(size!(totalRewards) == totalEpochs * 32, ErrorCodes.RewardsNotInitialized)
+        
+        // Migrate epoch if necessary
+        let newEpochIndex = getCurrentEpoch()
+        if (currentHarvestEpoch != newEpochIndex) {
+            let carryOverReward = currentHarvestTotal - currentHarvestDistributed
+
+            let newEpochReward = get(totalRewards, newEpochIndex)
+            currentHarvestTotal = newEpochReward + carryOverReward
+            currentHarvestDistributed = 0
+    
+            totalRewards = update(totalRewards, newEpochIndex, 0)
+            currentHarvestEpoch = newEpochIndex
+            emit EpochChanged(newEpochIndex, currentHarvestTotal, callerAddress!())
+        }
+    
+        // Calculate vested amount
+        let timeElapsedInCurrentEpoch = (blockTimeStamp!() - genesisDate) % epochDuration
+        let vestedAmount = ((currentHarvestTotal * timeElapsedInCurrentEpoch) / epochDuration) - currentHarvestDistributed
+        
+        // Min harvestable amount is limited to prevent excessive calling as callers need to be paid
+        assert!(vestedAmount >= 5 * (10 ** 18), ErrorCodes.HarvestValueTooSmall)
+
+        // Payout to caller & stakers
+        let callerReward = 15 * (10 ** 15) // 0.015 ALPH Reward for caller
+        transferTokenFromSelf!(callerAddress!(), rewardTokenId, callerReward)
+        let stakingRewardAmount = vestedAmount - callerReward
+        stakingContract.depositRewards{selfAddress!() -> rewardTokenId: stakingRewardAmount}(stakingRewardAmount)
+        
+        // Bookkeeping
+        currentHarvestDistributed = currentHarvestDistributed + vestedAmount
+        emit RewardHarvested(newEpochIndex, vestedAmount, callerAddress!())
+    }    
+    
+    // Adds rewards to the contract and distributes them across epochs.
+    @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, checkExternalCaller = false)
+    pub fn addRewards(sender: Address, amount: U256) -> () {
+        assert!(totalEpochs != 0, ErrorCodes.EpochsIsZero)
+
+        // Transfer rewards from caller
+        transferTokenToSelf!(sender, rewardTokenId, amount)
+
+        // Setup local vars
+        accumulatedRewards = accumulatedRewards + amount
+        let rewardPerEpoch = amount / totalEpochs
+        let mut newTotalRewards = #
+
+        // Update tokenRewards array with appropriate rewards
+        for (let mut i = 0; i < totalEpochs; i = i + 1) {
+            if (size!(totalRewards) == totalEpochs * 32) {
+                let startIndex = i * 32
+                let currentEpochReward = u256From32Byte!(byteVecSlice!(totalRewards, startIndex, startIndex + 32))
+                newTotalRewards = newTotalRewards ++ u256To32Byte!(currentEpochReward + rewardPerEpoch)
+            } else {
+                newTotalRewards = newTotalRewards ++ u256To32Byte!(rewardPerEpoch)
+            }
+        }
+    
+        // Bookkeeping
+        emit RewardAdded(amount, sender)
+        totalRewards = newTotalRewards
+    }
+
+    // Returns the total pending rewards yet to be distributed.
+    pub fn getTotalPendingRewards() -> U256 {
+
+        assert!(size!(totalRewards) == totalEpochs * 32, ErrorCodes.RewardsNotInitialized)
+        
+        let mut totalPendingRewards = 0
+        for (let mut i = 0; i < totalEpochs; i = i + 1) { totalPendingRewards = totalPendingRewards + u256From32Byte!(byteVecSlice!(totalRewards, (i * 32), (i * 32) + 32)) }
+        return totalPendingRewards
+    }
+
+    pub fn getCurrentEpoch() -> U256 { return (blockTimeStamp!() - genesisDate) / epochDuration % totalEpochs }
+    pub fn getGenesisDate() -> U256 { return genesisDate }
+    pub fn getEpochDuration() -> U256 { return epochDuration }
+    pub fn getTotalEpochs() -> U256 { return totalEpochs }
+    pub fn getAccumulatedRewards() -> U256 { return accumulatedRewards }
+    pub fn getTotalRewards() -> ByteVec { return totalRewards }
+
+    // Internal array operation functions from https://github.com/alephium/ralph-example/blob/master/dynamic-array/contracts/dynamic-array.ral
+    fn update(array: ByteVec, index: U256, value: U256) -> ByteVec {
+        assert!(size!(array) % 32 == 0, 0)
+
+        let offset = index * 32
+        return byteVecSlice!(array, 0, offset) ++ u256To32Byte!(value) ++ byteVecSlice!(array, offset + 32, size!(array))
+    }
+
+    fn get(array: ByteVec, index: U256) -> U256 {
+        assert!(size!(array) % 32 == 0, 0)
+
+        let offset = index * 32
+        let bytes = byteVecSlice!(array, offset, offset + 32)
+        return u256From32Byte!(bytes)
+    }
+}
+
+// Transaction scripts
+TxScript RewardDistributorAddRewardsTX(rd: RewardDistributor, amount: U256) {
+    let caller = callerAddress!()
+    rd.addRewards{caller -> ALPH: amount}(caller, amount)
+}
+
+TxScript RewardDistributorHarvestTX(rd: RewardDistributor) {
+    rd.harvest()
+}

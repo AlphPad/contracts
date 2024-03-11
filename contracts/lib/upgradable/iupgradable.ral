@@ -1,0 +1,60 @@
+
+
+
+Interface IUpgradable {
+    // Initiates ownership transfer to a new owner.
+    @using(updateFields = true)
+    pub fn changeOwner(changeOwner: Address) -> ()
+
+    // Initiates migration to new contract code.
+    @using(updateFields = true)
+    pub fn migrate(changeCode: ByteVec) -> ()
+
+    // Initiates migration with new fields
+    @using(updateFields = true)
+    pub fn migrateWithFields(changeCode: ByteVec, changeImmFieldsEncoded: ByteVec, changeMutFieldsEncoded: ByteVec) -> ()
+
+    /// Applies the change of contract ownership.
+    @using(updateFields = true)
+    pub fn changeOwnerApply() -> ()
+
+    // Applies the migration to the new contract code.
+    pub fn migrateApply() -> ()
+
+    // Applies the migration along with new fields.
+    @using(updateFields = true)
+    pub fn migrateWithFieldsApply() -> ()
+
+    // Resets the upgrade-related fields to their default state.
+    // - This is a public function because it can be beneficial to cancel an update or to prevent an upgrade when owner is compromised
+    pub fn resetUpgrade() -> ()
+}
+
+// TX Scripts
+TxScript IUpgradableResetUpgradeTX(upgradable: IUpgradable) {
+    upgradable.resetUpgrade()
+}
+
+TxScript IUpgradableChangeOwnerTX(upgradable: IUpgradable, changeOwner: Address) {
+    upgradable.changeOwner(changeOwner)
+}
+
+TxScript IUpgradableMigrateTX(upgradable: IUpgradable, changeCode: ByteVec) {
+    upgradable.migrate(changeCode)
+}
+
+TxScript IUpgradableMigrateWithFieldsTX(upgradable: IUpgradable, changeCode: ByteVec, changeImmFieldsEncoded: ByteVec, changeMutFieldsEncoded: ByteVec) {
+    upgradable.migrateWithFields(changeCode, changeImmFieldsEncoded, changeMutFieldsEncoded)
+}
+
+TxScript IUpgradableChangeOwnerApplyTX(upgradable: IUpgradable) {
+    upgradable.changeOwnerApply()
+}
+
+TxScript IUpgradableMigrateApplyTX(upgradable: IUpgradable) {
+    upgradable.migrateApply()
+}
+
+TxScript IUpgradableMigrateWithFieldsApplyTX(upgradable: IUpgradable) {
+    upgradable.migrateWithFieldsApply()
+}

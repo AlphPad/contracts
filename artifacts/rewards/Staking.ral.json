@@ -1,0 +1,823 @@
+{
+  "version": "v2.11.0",
+  "name": "Staking",
+  "bytecode": "0d402540244047406f408e40b940ed40f84127414841564162416d4176417f41884191419a41a341ac41c441d341e141fa429b42c4430b43364349435a438043aa43b343bc43c543ce43d743e9010001010011b4001400151600a1031400a1051400a1061400a10756a10407a002a0035f010001040011b400140015caa1031600a1051400a1061400a10756a10409a002a0055f010003030013b400140015caa1031600a1051601a1061602a10756a1041206a002a005a006a0076101000000000fb400140016a003ca461372ce7b08a002a0035fa003a1020013010000000017b400140016a005140042a0061400411aa0071400411a1372cc7b0aa002a0055fa005ba001301000000001bb400140016a005140042a0061400421aa0071400421a1372cd7b1207a002a005a006a00761a005a006a007bb0013010000000003b4001400130003030400141600000a19136ee17b160013c40de0b6b3a7640000a2160047ce0016011602c117030516004716035f000001030010160000091600000b1701160117020c0c160201000616004716015f0000010100041600000a136ee27b0100010101041600000bc502010001010104160047cb02010000000102ce0402010000000102a00202010000000102a00302010000000102a00402010000000102a00502010000000102a00602010000000102a0070200000000000a0ca104caa1031400a1051400a1061400a1070000010100051600a002451372c87b000000000005a0040c2f1372c97b00000000000ca0040c301372ca7b56a004ce042a331372cb7b0101020a004055b417021208160216005f1602ce011600ac1602000a4c1c1602000b17031603001d1704120d160216045f0c0d16030105ce021604aba0010d0c1603010a16000d0c160301074a40280c17050c17060c170716010c334c08561706160616012a170716001705b2160216061607160513056416000c0ca00113046417091708160213c40de0b6b3a7640000a21602160816090007a00016002aa100010001030014b417011601000b17021209160116005f1602001e16000d0c16020108a00016002ba10001020002004028b417001600000b1701ce030c0d160101102a56311340657b120a16000c0d1601010f5f1600ce010c0d1601010fab0c0c160101090c0d160101014c0216000008010101020017a0000c331340667b120cb416005fb4ce021600ac160000242c1701a0011601a0002d2aa101010000050007b417001600000b17011601001e0100010201061600000b17011601001d020000010401140c0d1600011117010c0d1600010e1702a00116012b1703160216032c00242d020002010300151600001d17010c0d160001051702120d160216015f1602ce021601aba0010d0c1600010a010000000102ce0102010000000102ce0202010000000102ce0302010000000102a00002010000000102a001020000000001061385f5e100130a1312832c02",
+  "codeHash": "af0ac7188a434129e8279b905adf2160595938f0509f717ac3609af42509a613",
+  "fieldsSig": {
+    "names": [
+      "accountTemplateId",
+      "stakingTokenId",
+      "rewardsTokenId",
+      "unstakeLockTime",
+      "upgradeDelay",
+      "amountStaked",
+      "rewardPerToken",
+      "owner",
+      "newOwner",
+      "upgradeCommenced",
+      "newCode",
+      "newImmFieldsEncoded",
+      "newMutFieldsEncoded"
+    ],
+    "types": [
+      "ByteVec",
+      "ByteVec",
+      "ByteVec",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "Address",
+      "Address",
+      "U256",
+      "ByteVec",
+      "ByteVec",
+      "ByteVec"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "eventsSig": [
+    {
+      "name": "AccountCreate",
+      "fieldNames": [
+        "account",
+        "contractId"
+      ],
+      "fieldTypes": [
+        "ByteVec",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "AccountDestroy",
+      "fieldNames": [
+        "account",
+        "contractId"
+      ],
+      "fieldTypes": [
+        "ByteVec",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "ChangeOwnerCommence",
+      "fieldNames": [
+        "owner",
+        "changeOwner"
+      ],
+      "fieldTypes": [
+        "Address",
+        "Address"
+      ]
+    },
+    {
+      "name": "ChangeOwnerApply",
+      "fieldNames": [
+        "owner",
+        "changeOwner"
+      ],
+      "fieldTypes": [
+        "Address",
+        "Address"
+      ]
+    },
+    {
+      "name": "MigrateCommence",
+      "fieldNames": [
+        "owner",
+        "changeCode"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "MigrateApply",
+      "fieldNames": [
+        "owner",
+        "changeCode"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "MigrateWithFieldsCommence",
+      "fieldNames": [
+        "owner",
+        "changeCode",
+        "changeImmFieldsEncoded",
+        "changeMutFieldsEncoded"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec",
+        "ByteVec",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "MigrateWithFieldsApply",
+      "fieldNames": [
+        "owner",
+        "changeCode",
+        "changeImmFieldsEncoded",
+        "changeMutFieldsEncoded"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec",
+        "ByteVec",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "Stake",
+      "fieldNames": [
+        "account",
+        "amount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "Unstake",
+      "fieldNames": [
+        "account",
+        "amount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "Withdraw",
+      "fieldNames": [
+        "account",
+        "amount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "Claim",
+      "fieldNames": [
+        "account",
+        "amount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "DepositReward",
+      "fieldNames": [
+        "account",
+        "amount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "ClaimReward",
+      "fieldNames": [
+        "account",
+        "amount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "changeOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "changeOwner"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "migrate",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "changeCode"
+      ],
+      "paramTypes": [
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "migrateWithFields",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "changeCode",
+        "changeImmFieldsEncoded",
+        "changeMutFieldsEncoded"
+      ],
+      "paramTypes": [
+        "ByteVec",
+        "ByteVec",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "changeOwnerApply",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "migrateApply",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "migrateWithFieldsApply",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "resetUpgrade",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "createAccount",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "account",
+        "encodedImmFields",
+        "encodedMutFields"
+      ],
+      "paramTypes": [
+        "Address",
+        "ByteVec",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "destroyAccount",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertAccountExists",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "accountExists",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "getSubContractId",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getUpgradeDelay",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Address"
+      ]
+    },
+    {
+      "name": "getNewOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Address"
+      ]
+    },
+    {
+      "name": "getUpgradeCommenced",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getNewCode",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getNewImmFieldsEncoded",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getNewMutFieldsEncoded",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "resetFields",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertOnlyOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "caller"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertUpgradeNotPending",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertUpgradeDelayElapsed",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "stake",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "amount",
+        "vestingPeriod"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "unstake",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "amount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "withdraw",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "depositRewards",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "amount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "claimRewards",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "getPendingRewards",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "staker"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "calcPendingRewards",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "StakingAccount"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "claimRewardsForAccount",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": true,
+      "isPublic": false,
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "StakingAccount"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "getStakingTokenId",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getRewardsTokenId",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getUnstakeLockTime",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getAmountStaked",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getRewardPerToken",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getRewardPerTokenScalingFactor",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    }
+  ],
+  "constants": [],
+  "enums": [
+    {
+      "name": "UpgradeErrorCodes",
+      "fields": [
+        {
+          "name": "Forbidden",
+          "value": {
+            "type": "U256",
+            "value": "13000"
+          }
+        },
+        {
+          "name": "UpgradePending",
+          "value": {
+            "type": "U256",
+            "value": "13001"
+          }
+        },
+        {
+          "name": "UpgradeNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13002"
+          }
+        },
+        {
+          "name": "UpgradeDelayNotExpired",
+          "value": {
+            "type": "U256",
+            "value": "13003"
+          }
+        },
+        {
+          "name": "MigrateNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13004"
+          }
+        },
+        {
+          "name": "MigrateWithFieldsNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13005"
+          }
+        },
+        {
+          "name": "ChangeOwnerNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13006"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "UnstakeNotClaimable",
+          "value": {
+            "type": "U256",
+            "value": "101"
+          }
+        },
+        {
+          "name": "CanNotDepositRewardsToNoStakers",
+          "value": {
+            "type": "U256",
+            "value": "102"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AccountErrorCodes",
+      "fields": [
+        {
+          "name": "AccountAlreadyExists",
+          "value": {
+            "type": "U256",
+            "value": "12001"
+          }
+        },
+        {
+          "name": "AccountDoesNotExists",
+          "value": {
+            "type": "U256",
+            "value": "12002"
+          }
+        }
+      ]
+    }
+  ]
+}
