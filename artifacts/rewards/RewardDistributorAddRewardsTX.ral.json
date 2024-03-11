@@ -1,0 +1,31 @@
+{
+  "version": "v2.11.0",
+  "name": "RewardDistributorAddRewardsTX",
+  "bytecodeTemplate": "0101030001000bb417001600{1}a21600{1}0e0c{0}0113",
+  "fieldsSig": {
+    "names": [
+      "rd",
+      "amount"
+    ],
+    "types": [
+      "RewardDistributor",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

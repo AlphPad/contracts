@@ -1,0 +1,33 @@
+import "std/fungible_token_interface"
+
+// Dummy contract for devnet/testnet
+Contract TokenPair(
+  token0Id: ByteVec,
+  token1Id: ByteVec,
+  reserve0: U256,
+  reserve1: U256,
+  blockTimeStampLast: U256,
+  price0CumulativeLast: U256,
+  price1CumulativeLast: U256
+) implements DexPoolInterface {
+
+  pub fn getTokenPair() -> (ByteVec, ByteVec) {
+    return token0Id, token1Id
+  }
+
+  pub fn getReserves() -> (U256, U256) {
+    return reserve0, reserve1
+  }
+
+  pub fn getPrice0CumulativeLast() -> U256 {
+    return price0CumulativeLast
+  }
+
+  pub fn getPrice1CumulativeLast() -> U256 {
+    return price1CumulativeLast
+  }
+
+  pub fn getBlockTimeStampLast() -> U256 {
+    return blockTimeStampLast
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "version": "v2.11.0",
+  "name": "IUpgradableMigrateApplyTX",
+  "bytecodeTemplate": "010103000000040c0c{0}0104",
+  "fieldsSig": {
+    "names": [
+      "upgradable"
+    ],
+    "types": [
+      "IUpgradable"
+    ],
+    "isMutable": [
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

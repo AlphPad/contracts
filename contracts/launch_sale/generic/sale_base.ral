@@ -1,0 +1,115 @@
+// SaleBase Contract
+//
+// SaleBase is an abstract contract for managing token sales. It supports both general and whitelist phases,
+// enabling claims for tokens and refunds post-sale, depending on the sale outcome and participant's role.
+// The contract includes timing controls, a whitelisting mechanism, and events for tracking claims and refunds.
+// It extends the `MerkleProof` contract for whitelist functionalities.
+Abstract Contract SaleBase(
+    saleOwner: Address,
+    saleStart: U256,
+    saleEnd: U256,
+    minRaise: U256,
+    maxRaise: U256,
+    saleTokenId: ByteVec,
+    bidTokenId: ByteVec,
+    whitelistSaleStart: U256,
+    whitelistSaleEnd: U256,
+    mut tokensSold: U256,
+    mut totalRaised: U256,
+    mut merkleRoot: ByteVec
+) extends MerkleProof(merkleRoot) {
+
+    // Event emitted when a buyer claims their tokens.
+    event ClaimBuyer(account: Address, saleTokenAmount: U256)
+    // Event emitted when a buyer claims their refund.
+    event ClaimBuyerRefund(account: Address, bidTokenAmount: U256)
+    // Event emitted when the seller claims their tokens.
+    event ClaimSeller(account: Address, bidTokenAmount: U256)
+    // Event emitted when the seller claims their refund.
+    event ClaimSellerRefund(account: Address, saleTokenAmount: U256)
+
+    // Enumerates custom error codes specific to the SaleBase contract.
+    enum SaleBaseErrorCodes {
+        SaleNotLive = 1001
+        SaleNotFinished = 1002
+        SaleClaimNotAvailable = 1003
+        SaleRefundNotAvailable = 1004
+        SaleAlreadyStarted = 1005
+        SaleUpdateUnauthorized = 1006
+        SaleIsNotWLSale = 1007
+    }
+
+    // Function allowing participants to claim tokens or the seller to claim unsold tokens after sale success.
+    // Note: amount is included for Sale implementations that include vesting
+    @using(checkExternalCaller = false)
+    pub fn claim(amount: U256) -> () {
+        assertSaleFinished()
+        assertCanClaim()
+        let caller = callerAddress!()
+        if(isCallerSaleOwner(caller)) {
+            claimSeller(amount)
+            emit ClaimSeller(caller, amount)
+        } else {
+            claimBuyer(caller, amount)
+            emit ClaimBuyer(caller, amount)
+        }
+    }
+
+    // Function allowing participants to claim refunds or the seller to claim raised funds after sale failure.
+    // Note: amount is included for Sale implementations that include vesting
+    @using(checkExternalCaller = false)
+    pub fn claimRefund(amount: U256) -> () {
+        assertSaleFinished()
+        assertCanClaimRefund()
+        let caller = callerAddress!()
+        if(isCallerSaleOwner(caller)) {
+            claimSellerRefund(amount)
+            emit ClaimSellerRefund(caller, amount)
+        } else {
+            claimBuyerRefund(caller,amount)
+            emit ClaimBuyerRefund(caller, amount)
+        }
+    }
+
+    // Setter for merkle tree before sale starts.
+    pub fn setMerkleRoot(newMerkleRoot: ByteVec) -> () {
+        checkCaller!(callerAddress!() == saleOwner, SaleBaseErrorCodes.SaleUpdateUnauthorized)
+        assert!(isWhitelistSale(), SaleBaseErrorCodes.SaleIsNotWLSale)
+        assertSaleNotStarted()
+        updateRoot(newMerkleRoot)
+    }
+
+    // Internal functions for processing claims and refunds for buyers and sellers.
+    fn claimBuyer(caller: Address, amount: U256) -> ()
+    fn claimBuyerRefund(caller: Address, amount: U256) -> ()
+    fn claimSeller(amount: U256) -> ()
+    fn claimSellerRefund(amount: U256) -> ()
+
+    // Assertions to check various states of the sale.
+    fn assertSaleLive() -> () { assert!(isSaleLive(), SaleBaseErrorCodes.SaleNotLive) }
+    fn assertSaleFinished() -> () { assert!(isSaleFinished(), SaleBaseErrorCodes.SaleNotFinished) }
+    fn assertCanClaim() -> () { assert!(isSaleFinished() && isSaleSuccess(), SaleBaseErrorCodes.SaleClaimNotAvailable) }
+    fn assertCanClaimRefund() -> () { assert!(isSaleFinished() && !isSaleSuccess(), SaleBaseErrorCodes.SaleRefundNotAvailable) }
+    fn assertSaleNotStarted() -> () { assert!(saleStart < blockTimeStamp!(), SaleBaseErrorCodes.SaleAlreadyStarted) }
+
+    // Utility functions to determine the current state of the sale.
+    pub fn isSaleLive() -> Bool { return saleStart < blockTimeStamp!() && blockTimeStamp!() < saleEnd }
+    pub fn isSaleFinished() -> Bool { return blockTimeStamp!() > saleEnd }
+    pub fn isSaleSuccess() -> Bool { return totalRaised >= minRaise }
+    pub fn isWhitelistSaleLive() -> Bool { return whitelistSaleStart < blockTimeStamp!() && blockTimeStamp!() < whitelistSaleEnd }
+    pub fn isWhitelistSale() -> Bool { return size!(merkleRoot) == 32 }
+    pub fn isCallerSaleOwner(caller: Address) -> Bool { return caller == saleOwner }
+
+    // Getter functions for sale parameters.
+    pub fn getSaleOwner() -> Address { return saleOwner }
+    pub fn getSaleStart() -> U256 { return saleStart }
+    pub fn getSaleEnd() -> U256 { return saleEnd }
+    pub fn getMinRaise() -> U256 { return minRaise }
+    pub fn getMaxRaise() -> U256 { return maxRaise }
+    pub fn getSaleTokenId() -> ByteVec { return saleTokenId }
+    pub fn getBidTokenId() -> ByteVec { return bidTokenId }
+    pub fn getWhitelistSaleStart() -> U256 { return whitelistSaleStart }
+    pub fn getWhitelistSaleEnd() -> U256 { return whitelistSaleEnd }
+    pub fn getTokensSold() -> U256 { return tokensSold }
+    pub fn getTotalRaised() -> U256 { return totalRaised }
+}

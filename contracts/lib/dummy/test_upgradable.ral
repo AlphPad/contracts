@@ -1,0 +1,18 @@
+// Dummy contract for devnet
+Contract TestUpgradable (
+  immValue: U256,
+  upgradeDelay: U256,
+  mut mutValue: U256,
+  mut owner: Address,                
+  mut newOwner: Address,             
+  mut upgradeCommenced: U256,       
+  mut newCode: ByteVec,            
+  mut newImmFieldsEncoded: ByteVec,  
+  mut newMutFieldsEncoded: ByteVec   
+) extends Upgradable(upgradeDelay, owner, newOwner, upgradeCommenced, newCode, newImmFieldsEncoded, newMutFieldsEncoded) {
+
+  pub fn getImmValue() -> (U256) { return immValue }
+  pub fn getMutValue() -> (U256) { return mutValue }
+  @using(updateFields = true, checkExternalCaller = false)
+  pub fn setMutValue(newMutValue: U256) -> () { mutValue = newMutValue }
+}
