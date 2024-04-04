@@ -1,5 +1,5 @@
 {
-  "version": "v2.11.0",
+  "version": "v2.10.3",
   "name": "StakingDepositRewardsTX",
   "bytecodeTemplate": "01010300000008b4{1}a2{1}0d0c{0}011a",
   "fieldsSig": {

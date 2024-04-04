@@ -1,5 +1,5 @@
 {
-  "version": "v2.11.0",
+  "version": "v2.10.3",
   "name": "StakingStakeTX",
   "bytecodeTemplate": "0101030003004027b417000c0d{0}011f170116000d0d{0}010a170216024c0b16001601{1}a3{1}{2}0e0c{0}01174a0d16007a1601{1}a313c40de0b6b3a7640000a2{1}{2}0e0c{0}0117",
   "fieldsSig": {

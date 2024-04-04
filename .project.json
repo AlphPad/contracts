@@ -1,7 +1,7 @@
 {
-  "fullNodeVersion": "v2.11.0",
+  "fullNodeVersion": "v2.10.3",
   "compilerOptionsUsed": {
-    "ignoreUnusedConstantsWarnings": true,
+    "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
     "ignoreUnusedFieldsWarnings": false,
     "ignoreUnusedPrivateFunctionsWarnings": false,
@@ -59,7 +59,7 @@
       "warnings": []
     },
     "IFungibleToken": {
-      "sourceFile": "../node_modules/@alephium/web3/std/fungible_token_interface.ral",
+      "sourceFile": "../../../../.npm/_npx/f1b120e1b513c04c/node_modules/@alephium/web3/std/fungible_token_interface.ral",
       "sourceCodeHash": "6809cb06fb20fa7edf529461998beeebd12b1636d439612cca2f84214dbf4a20",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",

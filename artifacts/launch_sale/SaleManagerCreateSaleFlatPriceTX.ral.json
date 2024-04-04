@@ -1,5 +1,5 @@
 {
-  "version": "v2.11.0",
+  "version": "v2.10.3",
   "name": "SaleManagerCreateSaleFlatPriceTX",
   "bytecodeTemplate": "0101030000001cb47a13c40de0b6b3a7640000{1}2aa2{9}{10}a3{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}{15}130f0c{0}0112",
   "fieldsSig": {

@@ -1,5 +1,5 @@
 {
-  "version": "v2.11.0",
+  "version": "v2.10.3",
   "name": "SaleFlatPriceBuyTX",
   "bytecodeTemplate": "0101030002001fb4170016000d0d{0}0107170116014c0a1600{1}a2{1}{2}0e0c{0}01274a0b1600{1}13c40de0b6b3a76400002aa2{1}{2}0e0c{0}0127",
   "fieldsSig": {

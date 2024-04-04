@@ -57,7 +57,7 @@ const testnetSettings: Settings = {
   },
   team: {
     tokenAmount: 15_000_000n * 10n ** 18n,
-    tokenVestingPeriod: 126230400000n
+    tokenVestingPeriod: 259200000n // 3 days
   },
   sale: {
     tokenPair: ""
