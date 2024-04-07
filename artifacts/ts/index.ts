@@ -3,9 +3,11 @@
 /* eslint-disable */
 
 export * from "./ApadToken";
+export * from "./BurnALPH";
+export * from "./DummyToken";
 export * from "./RewardDistributor";
 export * from "./SaleBuyerAccount";
-export * from "./SaleFlatPrice";
+export * from "./SaleFlatPriceAlph";
 export * from "./SaleManager";
 export * from "./Staking";
 export * from "./StakingAccount";

@@ -1,7 +1,7 @@
 // Contract SaleFlatPrice
 // - Manages a flat price token sale with optional whitelist.
 // - Extends AccountFactory for buyer account management and SaleBase for common sale functionalities.
-Contract SaleFlatPrice(
+Abstract Contract SaleFlatPrice(
     rewardDistributor: RewardDistributor,   // Reward distributor for managing rewards
     saleOwner: Address,                     // Owner of the sale
     accountTemplateId: ByteVec,             // Template ID for creating buyer accounts
@@ -12,7 +12,7 @@ Contract SaleFlatPrice(
     maxRaise: U256,                         // Maximum amount to be raised
     saleTokenId: ByteVec,                   // ID of the token being sold
     saleTokenTotalAmount: U256,             // Total amount of tokens available for sale
-    bidTokenId: ByteVec,                    // Token used for bidding (ALPH)
+    bidTokenId: ByteVec,                    // Token used for bidding
     whitelistSaleStart: U256,               // Start time of the whitelist sale
     whitelistSaleEnd: U256,                 // End time of the whitelist sale
     whitelistBuyerMaxBid: U256,             // Maximum bid amount for whitelisted buyers
@@ -36,7 +36,7 @@ Contract SaleFlatPrice(
 ) {
 
     // Event declarations
-    event Buy(account: Address, buyAlphAmount: U256, buyTokenAmount: U256)
+    event Buy(account: Address, buyBidAmount: U256, buyTokenAmount: U256)
 
     // Error codes specific to claiming operations in this contract.
     enum ErrorCodes {
@@ -48,11 +48,14 @@ Contract SaleFlatPrice(
         SaleTokenTotalExceeded = 606
         SaleOwnerCanNotBid = 607
         BuyerNotWhitelisted = 608
+        SaleTokenMoreThan18Decimal = 609
+        SaleAmountSmallerThanMin = 610
+        SaleAmountLargerThanMax = 611
     }
 
     // Handles token purchasing by buyers. Validates sale conditions and processes token allocation.
     @using(preapprovedAssets = true, assetsInContract = true, checkExternalCaller = false, updateFields = true)
-    pub fn buy(amountAlph: U256, wlMerkleProof: ByteVec) -> () {
+    pub fn buy(bidAmount: U256, wlMerkleProof: ByteVec) -> () {
         assertSaleLive()
         let account = callerAddress!()
         assert!(account != saleOwner, ErrorCodes.SaleOwnerCanNotBid)
@@ -60,30 +63,35 @@ Contract SaleFlatPrice(
         // If it's a whitelist sale, verifies the buyer's eligibility
         if(isWhitelistSale() && isWhitelistSaleLive()){
             assert!(verify(wlMerkleProof, keccak256!(toByteVec!(account))), ErrorCodes.BuyerNotWhitelisted)
-            assert!(amountAlph < whitelistBuyerMaxBid, ErrorCodes.BidMoreThanMax)
+            if (accountExists(account)) {
+                let buyerAccountCurrent = SaleBuyerAccount(getSubContractId(account))
+                assert!(bidAmount + buyerAccountCurrent.getAmountBid() <= whitelistBuyerMaxBid, ErrorCodes.BidMoreThanMax)
+            } else {
+                assert!(bidAmount <= whitelistBuyerMaxBid, ErrorCodes.BidMoreThanMax)
+            }
         }
 
-        let tokensReceived = calculateTokensReceivedPerAlph(amountAlph)
+        let tokensReceived = calculateSaleTokensReceivedPerBidTokens(bidAmount)
         assert!(tokensSold + tokensReceived <= saleTokenTotalAmount, ErrorCodes.SaleTokenTotalExceeded)
 
-        transferTokenToSelf!(account, bidTokenId, amountAlph)
+        transferTokenToSelf!(account, bidTokenId, bidAmount)
 
         // Manages buyer accounts and updates sale state
         if (!accountExists(account)) {
             let (encodedImmFieldsReg, encodedMutFieldsReg) = SaleBuyerAccount.encodeFields!(
                 selfAddress!(),
                 account, 
-                tokensReceived, amountAlph, 0, 0)
+                tokensReceived, bidAmount, 0, 0)
             createAccount{account -> ALPH: 1 alph}(account,encodedImmFieldsReg, encodedMutFieldsReg)
         } else {
             let buyerAccount = SaleBuyerAccount(getSubContractId(account))
-            buyerAccount.buy(tokensReceived, amountAlph)
+            buyerAccount.buy(tokensReceived, bidAmount)
         }
 
         tokensSold = tokensSold + tokensReceived
-        totalRaised = totalRaised + amountAlph
+        totalRaised = totalRaised + bidAmount
 
-        emit Buy(account, amountAlph, tokensReceived)
+        emit Buy(account, bidAmount, tokensReceived)
     }
 
     // Allows buyers to claim their purchased tokens after the sale concludes.
@@ -110,23 +118,6 @@ Contract SaleFlatPrice(
         }
     }
 
-    // Allows the sale owner to claim the raised funds and any unsold tokens after the sale concludes.
-    @using(assetsInContract = true)
-    fn claimSeller(amount: U256) -> () {
-        assert!(amount == totalRaised, ErrorCodes.InvalidClaimAmount)
-        let fee = totalRaised / 20 // apply a 5% fee for apad stakers
-        let burn = fee / 20 // apply a 5% burn fee to the fee
-        let stakerReward = fee - burn
-        rewardDistributor.addRewards{selfAddress!() -> bidTokenId: stakerReward}(selfAddress!(), stakerReward)
-        
-        // burn the burn amount here when alph burn contract is deployed
-
-        transferTokenFromSelf!(saleOwner, bidTokenId, totalRaised - fee)
-        if(saleTokenTotalAmount > tokensSold) {
-            transferTokenFromSelf!(saleOwner, saleTokenId, saleTokenTotalAmount - tokensSold)
-        }
-    }
-
     // Allows the sale owner to claim back the unsold tokens if the sale does not reach the min raise.
     @using(assetsInContract = true)
     fn claimSellerRefund(amount: U256) -> () {
@@ -134,46 +125,28 @@ Contract SaleFlatPrice(
         transferTokenFromSelf!(saleOwner, saleTokenId, saleTokenTotalAmount)
     }
 
-
-    // Price is padded with 18 decimals, ALPH has a max supply of 1b and 18 decimals
-    // So it is safe to pad ALPH with another 18 decimals to offset the price padding without causing overflow
-    pub fn calculateTokensReceivedPerAlph(amountAlph: U256) -> U256 {
+    @using(checkExternalCaller = false)
+    pub fn calculateSaleTokensReceivedPerBidTokens(bidAmount: U256) -> U256 {
         assertPriceInRange()
-        assertAlphAmountInRange(amountAlph)
-        let paddedAlph = amountAlph * (10**18) 
-        return paddedAlph / tokenPrice
+        assertSaleAmountInRange()
+        assertBidAmountInRange(bidAmount)
+        let saleTokenDecimals = IFungibleToken(saleTokenId).getDecimals()
+        assert!(saleTokenDecimals <= 18, ErrorCodes.SaleTokenMoreThan18Decimal)
+        return bidAmount * (10 ** saleTokenDecimals) / tokenPrice
     }
 
     fn assertPriceInRange() -> () {
-        assert!(tokenPrice <= 1e6 * (10**18), ErrorCodes.PriceMoreThanMax) // price can't be bigger than 1 million alph, with 18 decimal places
-        assert!(tokenPrice > 0, ErrorCodes.PriceLessThanMin) // price must be bigger than 0
+        assert!(tokenPrice <= 1 * (10**32), ErrorCodes.PriceMoreThanMax) // price can't be bigger than 32 digits to avoid overflows on multiplication
+        assert!(tokenPrice >= 1, ErrorCodes.PriceLessThanMin) // price must be bigger than 0 to avoid dividing with 0
     }
     
-    fn assertAlphAmountInRange(alphAmount: U256) -> () {
-        assert!(alphAmount <= 1e6 * (10**18), ErrorCodes.BidMoreThanMax) // 1 million alph maximum bid for safety, with 18 decimal places
-        assert!(alphAmount >= 1 * (10**12), ErrorCodes.BidLessThanMin) // 0.000001 ALPH minimum bid for safety, with 18 decimal places
+    fn assertBidAmountInRange(bidAmount: U256) -> () {
+        assert!(bidAmount <= 1 * (10**32), ErrorCodes.BidMoreThanMax) // bid can't be bigger than 32 digits to avoid overflows on multiplication
+        assert!(bidAmount >= 1, ErrorCodes.BidLessThanMin) // bid must be bigger than 0 to avoid dividing with 0
     }    
-}
 
-// Transaction scripts
-TxScript SaleFlatPriceSetMerkleRootTX (saleFlatPrice: SaleFlatPrice, newMerkleRoot: ByteVec) {
-    saleFlatPrice.setMerkleRoot(newMerkleRoot)
-}
-
-TxScript SaleFlatPriceBuyTX (saleFlatPrice: SaleFlatPrice, amountAlph: U256, merkleProof: ByteVec) {
-    let buyer = callerAddress!()
-    let buyerAccExists = saleFlatPrice.accountExists(buyer)
-    if (buyerAccExists) {
-        saleFlatPrice.buy{buyer -> ALPH: amountAlph}(amountAlph, merkleProof)
-    } else {
-        saleFlatPrice.buy{buyer -> ALPH: amountAlph + 1 alph}(amountAlph, merkleProof)
-    }
-}
-
-TxScript SaleFlatPriceClaimTX (saleFlatPrice: SaleFlatPrice, amount: U256) {
-    saleFlatPrice.claim(amount)
-}
-
-TxScript SaleFlatPriceClaimRefundTX (saleFlatPrice: SaleFlatPrice, amount: U256) {
-    saleFlatPrice.claimRefund(amount)
+    fn assertSaleAmountInRange() -> () {
+        assert!(saleTokenTotalAmount >= 1 * (10**6), ErrorCodes.SaleAmountSmallerThanMin) // Number with at least 6 digits
+        assert!(saleTokenTotalAmount <= 1 * (10**36), ErrorCodes.SaleAmountLargerThanMax) // Number with less than 36 digits
+    }  
 }

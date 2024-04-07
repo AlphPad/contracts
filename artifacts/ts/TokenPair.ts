@@ -23,6 +23,8 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
 import { default as TokenPairContractJson } from "../external/dummy/TokenPair.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -37,17 +39,35 @@ export namespace TokenPairTypes {
     blockTimeStampLast: bigint;
     price0CumulativeLast: bigint;
     price1CumulativeLast: bigint;
+    totalSupply: bigint;
+    feeCollectorId: HexString;
   };
 
   export type State = ContractState<Fields>;
 
   export interface CallMethodTable {
-    getPrice0CumulativeLast: {
+    getSymbol: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<HexString>;
+    };
+    getName: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<HexString>;
+    };
+    getDecimals: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
-    getPrice1CumulativeLast: {
+    getTotalSupply: {
       params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<bigint>;
+    };
+    uqdiv: {
+      params: CallContractParams<{ a: bigint; b: bigint }>;
+      result: CallContractResult<bigint>;
+    };
+    sqrt: {
+      params: CallContractParams<{ y: bigint }>;
       result: CallContractResult<bigint>;
     };
     getTokenPair: {
@@ -59,6 +79,14 @@ export namespace TokenPairTypes {
       result: CallContractResult<[bigint, bigint]>;
     };
     getBlockTimeStampLast: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<bigint>;
+    };
+    getPrice0CumulativeLast: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<bigint>;
+    };
+    getPrice1CumulativeLast: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
@@ -90,30 +118,109 @@ class Factory extends ContractFactory<
   }
 
   tests = {
-    getPrice0CumulativeLast: async (
-      params: Omit<TestContractParams<TokenPairTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
-      return testMethod(this, "getPrice0CumulativeLast", params);
+    getSymbol: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+      return testMethod(this, "getSymbol", params);
     },
-    getPrice1CumulativeLast: async (
-      params: Omit<TestContractParams<TokenPairTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
-      return testMethod(this, "getPrice1CumulativeLast", params);
+    getName: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+      return testMethod(this, "getName", params);
+    },
+    getDecimals: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
+      return testMethod(this, "getDecimals", params);
+    },
+    getTotalSupply: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
+      return testMethod(this, "getTotalSupply", params);
+    },
+    uqdiv: async (
+      params: TestContractParamsWithoutMaps<
+        TokenPairTypes.Fields,
+        { a: bigint; b: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
+      return testMethod(this, "uqdiv", params);
+    },
+    sqrt: async (
+      params: TestContractParamsWithoutMaps<
+        TokenPairTypes.Fields,
+        { y: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
+      return testMethod(this, "sqrt", params);
+    },
+    setFeeCollectorId: async (
+      params: TestContractParamsWithoutMaps<
+        TokenPairTypes.Fields,
+        { id: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "setFeeCollectorId", params);
     },
     getTokenPair: async (
-      params: Omit<TestContractParams<TokenPairTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<[HexString, HexString]>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<[HexString, HexString]>> => {
       return testMethod(this, "getTokenPair", params);
     },
     getReserves: async (
-      params: Omit<TestContractParams<TokenPairTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<[bigint, bigint]>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<[bigint, bigint]>> => {
       return testMethod(this, "getReserves", params);
     },
+    pairName_: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+      return testMethod(this, "pairName_", params);
+    },
     getBlockTimeStampLast: async (
-      params: Omit<TestContractParams<TokenPairTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getBlockTimeStampLast", params);
+    },
+    getPrice0CumulativeLast: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
+      return testMethod(this, "getPrice0CumulativeLast", params);
+    },
+    getPrice1CumulativeLast: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<TokenPairTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
+      return testMethod(this, "getPrice1CumulativeLast", params);
     },
   };
 }
@@ -123,7 +230,7 @@ export const TokenPair = new Factory(
   Contract.fromJson(
     TokenPairContractJson,
     "",
-    "d663548c102e2428a76913803835cada6a2e98b7c5a1735577b0137fb75f6542"
+    "2b98401ce86b160c0f357390bd72a4cf9eb66d57e490ac7d6553b40749b092ac"
   )
 );
 
@@ -138,27 +245,65 @@ export class TokenPairInstance extends ContractInstance {
   }
 
   methods = {
-    getPrice0CumulativeLast: async (
-      params?: TokenPairTypes.CallMethodParams<"getPrice0CumulativeLast">
-    ): Promise<TokenPairTypes.CallMethodResult<"getPrice0CumulativeLast">> => {
+    getSymbol: async (
+      params?: TokenPairTypes.CallMethodParams<"getSymbol">
+    ): Promise<TokenPairTypes.CallMethodResult<"getSymbol">> => {
       return callMethod(
         TokenPair,
         this,
-        "getPrice0CumulativeLast",
+        "getSymbol",
         params === undefined ? {} : params,
         getContractByCodeHash
       );
     },
-    getPrice1CumulativeLast: async (
-      params?: TokenPairTypes.CallMethodParams<"getPrice1CumulativeLast">
-    ): Promise<TokenPairTypes.CallMethodResult<"getPrice1CumulativeLast">> => {
+    getName: async (
+      params?: TokenPairTypes.CallMethodParams<"getName">
+    ): Promise<TokenPairTypes.CallMethodResult<"getName">> => {
       return callMethod(
         TokenPair,
         this,
-        "getPrice1CumulativeLast",
+        "getName",
         params === undefined ? {} : params,
         getContractByCodeHash
       );
+    },
+    getDecimals: async (
+      params?: TokenPairTypes.CallMethodParams<"getDecimals">
+    ): Promise<TokenPairTypes.CallMethodResult<"getDecimals">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "getDecimals",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    getTotalSupply: async (
+      params?: TokenPairTypes.CallMethodParams<"getTotalSupply">
+    ): Promise<TokenPairTypes.CallMethodResult<"getTotalSupply">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "getTotalSupply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    uqdiv: async (
+      params: TokenPairTypes.CallMethodParams<"uqdiv">
+    ): Promise<TokenPairTypes.CallMethodResult<"uqdiv">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "uqdiv",
+        params,
+        getContractByCodeHash
+      );
+    },
+    sqrt: async (
+      params: TokenPairTypes.CallMethodParams<"sqrt">
+    ): Promise<TokenPairTypes.CallMethodResult<"sqrt">> => {
+      return callMethod(TokenPair, this, "sqrt", params, getContractByCodeHash);
     },
     getTokenPair: async (
       params?: TokenPairTypes.CallMethodParams<"getTokenPair">
@@ -189,6 +334,28 @@ export class TokenPairInstance extends ContractInstance {
         TokenPair,
         this,
         "getBlockTimeStampLast",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    getPrice0CumulativeLast: async (
+      params?: TokenPairTypes.CallMethodParams<"getPrice0CumulativeLast">
+    ): Promise<TokenPairTypes.CallMethodResult<"getPrice0CumulativeLast">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "getPrice0CumulativeLast",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    getPrice1CumulativeLast: async (
+      params?: TokenPairTypes.CallMethodParams<"getPrice1CumulativeLast">
+    ): Promise<TokenPairTypes.CallMethodResult<"getPrice1CumulativeLast">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "getPrice1CumulativeLast",
         params === undefined ? {} : params,
         getContractByCodeHash
       );

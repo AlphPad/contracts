@@ -12,13 +12,13 @@ import {
   groupOfAddress,
   number256ToBigint,
   Project,
-  Token,
-  ZERO_ADDRESS
+  ZERO_ADDRESS,
+  stringToHex
 } from '@alephium/web3'
 import { expectAssertionError, randomContractId, testAddress, randomContractAddress } from '@alephium/web3-test'
 import { randomBytes } from 'crypto'
 import * as base58 from 'bs58'
-import { ApadToken, ApadTokenTypes, RewardDistributor, RewardDistributorTypes, Staking, StakingTypes, StakingAccount, StakingAccountTypes, SaleFlatPrice, SaleBuyerAccount, TokenPair, SaleManager, TestUpgradable } from '../../artifacts/ts'
+import { ApadToken, ApadTokenTypes, RewardDistributor, RewardDistributorTypes, Staking, StakingTypes, StakingAccount, StakingAccountTypes, SaleFlatPriceAlph, SaleBuyerAccount, TokenPair, SaleManager, TestUpgradable, DummyToken, BurnALPH } from '../../artifacts/ts'
 
 
 export class ContractFixture<F extends Fields> {
@@ -108,16 +108,39 @@ export function createApadToken(
   const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
   const contractState = ApadToken.stateForTest(
     {
-      minted: false,
+      maxSupply: 100_000_000n * 10n ** 18n,
       burned: 0n
     },
     {
-      alphAmount: ONE_ALPH,
-      tokens: [{ id: binToHex(tokenIdFromAddress(address)), amount: 100_000_000n * 10n ** 18n }]
+      alphAmount: ONE_ALPH
     },
     address
   )
   return new ContractFixture(contractState, [], address)
+}
+
+export function createDummyToken(
+  symbol: string,
+  name: string,
+  decimals: bigint,
+  supply: bigint,
+  dependencies: ContractState[],
+  contractId?: string,
+) {
+  const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
+  const contractState = DummyToken.stateForTest(
+    {
+      name: stringToHex(name),
+      symbol: stringToHex(symbol),
+      decimals,
+      supply
+    },
+    {
+      alphAmount: ONE_ALPH
+    },
+    address
+  )
+  return new ContractFixture(contractState, dependencies, address)
 }
 
 export function createTestUpgradable(
@@ -230,6 +253,7 @@ export function createSaleBuyerTemplateAccount(
 }
 
 export function createSaleFlatPrice(
+  burnAlph: string,
   rewardDistributor: string,
   saleOwner: string,
   accountTemplateId: string,
@@ -251,8 +275,9 @@ export function createSaleFlatPrice(
   contractId?: string
 ) {
   const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
-  const contractState = SaleFlatPrice.stateForTest(
+  const contractState = SaleFlatPriceAlph.stateForTest(
     {
+      burnAlphContract: burnAlph,
       rewardDistributor: rewardDistributor,
       saleOwner: saleOwner,
       accountTemplateId: accountTemplateId,
@@ -269,7 +294,7 @@ export function createSaleFlatPrice(
       whitelistBuyerMaxBid: whitelistBuyerMaxBid,
       tokensSold: tokensSold,
       totalRaised: totalRaised,
-      merkleRoot: merkleRoot,
+      merkleRoot: merkleRoot
     },
     {
       alphAmount: ONE_ALPH,
@@ -280,7 +305,21 @@ export function createSaleFlatPrice(
   return new ContractFixture(contractState, dependencies, address)
 }
 
-
+export function createBurnAlph(
+  dependencies: ContractState[],
+  contractId?: string
+) {
+  const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
+  const contractState = BurnALPH.stateForTest(
+    {},
+    {
+      alphAmount: ONE_ALPH,
+      tokens: []
+    },
+    address
+  )
+  return new ContractFixture(contractState, dependencies, address)
+}
 
 export function createTokenPair(
   dependencies: ContractState[],
@@ -295,7 +334,9 @@ export function createTokenPair(
       reserve1: 1158354144971n,
       blockTimeStampLast: 1711272923n,
       price0CumulativeLast: 106836841546536540153097986132n,
-      price1CumulativeLast: 63385262986297632636674035629216529767188163926182582n
+      price1CumulativeLast: 63385262986297632636674035629216529767188163926182582n,
+      feeCollectorId: "",
+      totalSupply: 0n
     },
     {
       alphAmount: ONE_ALPH,
@@ -309,19 +350,26 @@ export function createTokenPair(
 
 
 export function createSaleManager(
+  burnAlph: string,
   paidContractId: string,
   rewardDistributorContractId: string,
+  saleFlatPriceAlphTemplateId: string,
+  accountTemplateId: string,
   dependencies: ContractState[],
   contractId?: string
 ) {
   const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
   const contractState = SaleManager.stateForTest(
     {
+      burnAlphContract: burnAlph,
       pair: paidContractId,
       alphTokenId: ALPH_TOKEN_ID,
       usdtTokenId: "556d9582463fe44fbd108aedc9f409f69086dc78d994b88ea6c9e65f8bf98e00",
       listingFeeAmount: 100n * (10n**6n),
       rewardDistributor: rewardDistributorContractId,
+      accountTemplateId: accountTemplateId,
+      saleFlatPriceAlphTemplateId: saleFlatPriceAlphTemplateId,
+      saleCounter: 0n,
       newCode: "",
       newImmFieldsEncoded: "",
       newMutFieldsEncoded: "",

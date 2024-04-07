@@ -1,0 +1,83 @@
+// Contract SaleFlatPriceAlph
+// - Manages a flat price token sale with optional whitelist.
+// - Extends SaleFlatPrice for sale functionalities.
+Contract SaleFlatPriceAlph(
+    burnAlphContract: BurnAlphInterface,    // Contract for burning alph tokens
+    rewardDistributor: RewardDistributor,   // Reward distributor for managing rewards
+    saleOwner: Address,                     // Owner of the sale
+    accountTemplateId: ByteVec,             // Template ID for creating buyer accounts
+    tokenPrice: U256,                       // Price of the token in the sale
+    saleStart: U256,                        // Start time of the sale
+    saleEnd: U256,                          // End time of the sale
+    minRaise: U256,                         // Minimum amount to be raised
+    maxRaise: U256,                         // Maximum amount to be raised
+    saleTokenId: ByteVec,                   // ID of the token being sold
+    saleTokenTotalAmount: U256,             // Total amount of tokens available for sale
+    bidTokenId: ByteVec,                    // Token used for bidding (ALPH)
+    whitelistSaleStart: U256,               // Start time of the whitelist sale
+    whitelistSaleEnd: U256,                 // End time of the whitelist sale
+    whitelistBuyerMaxBid: U256,             // Maximum bid amount for whitelisted buyers
+    mut tokensSold: U256,                   // Amount of tokens sold
+    mut totalRaised: U256,                  // Total funds raised in the sale
+    mut merkleRoot: ByteVec                 // Merkle root for whitelist verification
+) extends SaleFlatPrice(
+        rewardDistributor,
+        saleOwner,
+        accountTemplateId,
+        tokenPrice,
+        saleStart,
+        saleEnd,
+        minRaise,
+        maxRaise,
+        saleTokenId,
+        saleTokenTotalAmount,
+        bidTokenId, 
+        whitelistSaleStart, 
+        whitelistSaleEnd,
+        whitelistBuyerMaxBid,
+        tokensSold, 
+        totalRaised,
+        merkleRoot
+) {
+
+    // Allows the sale owner to claim the raised funds and any unsold tokens after the sale concludes.
+    @using(assetsInContract = true)
+    fn claimSeller(amount: U256) -> () {
+        assert!(amount == totalRaised, ErrorCodes.InvalidClaimAmount)
+        let fee = totalRaised / 20 // apply a 5% fee for apad stakers
+        let burn = fee / 20 // apply a 5% burn fee to the fee
+        let stakerReward = fee - burn
+        rewardDistributor.addRewards{selfAddress!() -> bidTokenId: stakerReward}(selfAddress!(), stakerReward)
+
+        // burn the burn amount to the specific contract
+        burnAlphContract.burn{selfAddress!() -> bidTokenId: burn}(selfAddress!(), burn)
+
+        transferTokenFromSelf!(saleOwner, bidTokenId, totalRaised - fee)
+        if(saleTokenTotalAmount > tokensSold) {
+            transferTokenFromSelf!(saleOwner, saleTokenId, saleTokenTotalAmount - tokensSold)
+        }
+    }
+}
+
+// Transaction scripts
+TxScript SaleFlatPriceAlphSetMerkleRootTX (saleFlatPrice: SaleFlatPriceAlph, newMerkleRoot: ByteVec) {
+    saleFlatPrice.setMerkleRoot(newMerkleRoot)
+}
+
+TxScript SaleFlatPriceAlphBuyTX (saleFlatPrice: SaleFlatPriceAlph, amountAlph: U256, merkleProof: ByteVec) {
+    let buyer = callerAddress!()
+    let buyerAccExists = saleFlatPrice.accountExists(buyer)
+    if (buyerAccExists) {
+        saleFlatPrice.buy{buyer -> ALPH: amountAlph}(amountAlph, merkleProof)
+    } else {
+        saleFlatPrice.buy{buyer -> ALPH: amountAlph + 1 alph}(amountAlph, merkleProof)
+    }
+}
+
+TxScript SaleFlatPriceAlphClaimTX (saleFlatPrice: SaleFlatPriceAlph, amount: U256) {
+    saleFlatPrice.claim(amount)
+}
+
+TxScript SaleFlatPriceAlphClaimRefundTX (saleFlatPrice: SaleFlatPriceAlph, amount: U256) {
+    saleFlatPrice.claimRefund(amount)
+}

@@ -2,7 +2,7 @@ import { web3, Project, DUST_AMOUNT, ALPH_TOKEN_ID, ONE_ALPH, ContractInstance, 
 import { getSigner, transfer } from '@alephium/web3-test'
 import { DeployContractExecutionResult, Deployments, deployToDevnet } from '@alephium/cli'
 import { PrivateKeyWallet } from '@alephium/web3-wallet';
-import { SaleFlatPrice, SaleFlatPriceBuyTX, SaleFlatPriceClaimRefundTX, SaleFlatPriceClaimTX, SaleManager, SaleManagerCreateSaleFlatPriceTX } from '../../artifacts/ts'
+import { SaleFlatPriceAlph, SaleFlatPriceAlphBuyTX, SaleFlatPriceAlphClaimRefundTX, SaleFlatPriceAlphClaimTX, SaleManager, SaleManagerCreateSaleFlatPriceTX } from '../../artifacts/ts'
 import configuration from '../../alephium.config'
 import { add18Decimals, add18DecimalsToDecimal, balanceOf, deployedContractNotFound, getEventByTxId, sleep } from '../utils';
 
@@ -48,7 +48,7 @@ describe('Sale Contracts Tests', () => {
     tokenAddress = token.contractInstance.address
 
     saleManager = deployments.getDeployedContractResult(testGroup, 'SaleManager') || deployedContractNotFound("SaleManager");
-    saleTemplate = deployments.getDeployedContractResult(testGroup, 'SaleFlatPrice') || deployedContractNotFound("SaleFlatPrice");
+    saleTemplate = deployments.getDeployedContractResult(testGroup, 'SaleFlatPriceAlph') || deployedContractNotFound("SaleFlatPriceAlph");
     accountTemplate = deployments.getDeployedContractResult(testGroup, 'SaleBuyerAccount') || deployedContractNotFound("SaleBuyerAccount");
     // Transfer APAD for testing
     const genesisWallet = new PrivateKeyWallet({ privateKey: configuration.networks.devnet.privateKeys[0] })
@@ -63,8 +63,6 @@ describe('Sale Contracts Tests', () => {
       initialFields: {
         saleManager: saleManager.contractInstance.contractId,
         amountAlph: listingFee,
-        saleFlatPriceTemplateId: saleTemplate.contractInstance.contractId,
-        accountTemplateId: accountTemplate.contractInstance.contractId,
         tokenPrice: add18DecimalsToDecimal(0.0002),
         saleStart: BigInt(Date.now() + 10000),
         saleEnd: BigInt(Date.now() + 20000),
@@ -89,9 +87,9 @@ describe('Sale Contracts Tests', () => {
     await sleep(10000);
     const createEvent = await getEventByTxId(res.txId, SaleManager.contract.codeHash, 2);
     const flatPriceSaleContractId = createEvent.fields.contractId.toString();
-    const flatPriceSaleInst = SaleFlatPrice.at(addressFromContractId(flatPriceSaleContractId));
-
-    await SaleFlatPriceBuyTX.execute(buyer1, {
+    const flatPriceSaleInst = SaleFlatPriceAlph.at(addressFromContractId(flatPriceSaleContractId));
+    
+    await SaleFlatPriceAlphBuyTX.execute(buyer1, {
       initialFields: {
         amountAlph: add18Decimals(30n),
         merkleProof: "",
@@ -100,7 +98,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: add18Decimals(30n) + ONE_ALPH,
     })
 
-    await SaleFlatPriceBuyTX.execute(buyer1, {
+    await SaleFlatPriceAlphBuyTX.execute(buyer1, {
       initialFields: {
         amountAlph: add18Decimals(30n),
         merkleProof: "",
@@ -109,7 +107,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: add18Decimals(30n),
     })
 
-    await SaleFlatPriceBuyTX.execute(buyer2, {
+    await SaleFlatPriceAlphBuyTX.execute(buyer2, {
       initialFields: {
         amountAlph: add18Decimals(50n),
         merkleProof: "",
@@ -118,7 +116,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: add18Decimals(50n) + ONE_ALPH,
     })
 
-    await SaleFlatPriceBuyTX.execute(buyer3, {
+    await SaleFlatPriceAlphBuyTX.execute(buyer3, {
       initialFields: {
         amountAlph: add18Decimals(90n),
         merkleProof: "",
@@ -129,7 +127,7 @@ describe('Sale Contracts Tests', () => {
 
     await sleep(10000);
 
-    await SaleFlatPriceClaimTX.execute(buyer1, {
+    await SaleFlatPriceAlphClaimTX.execute(buyer1, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(300000n)
@@ -137,7 +135,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
-    await SaleFlatPriceClaimTX.execute(buyer2, {
+    await SaleFlatPriceAlphClaimTX.execute(buyer2, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(250000n)
@@ -145,7 +143,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
-    await SaleFlatPriceClaimTX.execute(buyer3, {
+    await SaleFlatPriceAlphClaimTX.execute(buyer3, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(450000n)
@@ -153,7 +151,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
-    await SaleFlatPriceClaimTX.execute(seller, {
+    await SaleFlatPriceAlphClaimTX.execute(seller, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(200n)
@@ -189,8 +187,6 @@ describe('Sale Contracts Tests', () => {
       initialFields: {
         saleManager: saleManager.contractInstance.contractId,
         amountAlph: listingFee,
-        saleFlatPriceTemplateId: saleTemplate.contractInstance.contractId,
-        accountTemplateId: accountTemplate.contractInstance.contractId,
         tokenPrice: add18DecimalsToDecimal(0.0002),
         saleStart: BigInt(Date.now() + 10000),
         saleEnd: BigInt(Date.now() + 20000),
@@ -215,9 +211,9 @@ describe('Sale Contracts Tests', () => {
     await sleep(10000);
     const createEvent = await getEventByTxId(res.txId, SaleManager.contract.codeHash, 2);
     const flatPriceSaleContractId = createEvent.fields.contractId.toString();
-    const flatPriceSaleInst = SaleFlatPrice.at(addressFromContractId(flatPriceSaleContractId));
+    const flatPriceSaleInst = SaleFlatPriceAlph.at(addressFromContractId(flatPriceSaleContractId));
 
-    await SaleFlatPriceBuyTX.execute(buyer4, {
+    await SaleFlatPriceAlphBuyTX.execute(buyer4, {
       initialFields: {
         amountAlph: add18Decimals(50n),
         merkleProof: "",
@@ -226,7 +222,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: add18Decimals(50n) + ONE_ALPH,
     })
 
-    await SaleFlatPriceBuyTX.execute(buyer5, {
+    await SaleFlatPriceAlphBuyTX.execute(buyer5, {
       initialFields: {
         amountAlph: add18Decimals(50n),
         merkleProof: "",
@@ -237,7 +233,7 @@ describe('Sale Contracts Tests', () => {
 
     await sleep(10000);
 
-    await SaleFlatPriceClaimTX.execute(buyer4, {
+    await SaleFlatPriceAlphClaimTX.execute(buyer4, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(250000n)
@@ -245,7 +241,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
-    await SaleFlatPriceClaimTX.execute(buyer5, {
+    await SaleFlatPriceAlphClaimTX.execute(buyer5, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(250000n)
@@ -253,7 +249,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
-    await SaleFlatPriceClaimTX.execute(seller2, {
+    let tx = await SaleFlatPriceAlphClaimTX.execute(seller2, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(100n)
@@ -261,6 +257,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
+    console.log("CHECK THIS: " + tx.txId);
 
     let apadBalance = await balanceOf(tokenId, seller2.address);
     let alphBalance = await balanceOf(ALPH_TOKEN_ID, seller2.address);
@@ -284,8 +281,6 @@ describe('Sale Contracts Tests', () => {
       initialFields: {
         saleManager: saleManager.contractInstance.contractId,
         amountAlph: listingFee,
-        saleFlatPriceTemplateId: saleTemplate.contractInstance.contractId,
-        accountTemplateId: accountTemplate.contractInstance.contractId,
         tokenPrice: add18DecimalsToDecimal(0.0002),
         saleStart: BigInt(Date.now() + 10000),
         saleEnd: BigInt(Date.now() + 20000),
@@ -310,9 +305,8 @@ describe('Sale Contracts Tests', () => {
     await sleep(10000);
     const createEvent = await getEventByTxId(res.txId, SaleManager.contract.codeHash, 2);
     const flatPriceSaleContractId = createEvent.fields.contractId.toString();
-    const flatPriceSaleInst = SaleFlatPrice.at(addressFromContractId(flatPriceSaleContractId));
-
-    await SaleFlatPriceBuyTX.execute(buyer6, {
+    const flatPriceSaleInst = SaleFlatPriceAlph.at(addressFromContractId(flatPriceSaleContractId));
+    await SaleFlatPriceAlphBuyTX.execute(buyer6, {
       initialFields: {
         amountAlph: add18Decimals(40n),
         merkleProof: "",
@@ -321,7 +315,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: add18Decimals(40n) + ONE_ALPH,
     })
 
-    await SaleFlatPriceBuyTX.execute(buyer7, {
+    await SaleFlatPriceAlphBuyTX.execute(buyer7, {
       initialFields: {
         amountAlph: add18Decimals(40n),
         merkleProof: "",
@@ -332,7 +326,7 @@ describe('Sale Contracts Tests', () => {
 
     await sleep(10000);
 
-    await SaleFlatPriceClaimRefundTX.execute(buyer6, {
+    await SaleFlatPriceAlphClaimRefundTX.execute(buyer6, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(40n)
@@ -340,7 +334,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
-    await SaleFlatPriceClaimRefundTX.execute(buyer7, {
+    await SaleFlatPriceAlphClaimRefundTX.execute(buyer7, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(40n)
@@ -348,14 +342,13 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
-    await SaleFlatPriceClaimRefundTX.execute(seller3, {
+    await SaleFlatPriceAlphClaimRefundTX.execute(seller3, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(BigInt(1e6))
       },
       attoAlphAmount: DUST_AMOUNT
     })
-
 
     let apadBalance = await balanceOf(tokenId, seller3.address);
     let alphBalance = await balanceOf(ALPH_TOKEN_ID, seller3.address);

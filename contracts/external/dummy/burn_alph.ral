@@ -1,0 +1,7 @@
+// Dummy contract for devnet/testnet
+Contract BurnALPH() {
+    @using(preapprovedAssets = true, assetsInContract = true, checkExternalCaller = false)
+    pub fn burn(from: Address, amount: U256) -> () {
+        transferTokenToSelf!(from, ALPH, amount)
+    }
+}

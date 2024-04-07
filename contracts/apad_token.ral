@@ -2,31 +2,15 @@ import "std/fungible_token_interface"
 
 // ApadToken Contract
 //
-// Implements a basic fungible token with minting and burning functionalities.
+// Implements a basic fungible token burning functionalities.
 // The token follows standard fungible token interfaces.
 Contract ApadToken (
-    mut minted: Bool,   // Tracks if the tokens have been minted.
+    maxSupply: U256,    // Max supply of tokens that will be issued.
     mut burned: U256    // Total amount of tokens burned.
 ) implements IFungibleToken {
 
-    // Events for tracking token minting and burning.
-    event Mint(to: Address, amount: U256)
+    // Event for tracking token burning.
     event Burn(burner: Address, amount: U256)
-
-    // Enum for custom error codes specific to this contract.
-    enum ErrorCodes {
-        TokensAlreadyMinted = 0
-    }
-
-    // Mint tokens to a specified address. Can only be called once as it mints the maximum supply to the address.
-    // Asserts that tokens have not been minted before.
-    @using(assetsInContract = true, updateFields = true, checkExternalCaller = false)
-    pub fn mint(to: Address) -> () {
-        assert!(minted == false, ErrorCodes.TokensAlreadyMinted)
-        emit Mint(to, getMaxSupply())
-        transferTokenFromSelf!(to, selfTokenId!(), getMaxSupply())
-        minted = true
-    }
 
     // Burn a specified amount of tokens from a given address.
     // Increases the total burned amount and emits a burn event.
@@ -39,11 +23,11 @@ Contract ApadToken (
     }
 
     pub fn getSymbol() -> ByteVec {
-        return #41504144 //"APAD"
+        return b`APAD`
     }
 
     pub fn getName() -> ByteVec {
-        return #416C7068506164 //"AlphPad"
+        return b`AlphPad`
     }
 
     pub fn getDecimals() -> U256 {
@@ -55,13 +39,8 @@ Contract ApadToken (
     }
 
     pub fn getMaxSupply() -> U256 {
-        return 100_000_000 * (10**18)
+        return maxSupply
     }
-}
-
-// Transaction script to mint Apad tokens.
-TxScript ApadTokenMintTX(token: ApadToken) {
-    token.mint(callerAddress!())
 }
 
 // Transaction script to burn a specified amount of Apad tokens.

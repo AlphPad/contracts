@@ -24,7 +24,7 @@ Contract RewardDistributor (
     // Event declarations for tracking contract activities
     event EpochChanged(epoch: U256, rewardsTransfered: U256, updatedBy: Address)
     event RewardHarvested(epoch: U256, harvestedAmount: U256, harvestedBy: Address)
-    event RewardAdded(addedAmount: U256, addedBy: Address)
+    event RewardAdded(epoch: U256, addedAmount: U256, addedBy: Address)
 
     // Error codes for contract operations
     enum ErrorCodes {
@@ -38,7 +38,7 @@ Contract RewardDistributor (
     pub fn harvest() -> () {
 
         // Check if rewards are initialized
-        assert!(size!(totalRewards) == totalEpochs * 32, ErrorCodes.RewardsNotInitialized)
+        assertTotalRewardsIsInitialized()
         
         // Migrate epoch if necessary
         let newEpochIndex = getCurrentEpoch()
@@ -71,6 +71,39 @@ Contract RewardDistributor (
         currentHarvestDistributed = currentHarvestDistributed + vestedAmount
         emit RewardHarvested(newEpochIndex, vestedAmount, callerAddress!())
     }    
+
+    // Helper to check if rewards can be harvested
+    @using(checkExternalCaller = false)
+    pub fn canHarvest() -> Bool {
+
+        // Check if rewards are initialized
+        assertTotalRewardsIsInitialized()
+
+        // Setup mutable copies
+        let mut currentHarvestDistributedCalc = currentHarvestDistributed
+        let mut currentHarvestTotalCalc = currentHarvestTotal
+        
+        // Calculate epoch migration if necessary
+        let newEpochIndex = getCurrentEpoch()
+        if (currentHarvestEpoch != newEpochIndex) {
+            let carryOverReward = currentHarvestTotalCalc - currentHarvestDistributedCalc
+
+            let newEpochReward = get(totalRewards, newEpochIndex)
+            currentHarvestTotalCalc = newEpochReward + carryOverReward
+            currentHarvestDistributedCalc = 0
+        }
+    
+        // Calculate vested amount
+        let timeElapsedInCurrentEpoch = (blockTimeStamp!() - genesisDate) % epochDuration
+        let vestedAmount = ((currentHarvestTotalCalc * timeElapsedInCurrentEpoch) / epochDuration) - currentHarvestDistributedCalc
+        
+        // Min harvestable amount is limited to prevent excessive calling as callers need to be paid
+        if(vestedAmount >= 5 * (10 ** 18)) {
+            return true
+        } else {
+            return false
+        }
+    }    
     
     // Adds rewards to the contract and distributes them across epochs.
     @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, checkExternalCaller = false)
@@ -88,8 +121,7 @@ Contract RewardDistributor (
         // Update tokenRewards array with appropriate rewards
         for (let mut i = 0; i < totalEpochs; i = i + 1) {
             if (size!(totalRewards) == totalEpochs * 32) {
-                let startIndex = i * 32
-                let currentEpochReward = u256From32Byte!(byteVecSlice!(totalRewards, startIndex, startIndex + 32))
+                let currentEpochReward = get(totalRewards, i)
                 newTotalRewards = newTotalRewards ++ u256To32Byte!(currentEpochReward + rewardPerEpoch)
             } else {
                 newTotalRewards = newTotalRewards ++ u256To32Byte!(rewardPerEpoch)
@@ -97,17 +129,14 @@ Contract RewardDistributor (
         }
     
         // Bookkeeping
-        emit RewardAdded(amount, sender)
+        emit RewardAdded(getCurrentEpoch(), amount, sender)
         totalRewards = newTotalRewards
     }
 
     // Returns the total pending rewards yet to be distributed.
     pub fn getTotalPendingRewards() -> U256 {
-
-        assert!(size!(totalRewards) == totalEpochs * 32, ErrorCodes.RewardsNotInitialized)
-        
         let mut totalPendingRewards = 0
-        for (let mut i = 0; i < totalEpochs; i = i + 1) { totalPendingRewards = totalPendingRewards + u256From32Byte!(byteVecSlice!(totalRewards, (i * 32), (i * 32) + 32)) }
+        for (let mut i = 0; i < totalEpochs; i = i + 1) { totalPendingRewards = totalPendingRewards + get(totalRewards, i) }
         return totalPendingRewards
     }
 
@@ -118,16 +147,20 @@ Contract RewardDistributor (
     pub fn getAccumulatedRewards() -> U256 { return accumulatedRewards }
     pub fn getTotalRewards() -> ByteVec { return totalRewards }
 
+    fn assertTotalRewardsIsInitialized() -> (){
+        assert!(size!(totalRewards) == totalEpochs * 32, ErrorCodes.RewardsNotInitialized)
+    }
+
     // Internal array operation functions from https://github.com/alephium/ralph-example/blob/master/dynamic-array/contracts/dynamic-array.ral
     fn update(array: ByteVec, index: U256, value: U256) -> ByteVec {
-        assert!(size!(array) % 32 == 0, 0)
+        assertTotalRewardsIsInitialized()
 
         let offset = index * 32
         return byteVecSlice!(array, 0, offset) ++ u256To32Byte!(value) ++ byteVecSlice!(array, offset + 32, size!(array))
     }
 
     fn get(array: ByteVec, index: U256) -> U256 {
-        assert!(size!(array) % 32 == 0, 0)
+        assertTotalRewardsIsInitialized()
 
         let offset = index * 32
         let bytes = byteVecSlice!(array, offset, offset + 32)

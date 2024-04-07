@@ -30,12 +30,8 @@ Contract StakingAccount (
 
         let timeElapsed = currentTimestamp - vestedStart
         let totalVestingPeriod = vestedTill - vestedStart
-
-        let scalingFactor = 10**18
-        let vestedFraction = (timeElapsed * scalingFactor) / totalVestingPeriod
-        let totalVestedNow = (vestedTotalAmount * vestedFraction) / scalingFactor
         let amountUnstakedToNow = vestedTotalAmount - amountStaked
-    
+        let totalVestedNow = vestedTotalAmount * timeElapsed / totalVestingPeriod
         return totalVestedNow - amountUnstakedToNow
     }
 
@@ -54,8 +50,8 @@ Contract StakingAccount (
     pub fn unstake(amount: U256) -> () {
         assertIsParentTheCaller(callerAddress!())
 
-        assert!(amount <= calcVestedClaimable(), ErrorCodes.AmountNotVested)
         assert!(amountStaked >= amount, ErrorCodes.InsufficientBalance)
+        assert!(amount <= calcVestedClaimable(), ErrorCodes.AmountNotVested)
 
         amountStaked = amountStaked - amount
 

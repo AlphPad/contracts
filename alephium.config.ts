@@ -14,7 +14,8 @@ export type Settings = {
     tokenVestingPeriod: bigint
   },
   sale: {
-    tokenPair: string
+    tokenPair: string,
+    burnAlph: string
   },
   openaiAPIKey?: string
   ipfs?: {
@@ -37,7 +38,8 @@ const devnetSettings: Settings = {
     tokenVestingPeriod: 126230400000n
   },
   sale: {
-    tokenPair: ""
+    tokenPair: "",
+    burnAlph: ""
   },
   openaiAPIKey: process.env.OPENAI_API_KEY || '',
   ipfs: {
@@ -50,17 +52,18 @@ const devnetSettings: Settings = {
 
 const testnetSettings: Settings = {
   issueTokenAmount: 100_000_000n * 10n ** 18n,
-  upgradeDelay: 86400000n, // 1 days
+  upgradeDelay: 43200000n, // 12 hours
   rewards: {
     unstakeLockTime: 86400000n, // 1 day
     rdEpochDuration: 43200000n, // 12 hours
   },
   team: {
     tokenAmount: 15_000_000n * 10n ** 18n,
-    tokenVestingPeriod: 126230400000n
+    tokenVestingPeriod: 86400000n // 1 day
   },
   sale: {
-    tokenPair: ""
+    tokenPair: "",
+    burnAlph: "294LNTESjbx785FSdBAa9NYJnJSDtYUhg1oLG2rctsqou"
   },
   openaiAPIKey: process.env.OPENAI_API_KEY || '',
   ipfs: {
@@ -75,17 +78,18 @@ const testnetSettings: Settings = {
 
 const mainnetSettings: Settings = {
   issueTokenAmount: 100_000_000n * 10n ** 18n,
-  upgradeDelay: 604800000n, // 7 days
+  upgradeDelay: 1209600000n, // 14 days
   rewards: {
-    unstakeLockTime: 259200000n, // 3 days
+    unstakeLockTime: 864000000n, // 10 days
     rdEpochDuration: 864000000n, // 10 days
   },
   team: {
     tokenAmount: 15_000_000n * 10n ** 18n,
-    tokenVestingPeriod: 126230400000n
+    tokenVestingPeriod: 126230400000n // 4 years
   },
   sale: {
-    tokenPair: "2A5R8KZQ3rhKYrW7bAS4JTjY9FCFLJg6HjQpqSFZBqACX"
+    tokenPair: "2A5R8KZQ3rhKYrW7bAS4JTjY9FCFLJg6HjQpqSFZBqACX",
+    burnAlph: "27kKYRNKt9YxVybEGuxmdTzEeNfrkcYPattRQhHhgBn3y"
   },
   openaiAPIKey: process.env.OPENAI_API_KEY || '',
   ipfs: {

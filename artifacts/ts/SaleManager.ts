@@ -23,6 +23,8 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
 import { default as SaleManagerContractJson } from "../launch_sale/SaleManager.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -30,12 +32,16 @@ import { getContractByCodeHash } from "./contracts";
 // Custom types for the contract
 export namespace SaleManagerTypes {
   export type Fields = {
+    burnAlphContract: HexString;
     rewardDistributor: HexString;
     pair: HexString;
     alphTokenId: HexString;
     usdtTokenId: HexString;
     listingFeeAmount: bigint;
     upgradeDelay: bigint;
+    saleFlatPriceAlphTemplateId: HexString;
+    accountTemplateId: HexString;
+    saleCounter: bigint;
     owner: Address;
     newOwner: Address;
     upgradeCommenced: bigint;
@@ -74,8 +80,9 @@ export namespace SaleManagerTypes {
     changeImmFieldsEncoded: HexString;
     changeMutFieldsEncoded: HexString;
   }>;
-  export type CreateSaleFlatPriceEvent = ContractEvent<{
+  export type CreateSaleFlatPriceAlphEvent = ContractEvent<{
     account: Address;
+    saleIndex: bigint;
     contractId: HexString;
   }>;
 
@@ -112,10 +119,6 @@ export namespace SaleManagerTypes {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
-    get: {
-      params: Omit<CallContractParams<{}>, "args">;
-      result: CallContractResult<bigint>;
-    };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
     CallMethodTable[T]["params"];
@@ -146,7 +149,7 @@ class Factory extends ContractFactory<
     MigrateApply: 3,
     MigrateWithFieldsCommence: 4,
     MigrateWithFieldsApply: 5,
-    CreateSaleFlatPrice: 6,
+    CreateSaleFlatPriceAlph: 6,
   };
   consts = {
     UpgradeErrorCodes: {
@@ -174,6 +177,7 @@ class Factory extends ContractFactory<
       WLSaleMaxBidSmallerThan1Alph: BigInt(513),
       WLSaleInvalidMerkleRootSize: BigInt(514),
       WLSaleMerkleRootMustNotBeZeroes: BigInt(515),
+      IncorrectPairSetup: BigInt(516),
     },
   };
 
@@ -183,23 +187,23 @@ class Factory extends ContractFactory<
 
   tests = {
     changeOwner: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleManagerTypes.Fields,
         { changeOwner: Address }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "changeOwner", params);
     },
     migrate: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleManagerTypes.Fields,
         { changeCode: HexString }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "migrate", params);
     },
     migrateWithFields: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleManagerTypes.Fields,
         {
           changeCode: HexString;
@@ -207,133 +211,134 @@ class Factory extends ContractFactory<
           changeMutFieldsEncoded: HexString;
         }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "migrateWithFields", params);
     },
     changeOwnerApply: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "changeOwnerApply", params);
     },
     migrateApply: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "migrateApply", params);
     },
     migrateWithFieldsApply: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "migrateWithFieldsApply", params);
     },
     resetUpgrade: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "resetUpgrade", params);
     },
     getUpgradeDelay: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getUpgradeDelay", params);
     },
     getOwner: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<Address>> => {
+    ): Promise<TestContractResultWithoutMaps<Address>> => {
       return testMethod(this, "getOwner", params);
     },
     getNewOwner: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<Address>> => {
+    ): Promise<TestContractResultWithoutMaps<Address>> => {
       return testMethod(this, "getNewOwner", params);
     },
     getUpgradeCommenced: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getUpgradeCommenced", params);
     },
     getNewCode: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getNewCode", params);
     },
     getNewImmFieldsEncoded: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getNewImmFieldsEncoded", params);
     },
     getNewMutFieldsEncoded: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getNewMutFieldsEncoded", params);
     },
     resetFields: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "resetFields", params);
     },
     assertOnlyOwner: async (
-      params: TestContractParams<SaleManagerTypes.Fields, { caller: Address }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        SaleManagerTypes.Fields,
+        { caller: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertOnlyOwner", params);
     },
     assertUpgradeNotPending: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertUpgradeNotPending", params);
     },
     assertUpgradeDelayElapsed: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertUpgradeDelayElapsed", params);
     },
-    createSaleFlatPrice: async (
-      params: TestContractParams<
+    createSaleFlatPriceAlph: async (
+      params: TestContractParamsWithoutMaps<
         SaleManagerTypes.Fields,
         {
           amountAlph: bigint;
-          saleFlatPriceTemplateId: HexString;
-          accountTemplateId: HexString;
           tokenPrice: bigint;
           saleStart: bigint;
           saleEnd: bigint;
@@ -348,63 +353,55 @@ class Factory extends ContractFactory<
           merkleRoot: HexString;
         }
       >
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "createSaleFlatPrice", params);
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "createSaleFlatPriceAlph", params);
     },
     calculateListingFee: async (
       params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "calculateListingFee", params);
     },
-    get: async (
-      params: Omit<
-        TestContractParams<SaleManagerTypes.Fields, never>,
-        "testArgs"
-      >
-    ): Promise<TestContractResult<bigint>> => {
-      return testMethod(this, "get", params);
-    },
     assertPriceInRange: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleManagerTypes.Fields,
         { tokenPrice: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertPriceInRange", params);
     },
     assertAlphAmountInRange: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleManagerTypes.Fields,
         { alphAmount: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertAlphAmountInRange", params);
     },
     assertSaleAmountInRange: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleManagerTypes.Fields,
         { saleAmount: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertSaleAmountInRange", params);
     },
     assertSaleDates: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleManagerTypes.Fields,
         { saleStart: bigint; saleEnd: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertSaleDates", params);
     },
     assertListingFeePaid: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleManagerTypes.Fields,
         { amountAlph: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertListingFeePaid", params);
     },
   };
@@ -415,7 +412,7 @@ export const SaleManager = new Factory(
   Contract.fromJson(
     SaleManagerContractJson,
     "",
-    "d3781767b288775aef686acdf6782fb6f474422c15834e663ae0bff07a248090"
+    "5c4c81ea3e03eec11fb9694037c97fd69db3fcb5b6ad934dc936cb3992f2e43b"
   )
 );
 
@@ -511,15 +508,15 @@ export class SaleManagerInstance extends ContractInstance {
     );
   }
 
-  subscribeCreateSaleFlatPriceEvent(
-    options: EventSubscribeOptions<SaleManagerTypes.CreateSaleFlatPriceEvent>,
+  subscribeCreateSaleFlatPriceAlphEvent(
+    options: EventSubscribeOptions<SaleManagerTypes.CreateSaleFlatPriceAlphEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
       SaleManager.contract,
       this,
       options,
-      "CreateSaleFlatPrice",
+      "CreateSaleFlatPriceAlph",
       fromCount
     );
   }
@@ -532,7 +529,7 @@ export class SaleManagerInstance extends ContractInstance {
       | SaleManagerTypes.MigrateApplyEvent
       | SaleManagerTypes.MigrateWithFieldsCommenceEvent
       | SaleManagerTypes.MigrateWithFieldsApplyEvent
-      | SaleManagerTypes.CreateSaleFlatPriceEvent
+      | SaleManagerTypes.CreateSaleFlatPriceAlphEvent
     >,
     fromCount?: number
   ): EventSubscription {
@@ -629,17 +626,6 @@ export class SaleManagerInstance extends ContractInstance {
         SaleManager,
         this,
         "calculateListingFee",
-        params === undefined ? {} : params,
-        getContractByCodeHash
-      );
-    },
-    get: async (
-      params?: SaleManagerTypes.CallMethodParams<"get">
-    ): Promise<SaleManagerTypes.CallMethodResult<"get">> => {
-      return callMethod(
-        SaleManager,
-        this,
-        "get",
         params === undefined ? {} : params,
         getContractByCodeHash
       );
