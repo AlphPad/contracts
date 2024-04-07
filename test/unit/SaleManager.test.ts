@@ -13,7 +13,7 @@ import {
   createSaleFlatPrice
 } from './fixtures'
 import { expectAssertionError, randomContractId } from '@alephium/web3-test'
-import { SaleBuyerAccountTypes, SaleFlatPriceTypes, SaleManager, SaleManagerTypes, StakingTypes } from '../../artifacts/ts'
+import { SaleBuyerAccountTypes, SaleFlatPriceAlphTypes, SaleManager, SaleManagerTypes, StakingTypes } from '../../artifacts/ts'
 import { checkEvent } from '../utils'
 
 describe('Sale Manager Contract Testing', () => {
@@ -23,7 +23,7 @@ describe('Sale Manager Contract Testing', () => {
   let sender: string
   let saleToken: string
   let accountTemplateFixture: ContractFixture<SaleBuyerAccountTypes.Fields>
-  let saleFlatTemplateFixture: ContractFixture<SaleFlatPriceTypes.Fields>
+  let saleFlatTemplateFixture: ContractFixture<SaleFlatPriceAlphTypes.Fields>
   let fixture: ContractFixture<SaleManagerTypes.Fields>
   let listingFee: bigint
   beforeEach(async () => {
@@ -35,7 +35,7 @@ describe('Sale Manager Contract Testing', () => {
     saleFlatTemplateFixture = createSaleFlatPrice(randomContractId(), randomP2PKHAddress(), randomContractId(), 0n, 0n, 0n, 0n, 0n, randomTokenId(), 0n, randomTokenId(), 0n, 0n, 0n, 0n, 0n, "", accountTemplateFixture.states())
     let tokenPair = createTokenPair(saleFlatTemplateFixture.states())
     let rewardDistributor = createRewardDistributor(BigInt(genesis), 10n, 10n, randomContractId(), tokenPair.states())
-    fixture = createSaleManager(tokenPair.contractId, rewardDistributor.contractId, rewardDistributor.states());
+    fixture = createSaleManager(tokenPair.contractId, rewardDistributor.contractId, saleFlatTemplateFixture.contractId, accountTemplateFixture.contractId, rewardDistributor.states());
     listingFee = (await calculateListingFee(fixture.selfState, fixture.dependencies)).returns;
   })
 
@@ -77,8 +77,6 @@ describe('Sale Manager Contract Testing', () => {
   function createSaleWithFlatPrice(saleSettings:
     {
       amountAlph: bigint;
-      saleFlatPriceTemplateId: HexString;
-      accountTemplateId: HexString;
       tokenPrice: bigint;
       saleStart: bigint;
       saleEnd: bigint;
@@ -97,7 +95,7 @@ describe('Sale Manager Contract Testing', () => {
         alphAmount: (DUST_AMOUNT * 100n) + ONE_ALPH + saleSettings.amountAlph, tokens: [{ id: saleSettings.saleTokenId, amount: saleSettings.saleTokenTotalAmount }]
       }
     }]
-    return SaleManager.tests.createSaleFlatPrice({
+    return SaleManager.tests.createSaleFlatPriceAlph({
       initialFields: state.fields,
       initialAsset: state.asset,
       address: state.address,
@@ -120,7 +118,7 @@ describe('Sale Manager Contract Testing', () => {
       var saleSettings = createSaleWithFlatPriceDefaultParams();
       var result = await createSaleWithFlatPrice(saleSettings, sender, fixture.selfState, fixture.dependencies)
       var state = getContractState<StakingTypes.Fields>(result.contracts, fixture.contractId)
-      expect(checkEvent(result, "CreateSaleFlatPrice")).toBe(true);
+      expect(checkEvent(result, "CreateSaleFlatPriceAlph")).toBe(true);
     });
 
     test('Deploys a WL sale with default parameters successfully', async () => {
@@ -128,7 +126,7 @@ describe('Sale Manager Contract Testing', () => {
       saleSettings.isWLSale = true;
       var result = await createSaleWithFlatPrice(saleSettings, sender, fixture.selfState, fixture.dependencies)
       var state = getContractState<StakingTypes.Fields>(result.contracts, fixture.contractId)
-      expect(checkEvent(result, "CreateSaleFlatPrice")).toBe(true);
+      expect(checkEvent(result, "CreateSaleFlatPriceAlph")).toBe(true);
     });
   })
 
@@ -142,7 +140,7 @@ describe('Sale Manager Contract Testing', () => {
 
     test('Fails to create sale with token price exceeding max limit', async () => {
       var saleSettings = createSaleWithFlatPriceDefaultParams();
-      saleSettings.tokenPrice = 10_000_000n * (10n ** 18n); // Exceeding max limit
+      saleSettings.tokenPrice = 1n + 1n * (10n**32n); // Exceeding max limit
       await expectAssertionError(createSaleWithFlatPrice(saleSettings, sender, fixture.selfState, fixture.dependencies), fixture.address, Number(SaleManager.consts.ErrorCodes.PriceLargerThanMax));
     });
 

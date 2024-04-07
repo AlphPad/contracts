@@ -23,6 +23,8 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
 import { default as StakingContractJson } from "../rewards/Staking.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -225,17 +227,23 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
 
   tests = {
     changeOwner: async (
-      params: TestContractParams<StakingTypes.Fields, { changeOwner: Address }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { changeOwner: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "changeOwner", params);
     },
     migrate: async (
-      params: TestContractParams<StakingTypes.Fields, { changeCode: HexString }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { changeCode: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "migrate", params);
     },
     migrateWithFields: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         StakingTypes.Fields,
         {
           changeCode: HexString;
@@ -243,31 +251,43 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
           changeMutFieldsEncoded: HexString;
         }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "migrateWithFields", params);
     },
     changeOwnerApply: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "changeOwnerApply", params);
     },
     migrateApply: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "migrateApply", params);
     },
     migrateWithFieldsApply: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "migrateWithFieldsApply", params);
     },
     resetUpgrade: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "resetUpgrade", params);
     },
     createAccount: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         StakingTypes.Fields,
         {
           account: Address;
@@ -275,155 +295,239 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
           encodedMutFields: HexString;
         }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "createAccount", params);
     },
     destroyAccount: async (
-      params: TestContractParams<StakingTypes.Fields, { account: Address }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { account: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroyAccount", params);
     },
     assertAccountExists: async (
-      params: TestContractParams<StakingTypes.Fields, { account: Address }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { account: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertAccountExists", params);
     },
     accountExists: async (
-      params: TestContractParams<StakingTypes.Fields, { account: Address }>
-    ): Promise<TestContractResult<boolean>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { account: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "accountExists", params);
     },
     getSubContractId: async (
-      params: TestContractParams<StakingTypes.Fields, { account: Address }>
-    ): Promise<TestContractResult<HexString>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { account: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getSubContractId", params);
     },
     getUpgradeDelay: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getUpgradeDelay", params);
     },
     getOwner: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<Address>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<Address>> => {
       return testMethod(this, "getOwner", params);
     },
     getNewOwner: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<Address>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<Address>> => {
       return testMethod(this, "getNewOwner", params);
     },
     getUpgradeCommenced: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getUpgradeCommenced", params);
     },
     getNewCode: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<HexString>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getNewCode", params);
     },
     getNewImmFieldsEncoded: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<HexString>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getNewImmFieldsEncoded", params);
     },
     getNewMutFieldsEncoded: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<HexString>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getNewMutFieldsEncoded", params);
     },
     resetFields: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "resetFields", params);
     },
     assertOnlyOwner: async (
-      params: TestContractParams<StakingTypes.Fields, { caller: Address }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { caller: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertOnlyOwner", params);
     },
     assertUpgradeNotPending: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertUpgradeNotPending", params);
     },
     assertUpgradeDelayElapsed: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertUpgradeDelayElapsed", params);
     },
     stake: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         StakingTypes.Fields,
         { amount: bigint; vestingPeriod: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "stake", params);
     },
     unstake: async (
-      params: TestContractParams<StakingTypes.Fields, { amount: bigint }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { amount: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "unstake", params);
     },
     withdraw: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "withdraw", params);
     },
     depositRewards: async (
-      params: TestContractParams<StakingTypes.Fields, { amount: bigint }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { amount: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "depositRewards", params);
     },
     claimRewards: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claimRewards", params);
     },
     getPendingRewards: async (
-      params: TestContractParams<StakingTypes.Fields, { staker: Address }>
-    ): Promise<TestContractResult<bigint>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { staker: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getPendingRewards", params);
     },
     calcPendingRewards: async (
-      params: TestContractParams<StakingTypes.Fields, { account: HexString }>
-    ): Promise<TestContractResult<bigint>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { account: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "calcPendingRewards", params);
     },
     claimRewardsForAccount: async (
-      params: TestContractParams<StakingTypes.Fields, { account: HexString }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        StakingTypes.Fields,
+        { account: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claimRewardsForAccount", params);
     },
     getStakingTokenId: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<HexString>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getStakingTokenId", params);
     },
     getRewardsTokenId: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<HexString>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getRewardsTokenId", params);
     },
     getUnstakeLockTime: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getUnstakeLockTime", params);
     },
     getAmountStaked: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getAmountStaked", params);
     },
     getRewardPerToken: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getRewardPerToken", params);
     },
     getRewardPerTokenScalingFactor: async (
-      params: Omit<TestContractParams<StakingTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<StakingTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getRewardPerTokenScalingFactor", params);
     },
   };
@@ -434,7 +538,7 @@ export const Staking = new Factory(
   Contract.fromJson(
     StakingContractJson,
     "",
-    "af0ac7188a434129e8279b905adf2160595938f0509f717ac3609af42509a613"
+    "09cfa395376389a28fa1b847641fcef1d5909d2dccef2b581cb05d87d697bf83"
   )
 );
 

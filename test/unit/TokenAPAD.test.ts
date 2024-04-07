@@ -30,21 +30,6 @@ describe('Apad Token Contract Tests', () => {
   // --------------------
   // SECTION: Helpers
   // --------------------
-  function mint(state: ContractState<ApadTokenTypes.Fields>, existingContracts: ContractState[]) {
-    const inputAssets = [{ address: sender, asset: { alphAmount: DUST_AMOUNT * 100n } }]
-    return ApadToken.tests.mint({
-      initialFields: state.fields,
-      initialAsset: state.asset,
-      address: state.address,
-      existingContracts: existingContracts,
-      blockTimeStamp: Number(genesis),
-      inputAssets: inputAssets,
-      testArgs: {
-        to: sender
-      }
-    });
-  }
-
   function burn(state: ContractState<ApadTokenTypes.Fields>, amount: bigint, existingContracts: ContractState[]) {
     const inputAssets = [{ address: sender, asset: { alphAmount: DUST_AMOUNT * 100n, tokens: [{ id: tokenId, amount: amount }] } }]
     return ApadToken.tests.burn({
@@ -90,21 +75,13 @@ describe('Apad Token Contract Tests', () => {
       expect((await getMaxSupply(fixture.selfState, fixture.dependencies)).returns).toBe(totalSupply);
       expect((await getTotalSupply(fixture.selfState, fixture.dependencies)).returns).toBe(totalSupply);
 
-      var stateRes = await mint(fixture.selfState, fixture.dependencies)
-      var state = getContractState<ApadTokenTypes.Fields>(stateRes.contracts, fixture.contractId)
-
-      expect((await getMaxSupply(state, stateRes.contracts)).returns).toBe(totalSupply);
-      expect((await getTotalSupply(state, stateRes.contracts)).returns).toBe(totalSupply);
-      await expectAssertionError(mint(state, stateRes.contracts), fixture.address, Number(ApadToken.consts.ErrorCodes.TokensAlreadyMinted));
-
-      var stateRes = await burn(state, 1000n, stateRes.contracts);
+      var stateRes = await burn(fixture.selfState, 1000n, fixture.dependencies);
       var state = getContractState<ApadTokenTypes.Fields>(stateRes.contracts, fixture.contractId)
       burned += 1000n;
 
 
       expect((await getMaxSupply(state, stateRes.contracts)).returns).toBe(totalSupply);
       expect((await getTotalSupply(state, stateRes.contracts)).returns).toBe(totalSupply - burned);
-      await expectAssertionError(mint(state, stateRes.contracts), fixture.address, Number(ApadToken.consts.ErrorCodes.TokensAlreadyMinted));
 
       var stateRes = await burn(state, 1000000n, stateRes.contracts);
       var state = getContractState<ApadTokenTypes.Fields>(stateRes.contracts, fixture.contractId)
@@ -113,7 +90,6 @@ describe('Apad Token Contract Tests', () => {
 
       expect((await getMaxSupply(state, stateRes.contracts)).returns).toBe(totalSupply);
       expect((await getTotalSupply(state, stateRes.contracts)).returns).toBe(totalSupply - burned);
-      await expectAssertionError(mint(state, stateRes.contracts), fixture.address, Number(ApadToken.consts.ErrorCodes.TokensAlreadyMinted));
     });
   })
 })

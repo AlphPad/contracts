@@ -1,8 +1,8 @@
 {
   "version": "v2.11.0",
-  "name": "SaleFlatPrice",
-  "bytecode": "11402b4034406840b740cd40fc411d412b41374142416d419841b241be41ca41d941e941f742074212421e422e423b4247425042594262426b4274427d4286428f429842a142aa42b342c343174337434143e243fe441e444400020206001b16000008170216010c0d160201092f13425d7b16010d0c160201071600ce081601ab0c0d160201014c021600000500020203001b16000008170216010c0d1602010a2f13425d7b16010d0c160201081600ce0a1601ab0c0d160201014c02160000050002010500402b1600a0012f13425d7ba00113142d1701160113142d1702160116022b1703b2ce0a1603a3b216030e0cce000113ce01ce0aa00116012babce09a000334c06ce01ce08ce09a0002bab0002010100091600ce092f13425d7bce01ce08ce09ab0003030400141600000719136ee17b160013c40de0b6b3a7640000a2160047ce0216011602c117030516004716035f00000103001016000006160000081701160117020c0c160201000616004716015f00000101000416000007136ee27b01000101010416000008c502010001010104160047cb020100010f0015000d000eb41701160100164c071600000209160116005f4a0716011600000007160116005f010001020015000d000fb41701160100164c07160000030a160116005f4a0716011600000108160116005f01000101000bb4ce01451343ee7b00151343ef7b00101600002300000000000300111343e97b00000000000300121343ea7b000000000005001200131a1343eb7b00000000000600120013191a1343ec7b000000000005ce0456311343ed7b010000000108ce04563156ce05311a0201000000010456ce053302010000000104a001ce063402010000000108ce0b563156ce0c311a02010000000105a0024313202f020100010101041600ce014502010000000102ce0102010000000102ce0402010000000102ce0502010000000102ce0602010000000102ce0702010000000102ce0802010000000102ce0a02010000000102ce0b02010000000102ce0c02010000000102a00002010000000102a00102010000000102a002020000010100061600a1021206a002b45f0000020601402e16014313202f136afa7b160117021600431703160313202e0c2f136af97b0c170416041603314c1016001604160413202a6217051605160200251702160413202a17044a2c160271a002712f02000002020110160071160171314c05160016014400264a04160116004400260200000103010316004f0201010207004053000cb417021602ce014613425f7b001500141a4c0c16011602474f00241342607b1600ce0d3113425b7b160000281703a00016032ace093213425e7b1602ce0a1600ac160200074b14b21602130264160316000c0c13046417051704160213c40de0b6b3a7640000a216021604160500044a09160200081706160316000e0c16060106a00016032aa100a00116002aa10112071602160016036001000102010d00291600002a1600130a1312832c17011601ce032d0200000000000ece0313800f4240130a1312832c321342597bce030c3313425a7b000001010012160013800f4240130a1312832c3213425b7b16000d130a130c832c3413425c7b",
-  "codeHash": "62a28f9f3ce63294c9cc9df44f190675cba6227e7f999584b331545866235c5e",
+  "name": "SaleFlatPriceAlph",
+  "bytecode": "11402d09403d407140c040d6419441ea4206422242444273429442a242ae42b942e44310432a4336434243514361436f437f438a439643a643b343bf43c843d143da43e343ec43f543fe4407441044194422442b443b448f44af44b901000000010213120200020206001b1600000e170216010c0d160201092f13425d7b16010d0c160201071600ce081601ab0c0d160201014c021600000b00020203001b1600000e170216010c0d1602010a2f13425d7b16010d0c160201081600ce0a1601ab0c0d160201014c021600000b0002010500402b1600a0012f13425d7ba00113142d1701160113142d1702160116022b1703b2ce0a1603a3b216030e0cce000114ce01ce0aa00116012babce09a000334c06ce01ce08ce09a0002bab0002010100091600ce092f13425d7bce01ce08ce09ab010102080040640012b417021602ce014613425f7b001b001a1a4c1d16011602474f002a1342607b1602000d4c0e1602000e170316000c0d1603010a2ace0d3213425b7b4a051600ce0d3213425b7b160000061704a00016042ace093213425e7b1602ce0a1600ac1602000d4b14b21602130264160416000c0c13046417061705160213c40de0b6b3a7640000a2160216051606000a4a091602000e1707160416000e0c16070106a00016042aa100a00116002aa10105160216001604600100010501402f00070009160000080c0dce08010217010000170216011312321342617b1600130a1602832c17031603ce032d170416011602334c091604130a160116022b832c024a081604130a160216012b832d0200000000000ece030d130a1320832c321342597bce030d3413425a7b00000101000e16000d130a1320832c3213425b7b16000d3413425c7b000000000012ce090d130a1306832c341342627bce090d130a1324832c321342637b0003030400141600000d19136ee17b160013c40de0b6b3a7640000a2160047ce0216011602c117030616004716035f0000010300101600000c1600000e1701160117020c0c160201000716004716015f0000010100041600000d136ee27b0100010101041600000ec502010001010104160047cb020100010f001500130014b417011601001c4c07160000030a160116005f4a0716011600000108160116005f01000102001500130015b417011601001c4c07160000041206160116005f4a0716011600000209160116005f01000101000bb4ce01451343ee7b001b1343ef7b00161600002900000000000300171343e97b00000000000300181343ea7b000000000005001800191a1343eb7b00000000000600180019191a1343ec7b000000000005ce0456311343ed7b010000000108ce04563156ce05311a0201000000010456ce053302010000000104a001ce063402010000000108ce0b563156ce0c311a02010000000105a0024313202f020100010101041600ce014502010000000102ce0102010000000102ce0402010000000102ce0502010000000102ce0602010000000102ce0702010000000102ce0802010000000102ce0a02010000000102ce0b02010000000102ce0c02010000000102a00002010000000102a00102010000000102a002020000010100061600a1021207a002b45f0000020601402e16014313202f136afa7b160117021600431703160313202e0c2f136af97b0c170416041603314c1016001604160413202a62170516051602002b1702160413202a17044a2c160271a002712f02000002020110160071160171314c051600160144002c4a041601160044002c0200000103010316004f02",
+  "codeHash": "b017759f9a30ec96d21081b982dd0c24e1d59a4ecbe4b598e7f4d4ddde3b14b8",
   "fieldsSig": {
     "names": [
       "rewardDistributor",
@@ -63,6 +63,19 @@
     ]
   },
   "eventsSig": [
+    {
+      "name": "Buy",
+      "fieldNames": [
+        "account",
+        "buyBidAmount",
+        "buyTokenAmount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ]
+    },
     {
       "name": "AccountCreate",
       "fieldNames": [
@@ -139,22 +152,21 @@
         "ByteVec",
         "Address"
       ]
-    },
-    {
-      "name": "Buy",
-      "fieldNames": [
-        "account",
-        "buyAlphAmount",
-        "buyTokenAmount"
-      ],
-      "fieldTypes": [
-        "Address",
-        "U256",
-        "U256"
-      ]
     }
   ],
   "functions": [
+    {
+      "name": "getBidTokenDecimals",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
     {
       "name": "claimBuyer",
       "usePreapprovedAssets": false,
@@ -223,6 +235,79 @@
       "paramIsMutable": [
         false
       ],
+      "returnTypes": []
+    },
+    {
+      "name": "buy",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "bidAmount",
+        "wlMerkleProof"
+      ],
+      "paramTypes": [
+        "U256",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "calculateSaleTokensReceivedPerBidTokens",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "bidAmount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "assertPriceInRange",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertBidAmountInRange",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "bidAmount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertSaleAmountInRange",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
       "returnTypes": []
     },
     {
@@ -710,69 +795,6 @@
       "returnTypes": [
         "ByteVec"
       ]
-    },
-    {
-      "name": "buy",
-      "usePreapprovedAssets": true,
-      "useAssetsInContract": true,
-      "isPublic": true,
-      "paramNames": [
-        "amountAlph",
-        "wlMerkleProof"
-      ],
-      "paramTypes": [
-        "U256",
-        "ByteVec"
-      ],
-      "paramIsMutable": [
-        false,
-        false
-      ],
-      "returnTypes": []
-    },
-    {
-      "name": "calculateTokensReceivedPerAlph",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
-      "paramNames": [
-        "amountAlph"
-      ],
-      "paramTypes": [
-        "U256"
-      ],
-      "paramIsMutable": [
-        false
-      ],
-      "returnTypes": [
-        "U256"
-      ]
-    },
-    {
-      "name": "assertPriceInRange",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": false,
-      "paramNames": [],
-      "paramTypes": [],
-      "paramIsMutable": [],
-      "returnTypes": []
-    },
-    {
-      "name": "assertAlphAmountInRange",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": false,
-      "paramNames": [
-        "alphAmount"
-      ],
-      "paramTypes": [
-        "U256"
-      ],
-      "paramIsMutable": [
-        false
-      ],
-      "returnTypes": []
     }
   ],
   "constants": [],
@@ -834,6 +856,27 @@
           "value": {
             "type": "U256",
             "value": "608"
+          }
+        },
+        {
+          "name": "SaleTokenMoreThan18Decimal",
+          "value": {
+            "type": "U256",
+            "value": "609"
+          }
+        },
+        {
+          "name": "SaleAmountSmallerThanMin",
+          "value": {
+            "type": "U256",
+            "value": "610"
+          }
+        },
+        {
+          "name": "SaleAmountLargerThanMax",
+          "value": {
+            "type": "U256",
+            "value": "611"
           }
         }
       ]

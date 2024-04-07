@@ -45,9 +45,11 @@ Contract Staking(
             let stakingAccount = StakingAccount(getSubContractId(staker))
 
             let accountPendingReward = calcPendingRewards(stakingAccount)
-            emit ClaimReward(staker, accountPendingReward)
-            transferTokenFromSelf!(stakingAccount.getAccountHolder(), rewardsTokenId, accountPendingReward)
-            stakingAccount.setRewardPerToken(rewardPerToken)
+            if (accountPendingReward > 0) {
+                emit ClaimReward(staker, accountPendingReward)
+                transferTokenFromSelf!(stakingAccount.getAccountHolder(), rewardsTokenId, accountPendingReward)
+                stakingAccount.setRewardPerToken(rewardPerToken)
+            }
 
             stakingAccount.stake(amount)
         } else {

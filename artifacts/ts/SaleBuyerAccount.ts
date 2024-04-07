@@ -23,6 +23,8 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
 import { default as SaleBuyerAccountContractJson } from "../launch_sale/generic/SaleBuyerAccount.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -110,106 +112,106 @@ class Factory extends ContractFactory<
   tests = {
     destroy: async (
       params: Omit<
-        TestContractParams<SaleBuyerAccountTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleBuyerAccountTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroy", params);
     },
     isSafeToDestroy: async (
       params: Omit<
-        TestContractParams<SaleBuyerAccountTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleBuyerAccountTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<boolean>> => {
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "isSafeToDestroy", params);
     },
     assertIsSafeToDestroy: async (
       params: Omit<
-        TestContractParams<SaleBuyerAccountTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleBuyerAccountTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertIsSafeToDestroy", params);
     },
     assertIsParentTheCaller: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleBuyerAccountTypes.Fields,
         { caller: Address }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertIsParentTheCaller", params);
     },
     getParentContractAddress: async (
       params: Omit<
-        TestContractParams<SaleBuyerAccountTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleBuyerAccountTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<Address>> => {
+    ): Promise<TestContractResultWithoutMaps<Address>> => {
       return testMethod(this, "getParentContractAddress", params);
     },
     getAccountHolder: async (
       params: Omit<
-        TestContractParams<SaleBuyerAccountTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleBuyerAccountTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<Address>> => {
+    ): Promise<TestContractResultWithoutMaps<Address>> => {
       return testMethod(this, "getAccountHolder", params);
     },
     buy: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleBuyerAccountTypes.Fields,
         { addAmountBuy: bigint; addAmountBid: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "buy", params);
     },
     claim: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleBuyerAccountTypes.Fields,
         { claimAmount: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claim", params);
     },
     claimRefund: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         SaleBuyerAccountTypes.Fields,
         { claimAmount: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claimRefund", params);
     },
     getAmountBuy: async (
       params: Omit<
-        TestContractParams<SaleBuyerAccountTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleBuyerAccountTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getAmountBuy", params);
     },
     getAmountBid: async (
       params: Omit<
-        TestContractParams<SaleBuyerAccountTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleBuyerAccountTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getAmountBid", params);
     },
     getAmountClaimed: async (
       params: Omit<
-        TestContractParams<SaleBuyerAccountTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleBuyerAccountTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getAmountClaimed", params);
     },
     getAmountClaimedRefund: async (
       params: Omit<
-        TestContractParams<SaleBuyerAccountTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleBuyerAccountTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getAmountClaimedRefund", params);
     },
   };

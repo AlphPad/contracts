@@ -5,9 +5,10 @@
 import { Contract, ContractFactory } from "@alephium/web3";
 import {
   ApadToken,
+  DummyToken,
   RewardDistributor,
   SaleBuyerAccount,
-  SaleFlatPrice,
+  SaleFlatPriceAlph,
   SaleManager,
   Staking,
   StakingAccount,
@@ -21,9 +22,10 @@ export function getContractByCodeHash(codeHash: string): Contract {
   if (contracts === undefined) {
     contracts = [
       ApadToken,
+      DummyToken,
       RewardDistributor,
       SaleBuyerAccount,
-      SaleFlatPrice,
+      SaleFlatPriceAlph,
       SaleManager,
       Staking,
       StakingAccount,

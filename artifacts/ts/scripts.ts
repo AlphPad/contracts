@@ -12,7 +12,6 @@ import {
   HexString,
 } from "@alephium/web3";
 import { default as ApadTokenBurnTXScriptJson } from "../ApadTokenBurnTX.ral.json";
-import { default as ApadTokenMintTXScriptJson } from "../ApadTokenMintTX.ral.json";
 import { default as IUpgradableChangeOwnerApplyTXScriptJson } from "../lib/upgradable/IUpgradableChangeOwnerApplyTX.ral.json";
 import { default as IUpgradableChangeOwnerTXScriptJson } from "../lib/upgradable/IUpgradableChangeOwnerTX.ral.json";
 import { default as IUpgradableMigrateApplyTXScriptJson } from "../lib/upgradable/IUpgradableMigrateApplyTX.ral.json";
@@ -22,10 +21,10 @@ import { default as IUpgradableMigrateWithFieldsTXScriptJson } from "../lib/upgr
 import { default as IUpgradableResetUpgradeTXScriptJson } from "../lib/upgradable/IUpgradableResetUpgradeTX.ral.json";
 import { default as RewardDistributorAddRewardsTXScriptJson } from "../rewards/RewardDistributorAddRewardsTX.ral.json";
 import { default as RewardDistributorHarvestTXScriptJson } from "../rewards/RewardDistributorHarvestTX.ral.json";
-import { default as SaleFlatPriceBuyTXScriptJson } from "../launch_sale/SaleFlatPriceBuyTX.ral.json";
-import { default as SaleFlatPriceClaimRefundTXScriptJson } from "../launch_sale/SaleFlatPriceClaimRefundTX.ral.json";
-import { default as SaleFlatPriceClaimTXScriptJson } from "../launch_sale/SaleFlatPriceClaimTX.ral.json";
-import { default as SaleFlatPriceSetMerkleRootTXScriptJson } from "../launch_sale/SaleFlatPriceSetMerkleRootTX.ral.json";
+import { default as SaleFlatPriceAlphBuyTXScriptJson } from "../launch_sale/SaleFlatPriceAlphBuyTX.ral.json";
+import { default as SaleFlatPriceAlphClaimRefundTXScriptJson } from "../launch_sale/SaleFlatPriceAlphClaimRefundTX.ral.json";
+import { default as SaleFlatPriceAlphClaimTXScriptJson } from "../launch_sale/SaleFlatPriceAlphClaimTX.ral.json";
+import { default as SaleFlatPriceAlphSetMerkleRootTXScriptJson } from "../launch_sale/SaleFlatPriceAlphSetMerkleRootTX.ral.json";
 import { default as SaleManagerCreateSaleFlatPriceTXScriptJson } from "../launch_sale/SaleManagerCreateSaleFlatPriceTX.ral.json";
 import { default as StakingClaimRewardsTXScriptJson } from "../rewards/StakingClaimRewardsTX.ral.json";
 import { default as StakingClaimTXScriptJson } from "../rewards/StakingClaimTX.ral.json";
@@ -37,10 +36,6 @@ export const ApadTokenBurnTX = new ExecutableScript<{
   token: HexString;
   amount: bigint;
 }>(Script.fromJson(ApadTokenBurnTXScriptJson, ""));
-
-export const ApadTokenMintTX = new ExecutableScript<{ token: HexString }>(
-  Script.fromJson(ApadTokenMintTXScriptJson, "")
-);
 
 export const IUpgradableChangeOwnerApplyTX = new ExecutableScript<{
   upgradable: HexString;
@@ -84,32 +79,30 @@ export const RewardDistributorHarvestTX = new ExecutableScript<{
   rd: HexString;
 }>(Script.fromJson(RewardDistributorHarvestTXScriptJson, ""));
 
-export const SaleFlatPriceBuyTX = new ExecutableScript<{
+export const SaleFlatPriceAlphBuyTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   amountAlph: bigint;
   merkleProof: HexString;
-}>(Script.fromJson(SaleFlatPriceBuyTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphBuyTXScriptJson, ""));
 
-export const SaleFlatPriceClaimRefundTX = new ExecutableScript<{
+export const SaleFlatPriceAlphClaimRefundTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceClaimRefundTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphClaimRefundTXScriptJson, ""));
 
-export const SaleFlatPriceClaimTX = new ExecutableScript<{
+export const SaleFlatPriceAlphClaimTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceClaimTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphClaimTXScriptJson, ""));
 
-export const SaleFlatPriceSetMerkleRootTX = new ExecutableScript<{
+export const SaleFlatPriceAlphSetMerkleRootTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   newMerkleRoot: HexString;
-}>(Script.fromJson(SaleFlatPriceSetMerkleRootTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXScriptJson, ""));
 
 export const SaleManagerCreateSaleFlatPriceTX = new ExecutableScript<{
   saleManager: HexString;
   amountAlph: bigint;
-  saleFlatPriceTemplateId: HexString;
-  accountTemplateId: HexString;
   tokenPrice: bigint;
   saleStart: bigint;
   saleEnd: bigint;

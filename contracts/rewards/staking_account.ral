@@ -54,8 +54,8 @@ Contract StakingAccount (
     pub fn unstake(amount: U256) -> () {
         assertIsParentTheCaller(callerAddress!())
 
-        assert!(amount <= calcVestedClaimable(), ErrorCodes.AmountNotVested)
         assert!(amountStaked >= amount, ErrorCodes.InsufficientBalance)
+        assert!(amount <= calcVestedClaimable(), ErrorCodes.AmountNotVested)
 
         amountStaked = amountStaked - amount
 

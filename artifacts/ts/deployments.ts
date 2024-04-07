@@ -21,6 +21,8 @@ import {
   TokenPairInstance,
   SaleManager,
   SaleManagerInstance,
+  SaleFlatPriceAlph,
+  SaleFlatPriceAlphInstance,
 } from ".";
 import { default as devnetDeployments } from "../.deployments.devnet.json";
 
@@ -35,6 +37,7 @@ export type Deployments = {
     SaleFlatPrice: DeployContractExecutionResult<SaleFlatPriceInstance>;
     TokenPair: DeployContractExecutionResult<TokenPairInstance>;
     SaleManager: DeployContractExecutionResult<SaleManagerInstance>;
+    SaleFlatPriceAlph: DeployContractExecutionResult<SaleFlatPriceAlphInstance>;
   };
   scripts: {
     ApadTokenMintTX: RunScriptResult;
@@ -90,6 +93,12 @@ function toDeployments(json: any): Deployments {
       ...json.contracts["SaleManager"],
       contractInstance: SaleManager.at(
         json.contracts["SaleManager"].contractInstance.address
+      ),
+    },
+    SaleFlatPriceAlph: {
+      ...json.contracts["SaleFlatPriceAlph"],
+      contractInstance: SaleFlatPriceAlph.at(
+        json.contracts["SaleFlatPriceAlph"].contractInstance.address
       ),
     },
   };

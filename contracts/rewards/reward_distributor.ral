@@ -24,7 +24,7 @@ Contract RewardDistributor (
     // Event declarations for tracking contract activities
     event EpochChanged(epoch: U256, rewardsTransfered: U256, updatedBy: Address)
     event RewardHarvested(epoch: U256, harvestedAmount: U256, harvestedBy: Address)
-    event RewardAdded(addedAmount: U256, addedBy: Address)
+    event RewardAdded(epoch: U256, addedAmount: U256, addedBy: Address)
 
     // Error codes for contract operations
     enum ErrorCodes {
@@ -71,6 +71,39 @@ Contract RewardDistributor (
         currentHarvestDistributed = currentHarvestDistributed + vestedAmount
         emit RewardHarvested(newEpochIndex, vestedAmount, callerAddress!())
     }    
+
+    // Helper to check if rewards can be harvested
+    @using(checkExternalCaller = false)
+    pub fn canHarvest() -> Bool {
+
+        // Check if rewards are initialized
+        assert!(size!(totalRewards) == totalEpochs * 32, ErrorCodes.RewardsNotInitialized)
+
+        // Setup mutable copies
+        let mut currentHarvestDistributedCalc = currentHarvestDistributed
+        let mut currentHarvestTotalCalc = currentHarvestTotal
+        
+        // Calculate epoch migration if necessary
+        let newEpochIndex = getCurrentEpoch()
+        if (currentHarvestEpoch != newEpochIndex) {
+            let carryOverReward = currentHarvestTotalCalc - currentHarvestDistributedCalc
+
+            let newEpochReward = get(totalRewards, newEpochIndex)
+            currentHarvestTotalCalc = newEpochReward + carryOverReward
+            currentHarvestDistributedCalc = 0
+        }
+    
+        // Calculate vested amount
+        let timeElapsedInCurrentEpoch = (blockTimeStamp!() - genesisDate) % epochDuration
+        let vestedAmount = ((currentHarvestTotalCalc * timeElapsedInCurrentEpoch) / epochDuration) - currentHarvestDistributedCalc
+        
+        // Min harvestable amount is limited to prevent excessive calling as callers need to be paid
+        if(vestedAmount >= 5 * (10 ** 18)) {
+            return true
+        } else {
+            return false
+        }
+    }    
     
     // Adds rewards to the contract and distributes them across epochs.
     @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, checkExternalCaller = false)
@@ -97,7 +130,7 @@ Contract RewardDistributor (
         }
     
         // Bookkeeping
-        emit RewardAdded(amount, sender)
+        emit RewardAdded(getCurrentEpoch(), amount, sender)
         totalRewards = newTotalRewards
     }
 

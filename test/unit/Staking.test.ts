@@ -449,7 +449,7 @@ describe('Staking Contract End-to-End Functionality Testing', () => {
       calcVested = await calcVestedClaimable(stateStakingAccount, BigInt(genesis) + ((teamVesting / 10n) * 12n), stateRes.contracts);
       expect(calcVested.returns).toBe(((stakeApadAmount / 10n) * 3n));
 
-      await expectAssertionError(unstake(state, sender, calcVested.returns + 1n, BigInt(genesis) + ((teamVesting / 10n) * 12n), stateRes.contracts), stateStakingAccount.address, Number(StakingAccount.consts.ErrorCodes.AmountNotVested));
+      await expectAssertionError(unstake(state, sender, calcVested.returns + 1n, BigInt(genesis) + ((teamVesting / 10n) * 12n), stateRes.contracts), stateStakingAccount.address, Number(StakingAccount.consts.ErrorCodes.InsufficientBalance));
       stateRes = await unstake(state, sender, calcVested.returns, BigInt(genesis) + ((teamVesting / 10n) * 12n), stateRes.contracts);
       state = getContractState<StakingTypes.Fields>(stateRes.contracts, fixture.contractId);
       stateRes = await withdraw(state, sender, BigInt(genesis) + ((teamVesting / 10n) * 12n) + (unstakePeriod), stateRes.contracts)

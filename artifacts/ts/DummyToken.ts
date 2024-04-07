@@ -26,19 +26,19 @@ import {
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
 } from "@alephium/web3";
-import { default as ApadTokenContractJson } from "../ApadToken.ral.json";
+import { default as DummyTokenContractJson } from "../external/dummy/DummyToken.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
-export namespace ApadTokenTypes {
+export namespace DummyTokenTypes {
   export type Fields = {
-    maxSupply: bigint;
-    burned: bigint;
+    symbol: HexString;
+    name: HexString;
+    decimals: bigint;
+    supply: bigint;
   };
 
   export type State = ContractState<Fields>;
-
-  export type BurnEvent = ContractEvent<{ burner: Address; amount: bigint }>;
 
   export interface CallMethodTable {
     getSymbol: {
@@ -54,10 +54,6 @@ export namespace ApadTokenTypes {
       result: CallContractResult<bigint>;
     };
     getTotalSupply: {
-      params: Omit<CallContractParams<{}>, "args">;
-      result: CallContractResult<bigint>;
-    };
-    getMaxSupply: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
@@ -77,23 +73,21 @@ export namespace ApadTokenTypes {
 }
 
 class Factory extends ContractFactory<
-  ApadTokenInstance,
-  ApadTokenTypes.Fields
+  DummyTokenInstance,
+  DummyTokenTypes.Fields
 > {
   getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as ApadTokenTypes.Fields;
+    return this.contract.getInitialFieldsWithDefaultValues() as DummyTokenTypes.Fields;
   }
 
-  eventIndex = { Burn: 0 };
-
-  at(address: string): ApadTokenInstance {
-    return new ApadTokenInstance(address);
+  at(address: string): DummyTokenInstance {
+    return new DummyTokenInstance(address);
   }
 
   tests = {
     getSymbol: async (
       params: Omit<
-        TestContractParamsWithoutMaps<ApadTokenTypes.Fields, never>,
+        TestContractParamsWithoutMaps<DummyTokenTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -101,7 +95,7 @@ class Factory extends ContractFactory<
     },
     getName: async (
       params: Omit<
-        TestContractParamsWithoutMaps<ApadTokenTypes.Fields, never>,
+        TestContractParamsWithoutMaps<DummyTokenTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -109,7 +103,7 @@ class Factory extends ContractFactory<
     },
     getDecimals: async (
       params: Omit<
-        TestContractParamsWithoutMaps<ApadTokenTypes.Fields, never>,
+        TestContractParamsWithoutMaps<DummyTokenTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -117,73 +111,40 @@ class Factory extends ContractFactory<
     },
     getTotalSupply: async (
       params: Omit<
-        TestContractParamsWithoutMaps<ApadTokenTypes.Fields, never>,
+        TestContractParamsWithoutMaps<DummyTokenTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getTotalSupply", params);
     },
-    burn: async (
-      params: TestContractParamsWithoutMaps<
-        ApadTokenTypes.Fields,
-        { from: Address; amount: bigint }
-      >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "burn", params);
-    },
-    getMaxSupply: async (
-      params: Omit<
-        TestContractParamsWithoutMaps<ApadTokenTypes.Fields, never>,
-        "testArgs"
-      >
-    ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getMaxSupply", params);
-    },
   };
 }
 
 // Use this object to test and deploy the contract
-export const ApadToken = new Factory(
+export const DummyToken = new Factory(
   Contract.fromJson(
-    ApadTokenContractJson,
+    DummyTokenContractJson,
     "",
-    "da7543ebc9e29ae7fe1d75043dedead5564b44998b4f5076c4eee829bc814ca3"
+    "a2800413eb2c5c23d48068db23df5f8eeaba04653e12c8ed59d589720d96dadd"
   )
 );
 
 // Use this class to interact with the blockchain
-export class ApadTokenInstance extends ContractInstance {
+export class DummyTokenInstance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
 
-  async fetchState(): Promise<ApadTokenTypes.State> {
-    return fetchContractState(ApadToken, this);
-  }
-
-  async getContractEventsCurrentCount(): Promise<number> {
-    return getContractEventsCurrentCount(this.address);
-  }
-
-  subscribeBurnEvent(
-    options: EventSubscribeOptions<ApadTokenTypes.BurnEvent>,
-    fromCount?: number
-  ): EventSubscription {
-    return subscribeContractEvent(
-      ApadToken.contract,
-      this,
-      options,
-      "Burn",
-      fromCount
-    );
+  async fetchState(): Promise<DummyTokenTypes.State> {
+    return fetchContractState(DummyToken, this);
   }
 
   methods = {
     getSymbol: async (
-      params?: ApadTokenTypes.CallMethodParams<"getSymbol">
-    ): Promise<ApadTokenTypes.CallMethodResult<"getSymbol">> => {
+      params?: DummyTokenTypes.CallMethodParams<"getSymbol">
+    ): Promise<DummyTokenTypes.CallMethodResult<"getSymbol">> => {
       return callMethod(
-        ApadToken,
+        DummyToken,
         this,
         "getSymbol",
         params === undefined ? {} : params,
@@ -191,10 +152,10 @@ export class ApadTokenInstance extends ContractInstance {
       );
     },
     getName: async (
-      params?: ApadTokenTypes.CallMethodParams<"getName">
-    ): Promise<ApadTokenTypes.CallMethodResult<"getName">> => {
+      params?: DummyTokenTypes.CallMethodParams<"getName">
+    ): Promise<DummyTokenTypes.CallMethodResult<"getName">> => {
       return callMethod(
-        ApadToken,
+        DummyToken,
         this,
         "getName",
         params === undefined ? {} : params,
@@ -202,10 +163,10 @@ export class ApadTokenInstance extends ContractInstance {
       );
     },
     getDecimals: async (
-      params?: ApadTokenTypes.CallMethodParams<"getDecimals">
-    ): Promise<ApadTokenTypes.CallMethodResult<"getDecimals">> => {
+      params?: DummyTokenTypes.CallMethodParams<"getDecimals">
+    ): Promise<DummyTokenTypes.CallMethodResult<"getDecimals">> => {
       return callMethod(
-        ApadToken,
+        DummyToken,
         this,
         "getDecimals",
         params === undefined ? {} : params,
@@ -213,37 +174,26 @@ export class ApadTokenInstance extends ContractInstance {
       );
     },
     getTotalSupply: async (
-      params?: ApadTokenTypes.CallMethodParams<"getTotalSupply">
-    ): Promise<ApadTokenTypes.CallMethodResult<"getTotalSupply">> => {
+      params?: DummyTokenTypes.CallMethodParams<"getTotalSupply">
+    ): Promise<DummyTokenTypes.CallMethodResult<"getTotalSupply">> => {
       return callMethod(
-        ApadToken,
+        DummyToken,
         this,
         "getTotalSupply",
         params === undefined ? {} : params,
         getContractByCodeHash
       );
     },
-    getMaxSupply: async (
-      params?: ApadTokenTypes.CallMethodParams<"getMaxSupply">
-    ): Promise<ApadTokenTypes.CallMethodResult<"getMaxSupply">> => {
-      return callMethod(
-        ApadToken,
-        this,
-        "getMaxSupply",
-        params === undefined ? {} : params,
-        getContractByCodeHash
-      );
-    },
   };
 
-  async multicall<Calls extends ApadTokenTypes.MultiCallParams>(
+  async multicall<Calls extends DummyTokenTypes.MultiCallParams>(
     calls: Calls
-  ): Promise<ApadTokenTypes.MultiCallResults<Calls>> {
+  ): Promise<DummyTokenTypes.MultiCallResults<Calls>> {
     return (await multicallMethods(
-      ApadToken,
+      DummyToken,
       this,
       calls,
       getContractByCodeHash
-    )) as ApadTokenTypes.MultiCallResults<Calls>;
+    )) as DummyTokenTypes.MultiCallResults<Calls>;
   }
 }

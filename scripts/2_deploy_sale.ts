@@ -1,7 +1,7 @@
 import { Deployer, DeployFunction, Network } from '@alephium/cli'
 import { Settings } from '../alephium.config'
-import { ALPH_TOKEN_ID, binToHex, contractIdFromAddress, DUST_AMOUNT, ZERO_ADDRESS } from '@alephium/web3'
-import { ApadToken, RewardDistributor, SaleBuyerAccount, SaleFlatPrice, SaleManager, Staking, StakingAccount, TokenPair } from '../artifacts/ts'
+import { ALPH_TOKEN_ID, binToHex, contractIdFromAddress, DUST_AMOUNT, stringToHex, ZERO_ADDRESS } from '@alephium/web3'
+import { ApadToken, DummyToken, RewardDistributor, SaleBuyerAccount, SaleFlatPriceAlph, SaleManager, Staking, StakingAccount, TokenPair } from '../artifacts/ts'
 
 const deployStaking: DeployFunction<Settings> = async (
   deployer: Deployer,
@@ -20,7 +20,7 @@ const deployStaking: DeployFunction<Settings> = async (
     }
   })
 
-  const flatpriceSaleTemplate = await deployer.deployContract(SaleFlatPrice, {
+  const flatpriceSaleAlphTemplate = await deployer.deployContract(SaleFlatPriceAlph, {
     initialFields: {
       accountTemplateId: buyerTemplateAccount.contractInstance.contractId,
       bidTokenId: ALPH_TOKEN_ID,
@@ -56,6 +56,53 @@ const deployStaking: DeployFunction<Settings> = async (
       }
     })
     tokenPairAddress = tokenPair.contractInstance.address;
+
+
+    const issueTokenAmount = network.settings.issueTokenAmount
+
+    const testingTokenA = await deployer.deployContract(DummyToken, {
+      issueTokenAmount: issueTokenAmount,
+      issueTokenTo: deployer.account.address,
+      initialFields: {
+        supply: network.settings.issueTokenAmount as bigint,
+        decimals: 12n,
+        name: stringToHex("12 Decimal Token"),
+        symbol: stringToHex("12DT")
+      }
+    })
+
+    const testingTokenB = await deployer.deployContract(DummyToken, {
+      issueTokenAmount: issueTokenAmount,
+      issueTokenTo: deployer.account.address,
+      initialFields: {
+        supply: network.settings.issueTokenAmount as bigint,
+        decimals: 6n,
+        name: stringToHex("6 Decimal Token"),
+        symbol: stringToHex("6DT")
+      }
+    })
+
+    const testingTokenC = await deployer.deployContract(DummyToken, {
+      issueTokenAmount: issueTokenAmount,
+      issueTokenTo: deployer.account.address,
+      initialFields: {
+        supply: network.settings.issueTokenAmount as bigint,
+        decimals: 2n,
+        name: stringToHex("2 Decimal Token"),
+        symbol: stringToHex("2DT")
+      }
+    })
+
+    const testingTokenD = await deployer.deployContract(DummyToken, {
+      issueTokenAmount: issueTokenAmount,
+      issueTokenTo: deployer.account.address,
+      initialFields: {
+        supply: network.settings.issueTokenAmount as bigint,
+        decimals: 0n,
+        name: stringToHex("0 Decimal Token"),
+        symbol: stringToHex("0DT")
+      }
+    })
   }
 
   const saleManager = await deployer.deployContract(SaleManager, {
@@ -63,8 +110,10 @@ const deployStaking: DeployFunction<Settings> = async (
       pair: binToHex(contractIdFromAddress(tokenPairAddress)),
       alphTokenId: ALPH_TOKEN_ID,
       usdtTokenId: "556d9582463fe44fbd108aedc9f409f69086dc78d994b88ea6c9e65f8bf98e00",
-      listingFeeAmount: 100n * (10n**6n),
+      listingFeeAmount: 100n * (10n ** 6n),
       rewardDistributor: rewardDistributor.contractInstance.contractId,
+      accountTemplateId: buyerTemplateAccount.contractInstance.contractId,
+      saleFlatPriceAlphTemplateId: flatpriceSaleAlphTemplate.contractInstance.contractId,
       owner: deployer.account.address,
       upgradeDelay: network.settings.upgradeDelay,
       newCode: "",

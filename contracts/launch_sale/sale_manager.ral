@@ -8,6 +8,8 @@ Contract SaleManager (
     usdtTokenId: ByteVec,                   // Token ID for USDT tokens.
     listingFeeAmount: U256,                 // Required amount for listing a sale in USDT(100$).
     upgradeDelay: U256,                     // The delay period required between initiating and applying an upgrade.
+    saleFlatPriceAlphTemplateId: ByteVec,   // Template ID used for creating the sale flat price contract.
+    accountTemplateId: ByteVec,             // Template ID for the account managing the sale.
     mut owner: Address,                     // Current owner's address of the contract.
     mut newOwner: Address,                  // Address of the new owner, set during ownership transfer process.
     mut upgradeCommenced: U256,             // Timestamp marking the start of an upgrade process.
@@ -16,7 +18,7 @@ Contract SaleManager (
     mut newMutFieldsEncoded: ByteVec        // Encoded mutable fields for the new contract.
 ) extends Upgradable(upgradeDelay, owner, newOwner, upgradeCommenced, newCode, newImmFieldsEncoded, newMutFieldsEncoded) {
     // Event declarations for tracking contract activities
-    event CreateSaleFlatPrice(account: Address, contractId: ByteVec)
+    event CreateSaleFlatPriceAlph(account: Address, contractId: ByteVec)
 
     // Error codes for contract operations
     enum ErrorCodes {
@@ -35,15 +37,14 @@ Contract SaleManager (
         WLSaleMaxBidSmallerThan1Alph = 513
         WLSaleInvalidMerkleRootSize = 514
         WLSaleMerkleRootMustNotBeZeroes = 515
+        IncorrectPairSetup = 516
     }
 
     // Function to create a flat price sale.
     // Validates input parameters and creates a new sale.
     @using(preapprovedAssets = true, assetsInContract = false, checkExternalCaller = false, updateFields = false)
-    pub fn createSaleFlatPrice(
+    pub fn createSaleFlatPriceAlph(
         amountAlph: U256,                   // The amount of ALPH tokens used as the listing fee.
-        saleFlatPriceTemplateId: ByteVec,   // Template ID used for creating the sale flat price contract.
-        accountTemplateId: ByteVec,         // Template ID for the account managing the sale.
         tokenPrice: U256,                   // The price per token in the sale.
         saleStart: U256,                    // The start time of the sale as a UNIX timestamp.
         saleEnd: U256,                      // The end time of the sale as a UNIX timestamp.
@@ -58,7 +59,7 @@ Contract SaleManager (
         merkleRoot: ByteVec                 // Merkle root used for whitelist verification.
     ) -> () {
         let caller = callerAddress!()
-
+        
         assertListingFeePaid(amountAlph)
         assertPriceInRange(tokenPrice)
         assertSaleDates(saleStart, saleEnd)
@@ -77,7 +78,7 @@ Contract SaleManager (
         
         rewardDistributor.addRewards{caller -> ALPH: amountAlph}(caller, amountAlph)
 
-        let (encodedImmFields, encodedMutFields) = SaleFlatPrice.encodeFields!(
+        let (encodedImmFields, encodedMutFields) = SaleFlatPriceAlph.encodeFields!(
             rewardDistributor,
             caller,
             accountTemplateId,
@@ -94,15 +95,15 @@ Contract SaleManager (
             whitelistBuyerMaxBid,
             0,
             0,
-            merkleRoot            
+            merkleRoot
         )
         let contractId = copyCreateContract!{caller -> ALPH: 1 alph, saleTokenId: saleTokenTotalAmount}(
-            saleFlatPriceTemplateId,
+            saleFlatPriceAlphTemplateId,
             encodedImmFields,
             encodedMutFields
         )
 
-        emit CreateSaleFlatPrice(caller, contractId)
+        emit CreateSaleFlatPriceAlph(caller, contractId)
     }
 
     // Note on: "Beware of Oracle manipulation: Don't use spot price from an AMM as an oracle."
@@ -111,20 +112,7 @@ Contract SaleManager (
     pub fn calculateListingFee() -> U256 {
         let (reserve0, reserve1) = pair.getReserves()
         let (token0, token1) = pair.getTokenPair()
-        assert!((token0 == alphTokenId && token1 == usdtTokenId) || (token1 == alphTokenId && token0 == usdtTokenId), 5)
-        let product = reserve0 * reserve1
-        if (token0 == alphTokenId) {
-            return reserve0 - (product / ( reserve1 + listingFeeAmount ))
-        } else {
-            return reserve1 - (product / ( reserve0 + listingFeeAmount ))
-        }
-    }
-
-    @using(checkExternalCaller = false)
-    pub fn get() -> U256 {
-        let (reserve0, reserve1) = pair.getReserves()
-        let (token0, token1) = pair.getTokenPair()
-        assert!((token0 == alphTokenId && token1 == usdtTokenId) || (token1 == alphTokenId && token0 == usdtTokenId), 5)
+        assert!((token0 == alphTokenId && token1 == usdtTokenId) || (token1 == alphTokenId && token0 == usdtTokenId), ErrorCodes.IncorrectPairSetup)
         let product = reserve0 * reserve1
         if (token0 == alphTokenId) {
             return reserve0 - (product / ( reserve1 + listingFeeAmount ))
@@ -134,8 +122,8 @@ Contract SaleManager (
     }
 
     fn assertPriceInRange(tokenPrice: U256) -> () {
-        assert!(tokenPrice <= 1e6 * (10**18), ErrorCodes.PriceLargerThanMax) // price can't be bigger than 1 million alph, with 18 decimal places
-        assert!(tokenPrice > 0, ErrorCodes.PriceSmallerThanMin) // price must be bigger than 0
+        assert!(tokenPrice <= 1 * (10**32), ErrorCodes.PriceLargerThanMax) // price can't be bigger than 32 digits to avoid overflows on multiplication
+        assert!(tokenPrice >= 1, ErrorCodes.PriceSmallerThanMin) // price must be bigger than 0 to avoid dividing with 0
     }
     
     fn assertAlphAmountInRange(alphAmount: U256) -> () {
@@ -144,8 +132,8 @@ Contract SaleManager (
     }  
 
     fn assertSaleAmountInRange(saleAmount: U256) -> () {
-        assert!(saleAmount >= 1 * (10**6), ErrorCodes.SaleAmountSmallerThanMin) // Number with at least 6 decimal places
-        assert!(saleAmount <= 1 * (10**36), ErrorCodes.SaleAmountLargerThanMax) // Number with less then 36 digits including 18 decimals
+        assert!(saleAmount >= 1 * (10**6), ErrorCodes.SaleAmountSmallerThanMin) // Number with at least 6 digits
+        assert!(saleAmount <= 1 * (10**36), ErrorCodes.SaleAmountLargerThanMax) // Number with less than 36 digits
     }  
 
     fn assertSaleDates(saleStart: U256, saleEnd: U256) -> () {
@@ -165,8 +153,6 @@ Contract SaleManager (
 TxScript SaleManagerCreateSaleFlatPriceTX(
     saleManager: SaleManager,
     amountAlph: U256,                   
-    saleFlatPriceTemplateId: ByteVec,   
-    accountTemplateId: ByteVec,         
     tokenPrice: U256,                   
     saleStart: U256,                    
     saleEnd: U256,                     
@@ -180,10 +166,8 @@ TxScript SaleManagerCreateSaleFlatPriceTX(
     whitelistBuyerMaxBid: U256,         
     merkleRoot: ByteVec                 
 ) {
-    saleManager.createSaleFlatPrice{callerAddress!() -> ALPH: 1 alph + amountAlph, saleTokenId: saleTokenTotalAmount}(
+    saleManager.createSaleFlatPriceAlph{callerAddress!() -> ALPH: 1 alph + amountAlph, saleTokenId: saleTokenTotalAmount}(
         amountAlph,                   
-        saleFlatPriceTemplateId,   
-        accountTemplateId,         
         tokenPrice,                   
         saleStart,                    
         saleEnd,                     

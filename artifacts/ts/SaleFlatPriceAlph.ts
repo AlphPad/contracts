@@ -23,12 +23,14 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
-import { default as SaleFlatPriceContractJson } from "../launch_sale/SaleFlatPrice.ral.json";
+import { default as SaleFlatPriceAlphContractJson } from "../launch_sale/SaleFlatPriceAlph.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
-export namespace SaleFlatPriceTypes {
+export namespace SaleFlatPriceAlphTypes {
   export type Fields = {
     rewardDistributor: HexString;
     saleOwner: Address;
@@ -51,6 +53,11 @@ export namespace SaleFlatPriceTypes {
 
   export type State = ContractState<Fields>;
 
+  export type BuyEvent = ContractEvent<{
+    account: Address;
+    buyBidAmount: bigint;
+    buyTokenAmount: bigint;
+  }>;
   export type AccountCreateEvent = ContractEvent<{
     account: HexString;
     contractId: HexString;
@@ -79,13 +86,16 @@ export namespace SaleFlatPriceTypes {
     newMerkleRoot: HexString;
     updatedBy: Address;
   }>;
-  export type BuyEvent = ContractEvent<{
-    account: Address;
-    buyAlphAmount: bigint;
-    buyTokenAmount: bigint;
-  }>;
 
   export interface CallMethodTable {
+    getBidTokenDecimals: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<bigint>;
+    };
+    calculateSaleTokensReceivedPerBidTokens: {
+      params: CallContractParams<{ bidAmount: bigint }>;
+      result: CallContractResult<bigint>;
+    };
     accountExists: {
       params: CallContractParams<{ account: Address }>;
       result: CallContractResult<boolean>;
@@ -166,10 +176,6 @@ export namespace SaleFlatPriceTypes {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<HexString>;
     };
-    calculateTokensReceivedPerAlph: {
-      params: CallContractParams<{ amountAlph: bigint }>;
-      result: CallContractResult<bigint>;
-    };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
     CallMethodTable[T]["params"];
@@ -186,22 +192,22 @@ export namespace SaleFlatPriceTypes {
 }
 
 class Factory extends ContractFactory<
-  SaleFlatPriceInstance,
-  SaleFlatPriceTypes.Fields
+  SaleFlatPriceAlphInstance,
+  SaleFlatPriceAlphTypes.Fields
 > {
   getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as SaleFlatPriceTypes.Fields;
+    return this.contract.getInitialFieldsWithDefaultValues() as SaleFlatPriceAlphTypes.Fields;
   }
 
   eventIndex = {
-    AccountCreate: 0,
-    AccountDestroy: 1,
-    ClaimBuyer: 2,
-    ClaimBuyerRefund: 3,
-    ClaimSeller: 4,
-    ClaimSellerRefund: 5,
-    UpdateRoot: 6,
-    Buy: 7,
+    Buy: 0,
+    AccountCreate: 1,
+    AccountDestroy: 2,
+    ClaimBuyer: 3,
+    ClaimBuyerRefund: 4,
+    ClaimSeller: 5,
+    ClaimSellerRefund: 6,
+    UpdateRoot: 7,
   };
   consts = {
     ErrorCodes: {
@@ -213,6 +219,9 @@ class Factory extends ContractFactory<
       SaleTokenTotalExceeded: BigInt(606),
       SaleOwnerCanNotBid: BigInt(607),
       BuyerNotWhitelisted: BigInt(608),
+      SaleTokenMoreThan18Decimal: BigInt(609),
+      SaleAmountSmallerThanMin: BigInt(610),
+      SaleAmountLargerThanMax: BigInt(611),
     },
     AccountErrorCodes: {
       AccountAlreadyExists: BigInt(12001),
@@ -233,376 +242,424 @@ class Factory extends ContractFactory<
     },
   };
 
-  at(address: string): SaleFlatPriceInstance {
-    return new SaleFlatPriceInstance(address);
+  at(address: string): SaleFlatPriceAlphInstance {
+    return new SaleFlatPriceAlphInstance(address);
   }
 
   tests = {
+    getBidTokenDecimals: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
+      return testMethod(this, "getBidTokenDecimals", params);
+    },
     claimBuyer: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { caller: Address; amount: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claimBuyer", params);
     },
     claimBuyerRefund: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { caller: Address; amount: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claimBuyerRefund", params);
     },
     claimSeller: async (
-      params: TestContractParams<SaleFlatPriceTypes.Fields, { amount: bigint }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { amount: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claimSeller", params);
     },
     claimSellerRefund: async (
-      params: TestContractParams<SaleFlatPriceTypes.Fields, { amount: bigint }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { amount: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claimSellerRefund", params);
     },
+    buy: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { bidAmount: bigint; wlMerkleProof: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "buy", params);
+    },
+    calculateSaleTokensReceivedPerBidTokens: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { bidAmount: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
+      return testMethod(
+        this,
+        "calculateSaleTokensReceivedPerBidTokens",
+        params
+      );
+    },
+    assertPriceInRange: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "assertPriceInRange", params);
+    },
+    assertBidAmountInRange: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { bidAmount: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "assertBidAmountInRange", params);
+    },
+    assertSaleAmountInRange: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "assertSaleAmountInRange", params);
+    },
     createAccount: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         {
           account: Address;
           encodedImmFields: HexString;
           encodedMutFields: HexString;
         }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "createAccount", params);
     },
     destroyAccount: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { account: Address }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroyAccount", params);
     },
     assertAccountExists: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { account: Address }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertAccountExists", params);
     },
     accountExists: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { account: Address }
       >
-    ): Promise<TestContractResult<boolean>> => {
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "accountExists", params);
     },
     getSubContractId: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { account: Address }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getSubContractId", params);
     },
     claim: async (
-      params: TestContractParams<SaleFlatPriceTypes.Fields, { amount: bigint }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { amount: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claim", params);
     },
     claimRefund: async (
-      params: TestContractParams<SaleFlatPriceTypes.Fields, { amount: bigint }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { amount: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "claimRefund", params);
     },
     setMerkleRoot: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { newMerkleRoot: HexString }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setMerkleRoot", params);
     },
     assertSaleLive: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertSaleLive", params);
     },
     assertSaleFinished: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertSaleFinished", params);
     },
     assertCanClaim: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertCanClaim", params);
     },
     assertCanClaimRefund: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertCanClaimRefund", params);
     },
     assertSaleNotStarted: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertSaleNotStarted", params);
     },
     isSaleLive: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<boolean>> => {
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "isSaleLive", params);
     },
     isSaleFinished: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<boolean>> => {
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "isSaleFinished", params);
     },
     isSaleSuccess: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<boolean>> => {
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "isSaleSuccess", params);
     },
     isWhitelistSaleLive: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<boolean>> => {
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "isWhitelistSaleLive", params);
     },
     isWhitelistSale: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<boolean>> => {
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "isWhitelistSale", params);
     },
     isCallerSaleOwner: async (
-      params: TestContractParams<SaleFlatPriceTypes.Fields, { caller: Address }>
-    ): Promise<TestContractResult<boolean>> => {
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { caller: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "isCallerSaleOwner", params);
     },
     getSaleOwner: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<Address>> => {
+    ): Promise<TestContractResultWithoutMaps<Address>> => {
       return testMethod(this, "getSaleOwner", params);
     },
     getSaleStart: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getSaleStart", params);
     },
     getSaleEnd: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getSaleEnd", params);
     },
     getMinRaise: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getMinRaise", params);
     },
     getMaxRaise: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getMaxRaise", params);
     },
     getSaleTokenId: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getSaleTokenId", params);
     },
     getBidTokenId: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getBidTokenId", params);
     },
     getWhitelistSaleStart: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getWhitelistSaleStart", params);
     },
     getWhitelistSaleEnd: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getWhitelistSaleEnd", params);
     },
     getTokensSold: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getTokensSold", params);
     },
     getTotalRaised: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getTotalRaised", params);
     },
     getMerkleRoot: async (
       params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getMerkleRoot", params);
     },
     updateRoot: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { newMerkleRoot: HexString }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "updateRoot", params);
     },
     verify: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { proof: HexString; data: HexString }
       >
-    ): Promise<TestContractResult<boolean>> => {
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "verify", params);
     },
     hashPair: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { a: HexString; b: HexString }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "hashPair", params);
     },
     hash: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
         { dataToHash: HexString }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "hash", params);
-    },
-    buy: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
-        { amountAlph: bigint; wlMerkleProof: HexString }
-      >
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "buy", params);
-    },
-    calculateTokensReceivedPerAlph: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
-        { amountAlph: bigint }
-      >
-    ): Promise<TestContractResult<bigint>> => {
-      return testMethod(this, "calculateTokensReceivedPerAlph", params);
-    },
-    assertPriceInRange: async (
-      params: Omit<
-        TestContractParams<SaleFlatPriceTypes.Fields, never>,
-        "testArgs"
-      >
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "assertPriceInRange", params);
-    },
-    assertAlphAmountInRange: async (
-      params: TestContractParams<
-        SaleFlatPriceTypes.Fields,
-        { alphAmount: bigint }
-      >
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "assertAlphAmountInRange", params);
     },
   };
 }
 
 // Use this object to test and deploy the contract
-export const SaleFlatPrice = new Factory(
+export const SaleFlatPriceAlph = new Factory(
   Contract.fromJson(
-    SaleFlatPriceContractJson,
+    SaleFlatPriceAlphContractJson,
     "",
-    "62a28f9f3ce63294c9cc9df44f190675cba6227e7f999584b331545866235c5e"
+    "b017759f9a30ec96d21081b982dd0c24e1d59a4ecbe4b598e7f4d4ddde3b14b8"
   )
 );
 
 // Use this class to interact with the blockchain
-export class SaleFlatPriceInstance extends ContractInstance {
+export class SaleFlatPriceAlphInstance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
 
-  async fetchState(): Promise<SaleFlatPriceTypes.State> {
-    return fetchContractState(SaleFlatPrice, this);
+  async fetchState(): Promise<SaleFlatPriceAlphTypes.State> {
+    return fetchContractState(SaleFlatPriceAlph, this);
   }
 
   async getContractEventsCurrentCount(): Promise<number> {
     return getContractEventsCurrentCount(this.address);
   }
 
-  subscribeAccountCreateEvent(
-    options: EventSubscribeOptions<SaleFlatPriceTypes.AccountCreateEvent>,
+  subscribeBuyEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.BuyEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPrice.contract,
+      SaleFlatPriceAlph.contract,
+      this,
+      options,
+      "Buy",
+      fromCount
+    );
+  }
+
+  subscribeAccountCreateEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.AccountCreateEvent>,
+    fromCount?: number
+  ): EventSubscription {
+    return subscribeContractEvent(
+      SaleFlatPriceAlph.contract,
       this,
       options,
       "AccountCreate",
@@ -611,11 +668,11 @@ export class SaleFlatPriceInstance extends ContractInstance {
   }
 
   subscribeAccountDestroyEvent(
-    options: EventSubscribeOptions<SaleFlatPriceTypes.AccountDestroyEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.AccountDestroyEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPrice.contract,
+      SaleFlatPriceAlph.contract,
       this,
       options,
       "AccountDestroy",
@@ -624,11 +681,11 @@ export class SaleFlatPriceInstance extends ContractInstance {
   }
 
   subscribeClaimBuyerEvent(
-    options: EventSubscribeOptions<SaleFlatPriceTypes.ClaimBuyerEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.ClaimBuyerEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPrice.contract,
+      SaleFlatPriceAlph.contract,
       this,
       options,
       "ClaimBuyer",
@@ -637,11 +694,11 @@ export class SaleFlatPriceInstance extends ContractInstance {
   }
 
   subscribeClaimBuyerRefundEvent(
-    options: EventSubscribeOptions<SaleFlatPriceTypes.ClaimBuyerRefundEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.ClaimBuyerRefundEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPrice.contract,
+      SaleFlatPriceAlph.contract,
       this,
       options,
       "ClaimBuyerRefund",
@@ -650,11 +707,11 @@ export class SaleFlatPriceInstance extends ContractInstance {
   }
 
   subscribeClaimSellerEvent(
-    options: EventSubscribeOptions<SaleFlatPriceTypes.ClaimSellerEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.ClaimSellerEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPrice.contract,
+      SaleFlatPriceAlph.contract,
       this,
       options,
       "ClaimSeller",
@@ -663,11 +720,11 @@ export class SaleFlatPriceInstance extends ContractInstance {
   }
 
   subscribeClaimSellerRefundEvent(
-    options: EventSubscribeOptions<SaleFlatPriceTypes.ClaimSellerRefundEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.ClaimSellerRefundEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPrice.contract,
+      SaleFlatPriceAlph.contract,
       this,
       options,
       "ClaimSellerRefund",
@@ -676,11 +733,11 @@ export class SaleFlatPriceInstance extends ContractInstance {
   }
 
   subscribeUpdateRootEvent(
-    options: EventSubscribeOptions<SaleFlatPriceTypes.UpdateRootEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.UpdateRootEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPrice.contract,
+      SaleFlatPriceAlph.contract,
       this,
       options,
       "UpdateRoot",
@@ -688,34 +745,21 @@ export class SaleFlatPriceInstance extends ContractInstance {
     );
   }
 
-  subscribeBuyEvent(
-    options: EventSubscribeOptions<SaleFlatPriceTypes.BuyEvent>,
-    fromCount?: number
-  ): EventSubscription {
-    return subscribeContractEvent(
-      SaleFlatPrice.contract,
-      this,
-      options,
-      "Buy",
-      fromCount
-    );
-  }
-
   subscribeAllEvents(
     options: EventSubscribeOptions<
-      | SaleFlatPriceTypes.AccountCreateEvent
-      | SaleFlatPriceTypes.AccountDestroyEvent
-      | SaleFlatPriceTypes.ClaimBuyerEvent
-      | SaleFlatPriceTypes.ClaimBuyerRefundEvent
-      | SaleFlatPriceTypes.ClaimSellerEvent
-      | SaleFlatPriceTypes.ClaimSellerRefundEvent
-      | SaleFlatPriceTypes.UpdateRootEvent
-      | SaleFlatPriceTypes.BuyEvent
+      | SaleFlatPriceAlphTypes.BuyEvent
+      | SaleFlatPriceAlphTypes.AccountCreateEvent
+      | SaleFlatPriceAlphTypes.AccountDestroyEvent
+      | SaleFlatPriceAlphTypes.ClaimBuyerEvent
+      | SaleFlatPriceAlphTypes.ClaimBuyerRefundEvent
+      | SaleFlatPriceAlphTypes.ClaimSellerEvent
+      | SaleFlatPriceAlphTypes.ClaimSellerRefundEvent
+      | SaleFlatPriceAlphTypes.UpdateRootEvent
     >,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvents(
-      SaleFlatPrice.contract,
+      SaleFlatPriceAlph.contract,
       this,
       options,
       fromCount
@@ -723,11 +767,37 @@ export class SaleFlatPriceInstance extends ContractInstance {
   }
 
   methods = {
-    accountExists: async (
-      params: SaleFlatPriceTypes.CallMethodParams<"accountExists">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"accountExists">> => {
+    getBidTokenDecimals: async (
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getBidTokenDecimals">
+    ): Promise<
+      SaleFlatPriceAlphTypes.CallMethodResult<"getBidTokenDecimals">
+    > => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
+        this,
+        "getBidTokenDecimals",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    calculateSaleTokensReceivedPerBidTokens: async (
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"calculateSaleTokensReceivedPerBidTokens">
+    ): Promise<
+      SaleFlatPriceAlphTypes.CallMethodResult<"calculateSaleTokensReceivedPerBidTokens">
+    > => {
+      return callMethod(
+        SaleFlatPriceAlph,
+        this,
+        "calculateSaleTokensReceivedPerBidTokens",
+        params,
+        getContractByCodeHash
+      );
+    },
+    accountExists: async (
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"accountExists">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"accountExists">> => {
+      return callMethod(
+        SaleFlatPriceAlph,
         this,
         "accountExists",
         params,
@@ -735,10 +805,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getSubContractId: async (
-      params: SaleFlatPriceTypes.CallMethodParams<"getSubContractId">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getSubContractId">> => {
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"getSubContractId">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSubContractId">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getSubContractId",
         params,
@@ -746,10 +816,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     isSaleLive: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"isSaleLive">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"isSaleLive">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isSaleLive">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"isSaleLive">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "isSaleLive",
         params === undefined ? {} : params,
@@ -757,10 +827,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     isSaleFinished: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"isSaleFinished">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"isSaleFinished">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isSaleFinished">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"isSaleFinished">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "isSaleFinished",
         params === undefined ? {} : params,
@@ -768,10 +838,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     isSaleSuccess: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"isSaleSuccess">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"isSaleSuccess">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isSaleSuccess">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"isSaleSuccess">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "isSaleSuccess",
         params === undefined ? {} : params,
@@ -779,10 +849,12 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     isWhitelistSaleLive: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"isWhitelistSaleLive">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"isWhitelistSaleLive">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isWhitelistSaleLive">
+    ): Promise<
+      SaleFlatPriceAlphTypes.CallMethodResult<"isWhitelistSaleLive">
+    > => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "isWhitelistSaleLive",
         params === undefined ? {} : params,
@@ -790,10 +862,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     isWhitelistSale: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"isWhitelistSale">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"isWhitelistSale">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isWhitelistSale">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"isWhitelistSale">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "isWhitelistSale",
         params === undefined ? {} : params,
@@ -801,10 +873,12 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     isCallerSaleOwner: async (
-      params: SaleFlatPriceTypes.CallMethodParams<"isCallerSaleOwner">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"isCallerSaleOwner">> => {
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"isCallerSaleOwner">
+    ): Promise<
+      SaleFlatPriceAlphTypes.CallMethodResult<"isCallerSaleOwner">
+    > => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "isCallerSaleOwner",
         params,
@@ -812,10 +886,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getSaleOwner: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getSaleOwner">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getSaleOwner">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getSaleOwner">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSaleOwner">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getSaleOwner",
         params === undefined ? {} : params,
@@ -823,10 +897,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getSaleStart: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getSaleStart">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getSaleStart">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getSaleStart">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSaleStart">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getSaleStart",
         params === undefined ? {} : params,
@@ -834,10 +908,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getSaleEnd: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getSaleEnd">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getSaleEnd">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getSaleEnd">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSaleEnd">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getSaleEnd",
         params === undefined ? {} : params,
@@ -845,10 +919,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getMinRaise: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getMinRaise">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getMinRaise">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getMinRaise">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getMinRaise">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getMinRaise",
         params === undefined ? {} : params,
@@ -856,10 +930,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getMaxRaise: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getMaxRaise">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getMaxRaise">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getMaxRaise">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getMaxRaise">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getMaxRaise",
         params === undefined ? {} : params,
@@ -867,10 +941,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getSaleTokenId: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getSaleTokenId">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getSaleTokenId">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getSaleTokenId">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSaleTokenId">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getSaleTokenId",
         params === undefined ? {} : params,
@@ -878,10 +952,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getBidTokenId: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getBidTokenId">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getBidTokenId">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getBidTokenId">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getBidTokenId">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getBidTokenId",
         params === undefined ? {} : params,
@@ -889,12 +963,12 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getWhitelistSaleStart: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getWhitelistSaleStart">
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getWhitelistSaleStart">
     ): Promise<
-      SaleFlatPriceTypes.CallMethodResult<"getWhitelistSaleStart">
+      SaleFlatPriceAlphTypes.CallMethodResult<"getWhitelistSaleStart">
     > => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getWhitelistSaleStart",
         params === undefined ? {} : params,
@@ -902,10 +976,12 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getWhitelistSaleEnd: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getWhitelistSaleEnd">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getWhitelistSaleEnd">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getWhitelistSaleEnd">
+    ): Promise<
+      SaleFlatPriceAlphTypes.CallMethodResult<"getWhitelistSaleEnd">
+    > => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getWhitelistSaleEnd",
         params === undefined ? {} : params,
@@ -913,10 +989,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getTokensSold: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getTokensSold">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getTokensSold">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getTokensSold">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getTokensSold">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getTokensSold",
         params === undefined ? {} : params,
@@ -924,10 +1000,10 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getTotalRaised: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getTotalRaised">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getTotalRaised">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getTotalRaised">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getTotalRaised">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getTotalRaised",
         params === undefined ? {} : params,
@@ -935,39 +1011,26 @@ export class SaleFlatPriceInstance extends ContractInstance {
       );
     },
     getMerkleRoot: async (
-      params?: SaleFlatPriceTypes.CallMethodParams<"getMerkleRoot">
-    ): Promise<SaleFlatPriceTypes.CallMethodResult<"getMerkleRoot">> => {
+      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getMerkleRoot">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getMerkleRoot">> => {
       return callMethod(
-        SaleFlatPrice,
+        SaleFlatPriceAlph,
         this,
         "getMerkleRoot",
         params === undefined ? {} : params,
         getContractByCodeHash
       );
     },
-    calculateTokensReceivedPerAlph: async (
-      params: SaleFlatPriceTypes.CallMethodParams<"calculateTokensReceivedPerAlph">
-    ): Promise<
-      SaleFlatPriceTypes.CallMethodResult<"calculateTokensReceivedPerAlph">
-    > => {
-      return callMethod(
-        SaleFlatPrice,
-        this,
-        "calculateTokensReceivedPerAlph",
-        params,
-        getContractByCodeHash
-      );
-    },
   };
 
-  async multicall<Calls extends SaleFlatPriceTypes.MultiCallParams>(
+  async multicall<Calls extends SaleFlatPriceAlphTypes.MultiCallParams>(
     calls: Calls
-  ): Promise<SaleFlatPriceTypes.MultiCallResults<Calls>> {
+  ): Promise<SaleFlatPriceAlphTypes.MultiCallResults<Calls>> {
     return (await multicallMethods(
-      SaleFlatPrice,
+      SaleFlatPriceAlph,
       this,
       calls,
       getContractByCodeHash
-    )) as SaleFlatPriceTypes.MultiCallResults<Calls>;
+    )) as SaleFlatPriceAlphTypes.MultiCallResults<Calls>;
   }
 }
