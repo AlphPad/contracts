@@ -52,7 +52,9 @@ const deployStaking: DeployFunction<Settings> = async (
         reserve1: 1158354144971n,
         blockTimeStampLast: 1711272923n,
         price0CumulativeLast: 106836841546536540153097986132n,
-        price1CumulativeLast: 63385262986297632636674035629216529767188163926182582n
+        price1CumulativeLast: 63385262986297632636674035629216529767188163926182582n,
+        feeCollectorId: "",
+        totalSupply: 0n
       }
     })
     tokenPairAddress = tokenPair.contractInstance.address;

@@ -131,20 +131,9 @@ Abstract Contract SaleFlatPrice(
         assertSaleAmountInRange()
         assertBidAmountInRange(bidAmount)
         let saleTokenDecimals = IFungibleToken(saleTokenId).getDecimals()
-        let bidTokenDecimals = getBidTokenDecimals()
         assert!(saleTokenDecimals <= 18, ErrorCodes.SaleTokenMoreThan18Decimal)
-        
-        let scaledUpBid = bidAmount * (10**bidTokenDecimals) // To maintain precision when dividing
-        let tokensReceivedInBidScale = scaledUpBid / tokenPrice // tokenPrice is on same scale as bidAmount
-        if (saleTokenDecimals > bidTokenDecimals) { // scale up if sale token has more decimals
-            return tokensReceivedInBidScale * (10**(saleTokenDecimals - bidTokenDecimals))
-        } else { // scale down if sale token has less decimals
-            return tokensReceivedInBidScale / (10**(bidTokenDecimals - saleTokenDecimals))
-        }
+        return bidAmount * (10 ** saleTokenDecimals) / tokenPrice
     }
-
-    // Let deriving contracts define the bid decimals
-    pub fn getBidTokenDecimals() -> U256
 
     fn assertPriceInRange() -> () {
         assert!(tokenPrice <= 1 * (10**32), ErrorCodes.PriceMoreThanMax) // price can't be bigger than 32 digits to avoid overflows on multiplication

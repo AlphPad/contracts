@@ -21,9 +21,9 @@ Abstract Contract AccountFactory(accountTemplateId: ByteVec) {
     
     // Event declarations
     // Triggered when a new account is created.
-    event AccountCreate(account: ByteVec, contractId: ByteVec)
+    event AccountCreate(account: Address, contractId: ByteVec)
     // Triggered when an account is destroyed.
-    event AccountDestroy(account: ByteVec, contractId: ByteVec)
+    event AccountDestroy(account: Address, contractId: ByteVec)
     
     // Error code enumeration for specific account related errors.
     enum AccountErrorCodes {
@@ -44,7 +44,7 @@ Abstract Contract AccountFactory(accountTemplateId: ByteVec) {
             encodedMutFields
         )
 
-        emit AccountCreate(toByteVec!(account), contractId)
+        emit AccountCreate(account, contractId)
     }
 
     // Destroys an existing account subcontract.
@@ -57,7 +57,7 @@ Abstract Contract AccountFactory(accountTemplateId: ByteVec) {
 
         accountInstance.destroy()
 
-        emit AccountDestroy(toByteVec!(account), subContractId)
+        emit AccountDestroy(account, subContractId)
     }
 
     // Checks whether an account subcontract exists for a given address.

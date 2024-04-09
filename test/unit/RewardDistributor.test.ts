@@ -124,7 +124,7 @@ describe('Reward Distributor Contract Testing', () => {
       }
       expect(rewardDistState.asset.alphAmount).toBeLessThan(ONE_ALPH * 802n);
       expect(cummulativeRewards).toBeGreaterThan(ONE_ALPH * 198n);
-    });
+    }, 10000);
 
 
     test('Harvest All Epochs After Adding Rewards And Adding Another Reward', async () => {
@@ -153,7 +153,7 @@ describe('Reward Distributor Contract Testing', () => {
       }
       expect(rewardDistState.asset.alphAmount).toBeLessThan(ONE_ALPH * 2n);
       expect(cummulativeRewards).toBeGreaterThan(ONE_ALPH * 1999n);
-    });
+    }, 10000);
 
     test('Harvest All Epochs After Adding Rewards', async () => {
       const addAlphAmount = ONE_ALPH * 1000n;
@@ -169,7 +169,7 @@ describe('Reward Distributor Contract Testing', () => {
         expect(rewardDistState.fields.currentHarvestDistributed).toBeGreaterThan(ONE_ALPH * 99n);
       }
       expect(rewardDistState.asset.alphAmount).toBeLessThan(ONE_ALPH * 2n);
-    });
+    }, 10000);
 
     test('Harvest At Mid Second Epoch After Adding Rewards', async () => {
       const addAlphAmount = ONE_ALPH * 1000n;

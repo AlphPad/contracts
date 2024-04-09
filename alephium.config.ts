@@ -75,9 +75,9 @@ const testnetSettings: Settings = {
 
 const mainnetSettings: Settings = {
   issueTokenAmount: 100_000_000n * 10n ** 18n,
-  upgradeDelay: 604800000n, // 7 days
+  upgradeDelay: 1209600000n, // 14 days
   rewards: {
-    unstakeLockTime: 259200000n, // 3 days
+    unstakeLockTime: 864000000n, // 10 days
     rdEpochDuration: 864000000n, // 10 days
   },
   team: {

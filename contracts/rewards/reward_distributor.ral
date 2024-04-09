@@ -121,8 +121,7 @@ Contract RewardDistributor (
         // Update tokenRewards array with appropriate rewards
         for (let mut i = 0; i < totalEpochs; i = i + 1) {
             if (size!(totalRewards) == totalEpochs * 32) {
-                let startIndex = i * 32
-                let currentEpochReward = u256From32Byte!(byteVecSlice!(totalRewards, startIndex, startIndex + 32))
+                let currentEpochReward = get(totalRewards, i)
                 newTotalRewards = newTotalRewards ++ u256To32Byte!(currentEpochReward + rewardPerEpoch)
             } else {
                 newTotalRewards = newTotalRewards ++ u256To32Byte!(rewardPerEpoch)
@@ -136,11 +135,8 @@ Contract RewardDistributor (
 
     // Returns the total pending rewards yet to be distributed.
     pub fn getTotalPendingRewards() -> U256 {
-
-        assert!(size!(totalRewards) == totalEpochs * 32, ErrorCodes.RewardsNotInitialized)
-        
         let mut totalPendingRewards = 0
-        for (let mut i = 0; i < totalEpochs; i = i + 1) { totalPendingRewards = totalPendingRewards + u256From32Byte!(byteVecSlice!(totalRewards, (i * 32), (i * 32) + 32)) }
+        for (let mut i = 0; i < totalEpochs; i = i + 1) { totalPendingRewards = totalPendingRewards + get(totalRewards, i) }
         return totalPendingRewards
     }
 
@@ -153,14 +149,14 @@ Contract RewardDistributor (
 
     // Internal array operation functions from https://github.com/alephium/ralph-example/blob/master/dynamic-array/contracts/dynamic-array.ral
     fn update(array: ByteVec, index: U256, value: U256) -> ByteVec {
-        assert!(size!(array) % 32 == 0, 0)
+        assert!(size!(array) % 32 == 0, ErrorCodes.RewardsNotInitialized)
 
         let offset = index * 32
         return byteVecSlice!(array, 0, offset) ++ u256To32Byte!(value) ++ byteVecSlice!(array, offset + 32, size!(array))
     }
 
     fn get(array: ByteVec, index: U256) -> U256 {
-        assert!(size!(array) % 32 == 0, 0)
+        assert!(size!(array) % 32 == 0, ErrorCodes.RewardsNotInitialized)
 
         let offset = index * 32
         let bytes = byteVecSlice!(array, offset, offset + 32)

@@ -8,8 +8,16 @@ Contract TokenPair(
   reserve1: U256,
   blockTimeStampLast: U256,
   price0CumulativeLast: U256,
-  price1CumulativeLast: U256
-) implements DexPoolInterface {
+  price1CumulativeLast: U256,
+  totalSupply: U256,
+  mut feeCollectorId: ByteVec
+) extends Math() implements IFungibleToken {
+
+
+  @using(updateFields = true,checkExternalCaller = false)
+  pub fn setFeeCollectorId(id: ByteVec) -> () {
+    feeCollectorId = id
+  }
 
   pub fn getTokenPair() -> (ByteVec, ByteVec) {
     return token0Id, token1Id
@@ -19,15 +27,49 @@ Contract TokenPair(
     return reserve0, reserve1
   }
 
+  fn pairName_() -> ByteVec {
+    let alph_ = #414c5048
+    let mut tokenA = alph_
+    let mut tokenB = alph_
+
+    if (token0Id != ALPH) {
+        tokenA = IFungibleToken(token0Id).getSymbol()
+    }
+
+    if (token1Id != ALPH) {
+        tokenB = IFungibleToken(token1Id).getSymbol()
+    }
+
+    return tokenA ++ tokenB
+  }
+  
+  @using(checkExternalCaller = false)
+  pub fn getSymbol() -> ByteVec {
+    return pairName_()
+  }
+
+  @using(checkExternalCaller = false)
+  pub fn getName() -> ByteVec {
+    return pairName_()
+  }
+
+  pub fn getDecimals() -> U256 {
+    return 18
+  }
+
+  pub fn getTotalSupply() -> U256 {
+    return totalSupply
+  }
+
+  pub fn getBlockTimeStampLast() -> U256 {
+    return blockTimeStampLast
+  }
+
   pub fn getPrice0CumulativeLast() -> U256 {
     return price0CumulativeLast
   }
 
   pub fn getPrice1CumulativeLast() -> U256 {
     return price1CumulativeLast
-  }
-
-  pub fn getBlockTimeStampLast() -> U256 {
-    return blockTimeStampLast
   }
 }

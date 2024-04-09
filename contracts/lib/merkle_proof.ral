@@ -58,10 +58,10 @@ Abstract Contract MerkleProof(mut merkleRoot: ByteVec) {
     // results in the Merkle root stored in the contract.
     // This verification is crucial for many cryptographic applications where proving membership or
     // correctness without revealing the entire data set is required.
-    fn verify(proof: ByteVec, data: ByteVec) -> (Bool) {
-        assert!(size!(data) == 32, MerkleProofErrorCodes.InvalidDataHash)
+    fn verify(proof: ByteVec, dataHash: ByteVec) -> (Bool) {
+        assert!(size!(dataHash) == 32, MerkleProofErrorCodes.InvalidDataHash)
         
-        let mut currentHash = data
+        let mut currentHash = dataHash
         
         let proofSize = size!(proof)
         assert!(proofSize % 32 == 0, MerkleProofErrorCodes.InvalidProofSize) // Ensure proof is a multiple of 32 bytes

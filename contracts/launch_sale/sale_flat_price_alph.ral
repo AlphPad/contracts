@@ -55,9 +55,6 @@ Contract SaleFlatPriceAlph(
             transferTokenFromSelf!(saleOwner, saleTokenId, saleTokenTotalAmount - tokensSold)
         }
     }
-
-    // Alph token has 18 decimals
-    pub fn getBidTokenDecimals() -> U256 { return 18 }
 }
 
 // Transaction scripts
