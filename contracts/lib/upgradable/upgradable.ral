@@ -1,0 +1,138 @@
+// Abstract Contract Upgradable
+// - This contract is a template for upgradeable smart contracts.
+// - It manages upgrades related to contract code and ownership.
+// - The upgrade process is designed to be secure, controlled, and transparent.
+Abstract Contract Upgradable (
+    upgradeDelay: U256,                 // The delay period required between initiating and applying an upgrade.
+    mut owner: Address,                 // Current owner's address of the contract.
+    mut newOwner: Address,              // Address of the new owner, set during ownership transfer process.
+    mut upgradeCommenced: U256,         // Timestamp marking the start of an upgrade process.
+    mut newCode: ByteVec,               // New contract code to be migrated to.
+    mut newImmFieldsEncoded: ByteVec,   // Encoded immutable fields for the new contract.
+    mut newMutFieldsEncoded: ByteVec    // Encoded mutable fields for the new contract.
+) implements IUpgradable {
+    
+    // Events for logging significant actions during the upgrade process
+    event ChangeOwnerCommence(owner: Address, changeOwner: Address)
+    event ChangeOwnerApply(owner: Address, changeOwner: Address)
+    event MigrateCommence(owner: Address, changeCode: ByteVec)
+    event MigrateApply(owner: Address, changeCode: ByteVec)
+    event MigrateWithFieldsCommence(owner: Address, changeCode: ByteVec, changeImmFieldsEncoded: ByteVec, changeMutFieldsEncoded: ByteVec)
+    event MigrateWithFieldsApply(owner: Address, changeCode: ByteVec, changeImmFieldsEncoded: ByteVec, changeMutFieldsEncoded: ByteVec)
+    
+    // Enum to represent different error codes related to the contract upgrade process
+    enum UpgradeErrorCodes {
+        Forbidden = 13000
+        UpgradePending = 13001
+        UpgradeNotPending = 13002
+        UpgradeDelayNotExpired = 13003
+        MigrateNotPending = 13004
+        MigrateWithFieldsNotPending = 13005
+        ChangeOwnerNotPending = 13006
+    }
+
+    // Initiates ownership transfer to a new owner.
+    @using(updateFields = true)
+    pub fn changeOwner(changeOwner: Address) -> () {
+        assertOnlyOwner(callerAddress!())
+        assertUpgradeNotPending()
+        newOwner = changeOwner
+        newCode = #
+        newImmFieldsEncoded = #
+        newMutFieldsEncoded = #
+        upgradeCommenced = blockTimeStamp!()
+        emit ChangeOwnerCommence(owner, newOwner)
+    }
+
+    // Initiates migration to new contract code.
+    @using(updateFields = true)
+    pub fn migrate(changeCode: ByteVec) -> () {
+        assertOnlyOwner(callerAddress!())
+        assertUpgradeNotPending()
+        newOwner = nullContractAddress!()
+        newCode = changeCode
+        newImmFieldsEncoded = #
+        newMutFieldsEncoded = #
+        upgradeCommenced = blockTimeStamp!()
+        emit MigrateCommence(owner, newCode)
+    }
+
+    // Initiates migration with new fields
+    @using(updateFields = true)
+    pub fn migrateWithFields(changeCode: ByteVec, changeImmFieldsEncoded: ByteVec, changeMutFieldsEncoded: ByteVec) -> () {
+        assertOnlyOwner(callerAddress!())
+        assertUpgradeNotPending()
+        newOwner = nullContractAddress!()
+        newCode = changeCode
+        newImmFieldsEncoded = changeImmFieldsEncoded
+        newMutFieldsEncoded = changeMutFieldsEncoded
+        upgradeCommenced = blockTimeStamp!()
+        emit MigrateWithFieldsCommence(owner, newCode, newImmFieldsEncoded, newMutFieldsEncoded)
+    }
+
+    /// Applies the change of contract ownership.
+    @using(updateFields = true)
+    pub fn changeOwnerApply() -> () {
+        assertOnlyOwner(callerAddress!())
+        assertUpgradeDelayElapsed()
+        assert!(newOwner != nullContractAddress!(), UpgradeErrorCodes.ChangeOwnerNotPending)
+        emit ChangeOwnerApply(owner, newOwner)
+        owner = newOwner
+        resetFields()
+    }
+
+    // Applies the migration to the new contract code.
+    pub fn migrateApply() -> () {
+        assertOnlyOwner(callerAddress!())
+        assertUpgradeDelayElapsed()
+        assert!((newCode != # && newImmFieldsEncoded == # && newMutFieldsEncoded == #), UpgradeErrorCodes.MigrateNotPending)
+        emit MigrateApply(owner, newCode)
+        migrate!(newCode)
+        resetFields()
+    }
+
+    // Applies the migration along with new fields.
+    @using(updateFields = true)
+    pub fn migrateWithFieldsApply() -> () {
+        assertOnlyOwner(callerAddress!())
+        assertUpgradeDelayElapsed()
+        assert!((newCode != # && newImmFieldsEncoded != # && newMutFieldsEncoded != #), UpgradeErrorCodes.MigrateWithFieldsNotPending)
+        emit MigrateWithFieldsApply(owner, newCode, newImmFieldsEncoded, newMutFieldsEncoded)
+        migrateWithFields!(newCode, newImmFieldsEncoded, newMutFieldsEncoded)
+        resetFields()
+    }
+
+    // Resets the upgrade-related fields to their default state.
+    // - This is a public function because it can be beneficial to cancel an update or to prevent an upgrade when owner is compromised
+    pub fn resetUpgrade() -> () {
+        assertOnlyOwner(callerAddress!())
+        resetFields()
+    }
+
+    // Public getters
+    pub fn getUpgradeDelay() -> U256 { return upgradeDelay }
+    pub fn getOwner() -> Address { return owner }
+    pub fn getNewOwner() -> Address { return newOwner }
+    pub fn getUpgradeCommenced() -> U256 { return upgradeCommenced }
+    pub fn getNewCode() -> ByteVec { return newCode }
+    pub fn getNewImmFieldsEncoded() -> ByteVec { return newImmFieldsEncoded }
+    pub fn getNewMutFieldsEncoded() -> ByteVec { return newMutFieldsEncoded }
+
+    // Resets the upgrade-related fields to their default state.
+    @using(updateFields = true)
+    fn resetFields() -> () {
+        upgradeCommenced = 0
+        newOwner = nullContractAddress!()
+        newCode = #
+        newImmFieldsEncoded = #
+        newMutFieldsEncoded = #
+    }
+
+    // Internal functions for asserting key parameters
+    fn assertOnlyOwner(caller: Address) -> () { checkCaller!(caller == owner, UpgradeErrorCodes.Forbidden) }
+    fn assertUpgradeNotPending() -> () { assert!(upgradeCommenced == 0, UpgradeErrorCodes.UpgradePending) }
+    fn assertUpgradeDelayElapsed() -> () { 
+        assert!(upgradeCommenced != 0, UpgradeErrorCodes.UpgradeNotPending) 
+        assert!(blockTimeStamp!() > upgradeCommenced + upgradeDelay, UpgradeErrorCodes.UpgradeDelayNotExpired) 
+    }
+}

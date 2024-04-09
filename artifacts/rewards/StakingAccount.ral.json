@@ -1,0 +1,318 @@
+{
+  "version": "v2.11.0",
+  "name": "StakingAccount",
+  "bytecode": "09120e1e402a40394042404b40a840c040ec40fb41084111411a4123412c4135413e4147010200000005b400030002ce01b0010000000108a0010c2fa0000c2f1a020000000000030001136f467b0000010100051600ce0045136f457b010000000102ce0002010000000102ce010201000007014034561700ce040c2f4c02a000021600ce02324c020c021600ce03344c02ce0317001600ce022b1701ce03ce022b1702130a1312831703160116032c16022d1704ce0416042c16032d1705ce04a0002b1706160516062b0201000101000bce040c2f1340717bb40003a00016002aa100010001010016b4000316000006321340707ba00016003413406f7ba00016002ba100a00116002aa10156a102010000000006b400030ca1020ca101010001010004b400031600a103010000000102ce0402010000000102ce0302010000000102ce0202010000000102a00002010000000102a00102010000000102a00202010000000102a00302",
+  "codeHash": "ed8ca8e2bf6914710e8ee9e6e5939f362256ed1db2c93d402b6f919583095776",
+  "fieldsSig": {
+    "names": [
+      "parentContractAddress",
+      "accountHolder",
+      "vestedStart",
+      "vestedTill",
+      "vestedTotalAmount",
+      "amountStaked",
+      "amountUnstaked",
+      "beginUnstakeAt",
+      "rewardPerToken"
+    ],
+    "types": [
+      "Address",
+      "Address",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "eventsSig": [],
+  "functions": [
+    {
+      "name": "destroy",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "isSafeToDestroy",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "assertIsSafeToDestroy",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertIsParentTheCaller",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "caller"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "getParentContractAddress",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Address"
+      ]
+    },
+    {
+      "name": "getAccountHolder",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Address"
+      ]
+    },
+    {
+      "name": "calcVestedClaimable",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "stake",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "amount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "unstake",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "amount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "withdraw",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "setRewardPerToken",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "newRewardPerToken"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "getVestedTotalAmount",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getVestedTill",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getVestedStart",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getAmountStaked",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getAmountUnstaked",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getBeginUnstakeAt",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getRewardPerToken",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    }
+  ],
+  "constants": [],
+  "enums": [
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "InsufficientBalance",
+          "value": {
+            "type": "U256",
+            "value": "111"
+          }
+        },
+        {
+          "name": "AmountNotVested",
+          "value": {
+            "type": "U256",
+            "value": "112"
+          }
+        },
+        {
+          "name": "CanNotStakeToVestedAccounts",
+          "value": {
+            "type": "U256",
+            "value": "113"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AccountBaseErrorCodes",
+      "fields": [
+        {
+          "name": "UnauthorizedAccess",
+          "value": {
+            "type": "U256",
+            "value": "12101"
+          }
+        },
+        {
+          "name": "UnsafeDestroy",
+          "value": {
+            "type": "U256",
+            "value": "12102"
+          }
+        }
+      ]
+    }
+  ]
+}

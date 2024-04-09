@@ -1,0 +1,71 @@
+/// Abstract Contract: AccountFactory
+///
+/// Manages the lifecycle of account-type subcontracts. It provides functionality for creating and
+/// destroying account subcontracts, facilitating management of account balances for a main contract.
+///
+/// Parameters:
+/// - accountTemplateId (ByteVec): ID of the account template used for creating subcontracts.
+///
+/// Events:
+/// - AccountCreate: Emitted when a new account subcontract is successfully created.
+/// - AccountDestroy: Emitted when an existing account subcontract is destroyed.
+///
+/// Error Codes:
+/// - AccountAlreadyExists (12001): Raised if an attempt is made to create an account that already exists.
+/// - AccountDoesNotExists (12002): Raised if an attempt is made to destroy an account that does not exist.
+///
+/// Usage:
+/// The `AccountFactory` contract should be utilized by other contracts requiring the management of
+/// account-type subcontracts, It ensures efficient and secure handling of account subcontracts.
+Abstract Contract AccountFactory(accountTemplateId: ByteVec) {
+    
+    // Event declarations
+    // Triggered when a new account is created.
+    event AccountCreate(account: ByteVec, contractId: ByteVec)
+    // Triggered when an account is destroyed.
+    event AccountDestroy(account: ByteVec, contractId: ByteVec)
+    
+    // Error code enumeration for specific account related errors.
+    enum AccountErrorCodes {
+        AccountAlreadyExists = 12001
+        AccountDoesNotExists = 12002
+    }
+
+    // Creates an account subcontract based on the account template.
+    // Emits the AccountCreate event upon successful creation.
+    @using(preapprovedAssets = true)
+    fn createAccount(account: Address, encodedImmFields:ByteVec, encodedMutFields:ByteVec) -> () {
+        assert!(!accountExists(account), AccountErrorCodes.AccountAlreadyExists)
+
+        let contractId = copyCreateSubContract!{account -> ALPH: 1 alph}(
+            toByteVec!(account),
+            accountTemplateId,
+            encodedImmFields,
+            encodedMutFields
+        )
+
+        emit AccountCreate(toByteVec!(account), contractId)
+    }
+
+    // Destroys an existing account subcontract.
+    // Emits the AccountDestroy event upon successful destruction.
+    fn destroyAccount(account: Address) -> () {
+        assertAccountExists(account)
+
+        let subContractId = getSubContractId(account)
+        let accountInstance = AccountInterface(subContractId)
+
+        accountInstance.destroy()
+
+        emit AccountDestroy(toByteVec!(account), subContractId)
+    }
+
+    // Checks whether an account subcontract exists for a given address.
+    fn assertAccountExists(account: Address) -> () { assert!(accountExists(account), AccountErrorCodes.AccountDoesNotExists) }
+
+    // Checks whether an account subcontract exists for a given address.
+    pub fn accountExists(account: Address) -> Bool { return contractExists!(getSubContractId(account)) }
+
+    // Retrieves the subcontract ID associated with an account address.
+    pub fn getSubContractId(account: Address) -> ByteVec { return subContractId!(toByteVec!(account)) }
+}
