@@ -10,7 +10,8 @@ import {
   createRewardDistributor,
   createStaking,
   createDummyToken,
-  createApadToken
+  createApadToken,
+  createBurnAlph
 } from './fixtures'
 import { expectAssertionError, randomContractAddress, randomContractId } from '@alephium/web3-test'
 import { SaleFlatPriceAlph, SaleFlatPriceAlphTypes } from '../../artifacts/ts'
@@ -55,8 +56,10 @@ describe('Sale Flat Price Contract Testing', () => {
     ]
     genesis = Date.now()
     let rewardDistributor = createRewardDistributor(BigInt(genesis), 1000n, 10n, randomContractId(), bidToken.states());
-    let accountTemplate = createSaleBuyerTemplateAccount(rewardDistributor.states());
+    let burnAlph = createBurnAlph(rewardDistributor.states());
+    let accountTemplate = createSaleBuyerTemplateAccount(burnAlph.states());
     fixtureRegularSale = createSaleFlatPrice(
+      burnAlph.contractId,
       rewardDistributor.contractId,
       seller,
       accountTemplate.contractId,
@@ -78,6 +81,7 @@ describe('Sale Flat Price Contract Testing', () => {
     );
 
     fixtureWLAndRegularSale = createSaleFlatPrice(
+      burnAlph.contractId,
       rewardDistributor.contractId,
       seller,
       accountTemplate.contractId,
@@ -216,7 +220,9 @@ describe('Sale Flat Price Contract Testing', () => {
       const saleToken = createDummyToken("a", "a", 4n, 10000000n * (10n ** 18n), []);
       const bidToken = createDummyToken("Alephium", "ALPH", 18n, 10000000n * (10n ** 18n), saleToken.states(), ALPH_TOKEN_ID);
       const saleTokenId = tokenIdFromAddress(saleToken.address);
+      const burnAlph = createBurnAlph(bidToken.states());
       const sale = createSaleFlatPrice(
+        burnAlph.contractId,
         randomContractId(),
         seller,
         randomContractId(),
@@ -234,7 +240,7 @@ describe('Sale Flat Price Contract Testing', () => {
         0n,
         0n,
         "",
-        bidToken.states())
+        burnAlph.states())
       var result = await calculateTokensReceivedPerAlph(sale.selfState, 10n * (10n ** 18n), sale.dependencies)
       expect(result.returns).toBe(10000n * 10n ** 4n);
       result = await calculateTokensReceivedPerAlph(sale.selfState, 50n * (10n ** 18n), sale.dependencies)
@@ -249,7 +255,9 @@ describe('Sale Flat Price Contract Testing', () => {
       const saleToken = createDummyToken("a", "a", 4n, 10000000n * (10n ** 18n), []);
       const bidToken = createDummyToken("Alephium", "ALPH", 18n, 10000000n * (10n ** 18n), saleToken.states(), ALPH_TOKEN_ID);
       const saleTokenId = tokenIdFromAddress(saleToken.address);
+      const burnAlph = createBurnAlph(bidToken.states());
       const sale = createSaleFlatPrice(
+        burnAlph.contractId,
         randomContractId(),
         seller,
         randomContractId(),
@@ -267,7 +275,7 @@ describe('Sale Flat Price Contract Testing', () => {
         0n,
         0n,
         "",
-        bidToken.states())
+        burnAlph.states())
       var result = await calculateTokensReceivedPerAlph(sale.selfState, 10n * (10n ** 18n), sale.dependencies)
       expect(result.returns).toBe(2n * 10n ** 4n);
       result = await calculateTokensReceivedPerAlph(sale.selfState, 50n * (10n ** 18n), sale.dependencies)
@@ -282,7 +290,9 @@ describe('Sale Flat Price Contract Testing', () => {
       const saleToken = createDummyToken("a", "a", 19n, 10000000n * (10n ** 18n), []);
       const bidToken = createDummyToken("Alephium", "ALPH", 18n, 10000000n * (10n ** 18n), saleToken.states(), ALPH_TOKEN_ID);
       const saleTokenId = tokenIdFromAddress(saleToken.address);
+      const burnAlph = createBurnAlph(bidToken.states());
       const sale = createSaleFlatPrice(
+        burnAlph.contractId,
         randomContractId(),
         seller,
         randomContractId(),
@@ -300,7 +310,7 @@ describe('Sale Flat Price Contract Testing', () => {
         0n,
         0n,
         "",
-        bidToken.states())
+        burnAlph.states())
 
       await expectAssertionError(calculateTokensReceivedPerAlph(sale.selfState, 10n * (10n ** 18n), sale.dependencies), sale.address, Number(SaleFlatPriceAlph.consts.ErrorCodes.SaleTokenMoreThan18Decimal));
     });

@@ -32,6 +32,7 @@ import { getContractByCodeHash } from "./contracts";
 // Custom types for the contract
 export namespace SaleManagerTypes {
   export type Fields = {
+    burnAlphContract: HexString;
     rewardDistributor: HexString;
     pair: HexString;
     alphTokenId: HexString;
@@ -40,6 +41,7 @@ export namespace SaleManagerTypes {
     upgradeDelay: bigint;
     saleFlatPriceAlphTemplateId: HexString;
     accountTemplateId: HexString;
+    saleCounter: bigint;
     owner: Address;
     newOwner: Address;
     upgradeCommenced: bigint;
@@ -80,6 +82,7 @@ export namespace SaleManagerTypes {
   }>;
   export type CreateSaleFlatPriceAlphEvent = ContractEvent<{
     account: Address;
+    saleIndex: bigint;
     contractId: HexString;
   }>;
 
@@ -409,7 +412,7 @@ export const SaleManager = new Factory(
   Contract.fromJson(
     SaleManagerContractJson,
     "",
-    "ea24ab6940736196666e9ee716a14ebb3eaa40d4fb1c679702afd24415597647"
+    "5c4c81ea3e03eec11fb9694037c97fd69db3fcb5b6ad934dc936cb3992f2e43b"
   )
 );
 

@@ -50,11 +50,11 @@ export namespace StakingTypes {
   export type State = ContractState<Fields>;
 
   export type AccountCreateEvent = ContractEvent<{
-    account: HexString;
+    account: Address;
     contractId: HexString;
   }>;
   export type AccountDestroyEvent = ContractEvent<{
-    account: HexString;
+    account: Address;
     contractId: HexString;
   }>;
   export type ChangeOwnerCommenceEvent = ContractEvent<{
@@ -538,7 +538,7 @@ export const Staking = new Factory(
   Contract.fromJson(
     StakingContractJson,
     "",
-    "09cfa395376389a28fa1b847641fcef1d5909d2dccef2b581cb05d87d697bf83"
+    "b74ef76385018945cc0581cf1d680f5c1aea0ed05976c3b50d2a2e0c9fa752dc"
   )
 );
 

@@ -442,6 +442,14 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getTotalRewards", params);
     },
+    assertTotalRewardsIsInitialized: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<RewardDistributorTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "assertTotalRewardsIsInitialized", params);
+    },
     update: async (
       params: TestContractParamsWithoutMaps<
         RewardDistributorTypes.Fields,
@@ -466,7 +474,7 @@ export const RewardDistributor = new Factory(
   Contract.fromJson(
     RewardDistributorContractJson,
     "",
-    "606b7c84b055cc1b9fb7c6242e5790129f79ae228b3778bd533b23f2474d87a8"
+    "b913efd25718eeda658a22dfdd9da1d6be770e05b97d607e54ea9f273f724c16"
   )
 );
 

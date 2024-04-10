@@ -249,7 +249,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
-    await SaleFlatPriceAlphClaimTX.execute(seller2, {
+    let tx = await SaleFlatPriceAlphClaimTX.execute(seller2, {
       initialFields: {
         saleFlatPrice: flatPriceSaleContractId,
         amount: add18Decimals(100n)
@@ -257,6 +257,7 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
+    console.log("CHECK THIS: " + tx.txId);
 
     let apadBalance = await balanceOf(tokenId, seller2.address);
     let alphBalance = await balanceOf(ALPH_TOKEN_ID, seller2.address);
@@ -348,7 +349,6 @@ describe('Sale Contracts Tests', () => {
       },
       attoAlphAmount: DUST_AMOUNT
     })
-
 
     let apadBalance = await balanceOf(tokenId, seller3.address);
     let alphBalance = await balanceOf(ALPH_TOKEN_ID, seller3.address);

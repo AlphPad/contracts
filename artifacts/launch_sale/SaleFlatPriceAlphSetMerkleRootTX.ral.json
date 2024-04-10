@@ -1,7 +1,7 @@
 {
-  "version": "v2.11.0",
+  "version": "v2.12.0",
   "name": "SaleFlatPriceAlphSetMerkleRootTX",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}0111",
+  "bytecodeTemplate": "01010300000005{1}0d0c{0}0110",
   "fieldsSig": {
     "names": [
       "saleFlatPrice",

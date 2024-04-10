@@ -32,6 +32,7 @@ import { getContractByCodeHash } from "./contracts";
 // Custom types for the contract
 export namespace SaleFlatPriceAlphTypes {
   export type Fields = {
+    burnAlphContract: HexString;
     rewardDistributor: HexString;
     saleOwner: Address;
     accountTemplateId: HexString;
@@ -59,11 +60,11 @@ export namespace SaleFlatPriceAlphTypes {
     buyTokenAmount: bigint;
   }>;
   export type AccountCreateEvent = ContractEvent<{
-    account: HexString;
+    account: Address;
     contractId: HexString;
   }>;
   export type AccountDestroyEvent = ContractEvent<{
-    account: HexString;
+    account: Address;
     contractId: HexString;
   }>;
   export type ClaimBuyerEvent = ContractEvent<{
@@ -88,10 +89,6 @@ export namespace SaleFlatPriceAlphTypes {
   }>;
 
   export interface CallMethodTable {
-    getBidTokenDecimals: {
-      params: Omit<CallContractParams<{}>, "args">;
-      result: CallContractResult<bigint>;
-    };
     calculateSaleTokensReceivedPerBidTokens: {
       params: CallContractParams<{ bidAmount: bigint }>;
       result: CallContractResult<bigint>;
@@ -247,14 +244,6 @@ class Factory extends ContractFactory<
   }
 
   tests = {
-    getBidTokenDecimals: async (
-      params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
-        "testArgs"
-      >
-    ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getBidTokenDecimals", params);
-    },
     claimBuyer: async (
       params: TestContractParamsWithoutMaps<
         SaleFlatPriceAlphTypes.Fields,
@@ -594,7 +583,7 @@ class Factory extends ContractFactory<
     verify: async (
       params: TestContractParamsWithoutMaps<
         SaleFlatPriceAlphTypes.Fields,
-        { proof: HexString; data: HexString }
+        { proof: HexString; dataHash: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "verify", params);
@@ -623,7 +612,7 @@ export const SaleFlatPriceAlph = new Factory(
   Contract.fromJson(
     SaleFlatPriceAlphContractJson,
     "",
-    "b017759f9a30ec96d21081b982dd0c24e1d59a4ecbe4b598e7f4d4ddde3b14b8"
+    "4faf86493222343633c41282aefa03e6902b4e9472673f6a56b12c4694b93ab9"
   )
 );
 
@@ -767,19 +756,6 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   methods = {
-    getBidTokenDecimals: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getBidTokenDecimals">
-    ): Promise<
-      SaleFlatPriceAlphTypes.CallMethodResult<"getBidTokenDecimals">
-    > => {
-      return callMethod(
-        SaleFlatPriceAlph,
-        this,
-        "getBidTokenDecimals",
-        params === undefined ? {} : params,
-        getContractByCodeHash
-      );
-    },
     calculateSaleTokensReceivedPerBidTokens: async (
       params: SaleFlatPriceAlphTypes.CallMethodParams<"calculateSaleTokensReceivedPerBidTokens">
     ): Promise<

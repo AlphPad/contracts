@@ -2,6 +2,7 @@
 // - Manages a flat price token sale with optional whitelist.
 // - Extends SaleFlatPrice for sale functionalities.
 Contract SaleFlatPriceAlph(
+    burnAlphContract: BurnAlphInterface,    // Contract for burning alph tokens
     rewardDistributor: RewardDistributor,   // Reward distributor for managing rewards
     saleOwner: Address,                     // Owner of the sale
     accountTemplateId: ByteVec,             // Template ID for creating buyer accounts
@@ -47,8 +48,9 @@ Contract SaleFlatPriceAlph(
         let burn = fee / 20 // apply a 5% burn fee to the fee
         let stakerReward = fee - burn
         rewardDistributor.addRewards{selfAddress!() -> bidTokenId: stakerReward}(selfAddress!(), stakerReward)
-        
-        // burn the burn amount here when alph burn contract is deployed
+
+        // burn the burn amount to the specific contract
+        burnAlphContract.burn{selfAddress!() -> bidTokenId: burn}(selfAddress!(), burn)
 
         transferTokenFromSelf!(saleOwner, bidTokenId, totalRaised - fee)
         if(saleTokenTotalAmount > tokensSold) {

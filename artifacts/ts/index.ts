@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 export * from "./ApadToken";
+export * from "./BurnALPH";
 export * from "./DummyToken";
 export * from "./RewardDistributor";
 export * from "./SaleBuyerAccount";

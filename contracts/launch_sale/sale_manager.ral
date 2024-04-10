@@ -2,6 +2,7 @@
 // This contract is responsible for managing sales within a decentralized platform.
 // It interacts with a reward distributor, a DEX pool, and handles listing fees.
 Contract SaleManager (
+    burnAlphContract: BurnAlphInterface,    // Contract for burning alph tokens
     rewardDistributor: RewardDistributor,   // Reference to RewardDistributor contract.
     pair: DexPoolInterface,                 // DEX pool interface for ALPH/USDT pair.
     alphTokenId: ByteVec,                   // Token ID for ALPH tokens.
@@ -10,6 +11,7 @@ Contract SaleManager (
     upgradeDelay: U256,                     // The delay period required between initiating and applying an upgrade.
     saleFlatPriceAlphTemplateId: ByteVec,   // Template ID used for creating the sale flat price contract.
     accountTemplateId: ByteVec,             // Template ID for the account managing the sale.
+    mut saleCounter: U256,                  // Sale Counter keeps track of the number of sales it has initialized.
     mut owner: Address,                     // Current owner's address of the contract.
     mut newOwner: Address,                  // Address of the new owner, set during ownership transfer process.
     mut upgradeCommenced: U256,             // Timestamp marking the start of an upgrade process.
@@ -18,7 +20,7 @@ Contract SaleManager (
     mut newMutFieldsEncoded: ByteVec        // Encoded mutable fields for the new contract.
 ) extends Upgradable(upgradeDelay, owner, newOwner, upgradeCommenced, newCode, newImmFieldsEncoded, newMutFieldsEncoded) {
     // Event declarations for tracking contract activities
-    event CreateSaleFlatPriceAlph(account: Address, contractId: ByteVec)
+    event CreateSaleFlatPriceAlph(account: Address, saleIndex: U256, contractId: ByteVec)
 
     // Error codes for contract operations
     enum ErrorCodes {
@@ -42,7 +44,7 @@ Contract SaleManager (
 
     // Function to create a flat price sale.
     // Validates input parameters and creates a new sale.
-    @using(preapprovedAssets = true, assetsInContract = false, checkExternalCaller = false, updateFields = false)
+    @using(preapprovedAssets = true, assetsInContract = false, checkExternalCaller = false, updateFields = true)
     pub fn createSaleFlatPriceAlph(
         amountAlph: U256,                   // The amount of ALPH tokens used as the listing fee.
         tokenPrice: U256,                   // The price per token in the sale.
@@ -79,6 +81,7 @@ Contract SaleManager (
         rewardDistributor.addRewards{caller -> ALPH: amountAlph}(caller, amountAlph)
 
         let (encodedImmFields, encodedMutFields) = SaleFlatPriceAlph.encodeFields!(
+            burnAlphContract,
             rewardDistributor,
             caller,
             accountTemplateId,
@@ -97,13 +100,16 @@ Contract SaleManager (
             0,
             merkleRoot
         )
-        let contractId = copyCreateContract!{caller -> ALPH: 1 alph, saleTokenId: saleTokenTotalAmount}(
+        
+        let contractId = copyCreateSubContract!{caller -> ALPH: 1 alph, saleTokenId: saleTokenTotalAmount}(
+            toByteVec!(saleCounter),
             saleFlatPriceAlphTemplateId,
             encodedImmFields,
             encodedMutFields
         )
 
-        emit CreateSaleFlatPriceAlph(caller, contractId)
+        emit CreateSaleFlatPriceAlph(caller, saleCounter, contractId)
+        saleCounter = saleCounter + 1
     }
 
     // Note on: "Beware of Oracle manipulation: Don't use spot price from an AMM as an oracle."

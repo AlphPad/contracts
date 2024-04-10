@@ -1,0 +1,8 @@
+/// Interface: BurnAlphInterface
+///
+/// Provides an interface for burning alph tokens
+Interface BurnAlphInterface {
+    
+    @using(methodIndex = 0, preapprovedAssets = true, assetsInContract = true, checkExternalCaller = false)
+    pub fn burn(from: Address, amount: U256) -> ()
+}

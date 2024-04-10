@@ -15,14 +15,16 @@ import {
   RewardDistributorInstance,
   SaleBuyerAccount,
   SaleBuyerAccountInstance,
-  SaleFlatPrice,
-  SaleFlatPriceInstance,
   TokenPair,
   TokenPairInstance,
-  SaleManager,
-  SaleManagerInstance,
+  DummyToken,
+  DummyTokenInstance,
+  BurnALPH,
+  BurnALPHInstance,
   SaleFlatPriceAlph,
   SaleFlatPriceAlphInstance,
+  SaleManager,
+  SaleManagerInstance,
 } from ".";
 import { default as devnetDeployments } from "../.deployments.devnet.json";
 
@@ -34,15 +36,13 @@ export type Deployments = {
     Staking: DeployContractExecutionResult<StakingInstance>;
     RewardDistributor: DeployContractExecutionResult<RewardDistributorInstance>;
     SaleBuyerAccount: DeployContractExecutionResult<SaleBuyerAccountInstance>;
-    SaleFlatPrice: DeployContractExecutionResult<SaleFlatPriceInstance>;
     TokenPair: DeployContractExecutionResult<TokenPairInstance>;
-    SaleManager: DeployContractExecutionResult<SaleManagerInstance>;
+    DummyToken: DeployContractExecutionResult<DummyTokenInstance>;
+    BurnALPH: DeployContractExecutionResult<BurnALPHInstance>;
     SaleFlatPriceAlph: DeployContractExecutionResult<SaleFlatPriceAlphInstance>;
+    SaleManager: DeployContractExecutionResult<SaleManagerInstance>;
   };
-  scripts: {
-    ApadTokenMintTX: RunScriptResult;
-    StakingStakeTX: RunScriptResult;
-  };
+  scripts: { StakingStakeTX: RunScriptResult };
 };
 
 function toDeployments(json: any): Deployments {
@@ -77,22 +77,22 @@ function toDeployments(json: any): Deployments {
         json.contracts["SaleBuyerAccount"].contractInstance.address
       ),
     },
-    SaleFlatPrice: {
-      ...json.contracts["SaleFlatPrice"],
-      contractInstance: SaleFlatPrice.at(
-        json.contracts["SaleFlatPrice"].contractInstance.address
-      ),
-    },
     TokenPair: {
       ...json.contracts["TokenPair"],
       contractInstance: TokenPair.at(
         json.contracts["TokenPair"].contractInstance.address
       ),
     },
-    SaleManager: {
-      ...json.contracts["SaleManager"],
-      contractInstance: SaleManager.at(
-        json.contracts["SaleManager"].contractInstance.address
+    DummyToken: {
+      ...json.contracts["DummyToken"],
+      contractInstance: DummyToken.at(
+        json.contracts["DummyToken"].contractInstance.address
+      ),
+    },
+    BurnALPH: {
+      ...json.contracts["BurnALPH"],
+      contractInstance: BurnALPH.at(
+        json.contracts["BurnALPH"].contractInstance.address
       ),
     },
     SaleFlatPriceAlph: {
@@ -101,14 +101,17 @@ function toDeployments(json: any): Deployments {
         json.contracts["SaleFlatPriceAlph"].contractInstance.address
       ),
     },
+    SaleManager: {
+      ...json.contracts["SaleManager"],
+      contractInstance: SaleManager.at(
+        json.contracts["SaleManager"].contractInstance.address
+      ),
+    },
   };
   return {
     ...json,
     contracts: contracts as Deployments["contracts"],
-    scripts: {
-      ApadTokenMintTX: json.scripts["ApadTokenMintTX"],
-      StakingStakeTX: json.scripts["StakingStakeTX"],
-    },
+    scripts: { StakingStakeTX: json.scripts["StakingStakeTX"] },
   };
 }
 

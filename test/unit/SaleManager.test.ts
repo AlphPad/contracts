@@ -10,7 +10,8 @@ import {
   createSaleManager,
   createTokenPair,
   createSaleBuyerTemplateAccount,
-  createSaleFlatPrice
+  createSaleFlatPrice,
+  createBurnAlph
 } from './fixtures'
 import { expectAssertionError, randomContractId } from '@alephium/web3-test'
 import { SaleBuyerAccountTypes, SaleFlatPriceAlphTypes, SaleManager, SaleManagerTypes, StakingTypes } from '../../artifacts/ts'
@@ -31,11 +32,12 @@ describe('Sale Manager Contract Testing', () => {
     genesis = Date.now();
     sender = randomP2PKHAddress();
     saleToken = randomTokenId();
-    accountTemplateFixture = createSaleBuyerTemplateAccount([]);
-    saleFlatTemplateFixture = createSaleFlatPrice(randomContractId(), randomP2PKHAddress(), randomContractId(), 0n, 0n, 0n, 0n, 0n, randomTokenId(), 0n, randomTokenId(), 0n, 0n, 0n, 0n, 0n, "", accountTemplateFixture.states())
+    let burnAlph = createBurnAlph([]);
+    accountTemplateFixture = createSaleBuyerTemplateAccount(burnAlph.states());
+    saleFlatTemplateFixture = createSaleFlatPrice(burnAlph.contractId, randomContractId(), randomP2PKHAddress(), randomContractId(), 0n, 0n, 0n, 0n, 0n, randomTokenId(), 0n, randomTokenId(), 0n, 0n, 0n, 0n, 0n, "", accountTemplateFixture.states())
     let tokenPair = createTokenPair(saleFlatTemplateFixture.states())
     let rewardDistributor = createRewardDistributor(BigInt(genesis), 10n, 10n, randomContractId(), tokenPair.states())
-    fixture = createSaleManager(tokenPair.contractId, rewardDistributor.contractId, saleFlatTemplateFixture.contractId, accountTemplateFixture.contractId, rewardDistributor.states());
+    fixture = createSaleManager(burnAlph.contractId, tokenPair.contractId, rewardDistributor.contractId, saleFlatTemplateFixture.contractId, accountTemplateFixture.contractId, rewardDistributor.states());
     listingFee = (await calculateListingFee(fixture.selfState, fixture.dependencies)).returns;
   })
 

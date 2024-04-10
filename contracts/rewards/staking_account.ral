@@ -30,12 +30,8 @@ Contract StakingAccount (
 
         let timeElapsed = currentTimestamp - vestedStart
         let totalVestingPeriod = vestedTill - vestedStart
-
-        let scalingFactor = 10**18
-        let vestedFraction = (timeElapsed * scalingFactor) / totalVestingPeriod
-        let totalVestedNow = (vestedTotalAmount * vestedFraction) / scalingFactor
         let amountUnstakedToNow = vestedTotalAmount - amountStaked
-    
+        let totalVestedNow = vestedTotalAmount * timeElapsed / totalVestingPeriod
         return totalVestedNow - amountUnstakedToNow
     }
 

@@ -1,7 +1,7 @@
 {
-  "fullNodeVersion": "v2.11.0",
+  "fullNodeVersion": "v2.12.0",
   "compilerOptionsUsed": {
-    "ignoreUnusedConstantsWarnings": true,
+    "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
     "ignoreUnusedFieldsWarnings": false,
     "ignoreUnusedPrivateFunctionsWarnings": false,
@@ -18,7 +18,7 @@
     },
     "AccountFactory": {
       "sourceFile": "lib/account/account_factory.ral",
-      "sourceCodeHash": "fda2b961b921d81e76783f970c4e049cbe607eb547c3f7dcc78ffca651d59b0e",
+      "sourceCodeHash": "3f06065e8990989ebb38dd5475c01762127f131410e263fbf720ed92095cb334",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -44,9 +44,23 @@
       "codeHashDebug": "",
       "warnings": []
     },
+    "BurnALPH": {
+      "sourceFile": "external/dummy/burn_alph.ral",
+      "sourceCodeHash": "2d06e5c075f8784e0d1e913dbc4be4340579f1732470e95d2ad444d6afacdff6",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "59308e31f3f450eee919ae338ed0d477a49eaa19eac964c32b35438714207fb7",
+      "warnings": []
+    },
+    "BurnAlphInterface": {
+      "sourceFile": "external/burn_alph_interface.ral",
+      "sourceCodeHash": "4f0f1ff71494686193626c4a1c70b88a5d84c7fc305fe78f1cce14ba91653342",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
     "DexPoolInterface": {
       "sourceFile": "external/dex_pool_interface.ral",
-      "sourceCodeHash": "3ea6d07567c867e3643a35c2a1d527f75922e690af8f968b7ce39eb51261f0ea",
+      "sourceCodeHash": "06ec29c72bcc78871b05d961a68dbd6c341b884e3dc850d0c7edd5336dbd7dd7",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -121,30 +135,37 @@
       "codeHashDebug": "",
       "warnings": []
     },
+    "Math": {
+      "sourceFile": "external/dummy/math.ral",
+      "sourceCodeHash": "a466180187f2418982b536e4b14814375a25318cb09782e87976dcc1d5c438d7",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
     "MerkleProof": {
       "sourceFile": "lib/merkle_proof.ral",
-      "sourceCodeHash": "77d1b1344f92f333e9687c0b381407d9e1c94a3b45caeff4f167ae0ae99b745f",
+      "sourceCodeHash": "80e0978cffc2ed3f323b05082da0503ea7fc50fb2419e2b6ad1578eed78731e4",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "RewardDistributor": {
       "sourceFile": "rewards/reward_distributor.ral",
-      "sourceCodeHash": "b69082d76bc60f38b49d7e895f87845faf39c562f97109d4890653b4f0132e69",
+      "sourceCodeHash": "7f62143511f4a4e69aa77d13edfb6390dcd6eae291b8b1c03fe9fdeddcbca4c5",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "606b7c84b055cc1b9fb7c6242e5790129f79ae228b3778bd533b23f2474d87a8",
+      "codeHashDebug": "b913efd25718eeda658a22dfdd9da1d6be770e05b97d607e54ea9f273f724c16",
       "warnings": []
     },
     "RewardDistributorAddRewardsTX": {
       "sourceFile": "rewards/reward_distributor.ral",
-      "sourceCodeHash": "b69082d76bc60f38b49d7e895f87845faf39c562f97109d4890653b4f0132e69",
+      "sourceCodeHash": "7f62143511f4a4e69aa77d13edfb6390dcd6eae291b8b1c03fe9fdeddcbca4c5",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "RewardDistributorHarvestTX": {
       "sourceFile": "rewards/reward_distributor.ral",
-      "sourceCodeHash": "b69082d76bc60f38b49d7e895f87845faf39c562f97109d4890653b4f0132e69",
+      "sourceCodeHash": "7f62143511f4a4e69aa77d13edfb6390dcd6eae291b8b1c03fe9fdeddcbca4c5",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -165,105 +186,105 @@
     },
     "SaleFlatPrice": {
       "sourceFile": "launch_sale/sale_flat_price.ral",
-      "sourceCodeHash": "ad9194bb4e1956e6b233a4e6646f1b43cfda440fe6ab726d605c6a8cefa971bb",
+      "sourceCodeHash": "c2586d3e2fed942f4a977bf26784a496b222bb4f68e0db9aa429532750ada612",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleFlatPriceAlph": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "fdcf903b00f84e62547297224070a1035e2d9a52cba5339b4b1388201aff1b91",
+      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "b017759f9a30ec96d21081b982dd0c24e1d59a4ecbe4b598e7f4d4ddde3b14b8",
+      "codeHashDebug": "4faf86493222343633c41282aefa03e6902b4e9472673f6a56b12c4694b93ab9",
       "warnings": []
     },
     "SaleFlatPriceAlphBuyTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "fdcf903b00f84e62547297224070a1035e2d9a52cba5339b4b1388201aff1b91",
+      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleFlatPriceAlphClaimRefundTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "fdcf903b00f84e62547297224070a1035e2d9a52cba5339b4b1388201aff1b91",
+      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleFlatPriceAlphClaimTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "fdcf903b00f84e62547297224070a1035e2d9a52cba5339b4b1388201aff1b91",
+      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleFlatPriceAlphSetMerkleRootTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "fdcf903b00f84e62547297224070a1035e2d9a52cba5339b4b1388201aff1b91",
+      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleManager": {
       "sourceFile": "launch_sale/sale_manager.ral",
-      "sourceCodeHash": "4fca9808d897c1799824fa09c7ad2ee7862533708da28ad71407cbc96d0529f8",
+      "sourceCodeHash": "475b7f8008c0fea5abf41313dfd656aaca8314ad96ab5277b228c12946c35b6d",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "ea24ab6940736196666e9ee716a14ebb3eaa40d4fb1c679702afd24415597647",
+      "codeHashDebug": "5c4c81ea3e03eec11fb9694037c97fd69db3fcb5b6ad934dc936cb3992f2e43b",
       "warnings": []
     },
     "SaleManagerCreateSaleFlatPriceTX": {
       "sourceFile": "launch_sale/sale_manager.ral",
-      "sourceCodeHash": "4fca9808d897c1799824fa09c7ad2ee7862533708da28ad71407cbc96d0529f8",
+      "sourceCodeHash": "475b7f8008c0fea5abf41313dfd656aaca8314ad96ab5277b228c12946c35b6d",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "Staking": {
       "sourceFile": "rewards/staking.ral",
-      "sourceCodeHash": "5d20604a5113f125b24b8d7994e6b1ef8d65df248211aa74a34551d0f1529c3d",
+      "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "09cfa395376389a28fa1b847641fcef1d5909d2dccef2b581cb05d87d697bf83",
+      "codeHashDebug": "b74ef76385018945cc0581cf1d680f5c1aea0ed05976c3b50d2a2e0c9fa752dc",
       "warnings": []
     },
     "StakingAccount": {
       "sourceFile": "rewards/staking_account.ral",
-      "sourceCodeHash": "2dfdfad9239116ad6be87d166434979414c427a3b398c797a346df8a94f8cdd8",
+      "sourceCodeHash": "c7b6203f73a06c18ef961f1e07727a0a491ca506033d82463670842d876b545e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "d2ab403cff492d8c50da5f47d4865f9cc988f47fa05a01d6a2a3d94b1b3c1e71",
+      "codeHashDebug": "ce406d4e5e0bea3d9c89cc9fad8ff9140f3eafb69162d3ba97773c1a4df48a4f",
       "warnings": []
     },
     "StakingClaimRewardsTX": {
       "sourceFile": "rewards/staking.ral",
-      "sourceCodeHash": "5d20604a5113f125b24b8d7994e6b1ef8d65df248211aa74a34551d0f1529c3d",
+      "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "StakingClaimTX": {
       "sourceFile": "rewards/staking.ral",
-      "sourceCodeHash": "5d20604a5113f125b24b8d7994e6b1ef8d65df248211aa74a34551d0f1529c3d",
+      "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "StakingDepositRewardsTX": {
       "sourceFile": "rewards/staking.ral",
-      "sourceCodeHash": "5d20604a5113f125b24b8d7994e6b1ef8d65df248211aa74a34551d0f1529c3d",
+      "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "StakingStakeTX": {
       "sourceFile": "rewards/staking.ral",
-      "sourceCodeHash": "5d20604a5113f125b24b8d7994e6b1ef8d65df248211aa74a34551d0f1529c3d",
+      "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "StakingUnstakeTX": {
       "sourceFile": "rewards/staking.ral",
-      "sourceCodeHash": "5d20604a5113f125b24b8d7994e6b1ef8d65df248211aa74a34551d0f1529c3d",
+      "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -284,9 +305,9 @@
     },
     "TokenPair": {
       "sourceFile": "external/dummy/token_pair.ral",
-      "sourceCodeHash": "bc3f5d5bdd389d7225a46a48969cb1adcc2ed06b5a07f95a789eecbc54b961bd",
+      "sourceCodeHash": "c4bdd6d198d3e8572356b29af08fb7cb5f8de7044b745e3703f40fa6cc053ab1",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "d663548c102e2428a76913803835cada6a2e98b7c5a1735577b0137fb75f6542",
+      "codeHashDebug": "2b98401ce86b160c0f357390bd72a4cf9eb66d57e490ac7d6553b40749b092ac",
       "warnings": []
     },
     "Upgradable": {

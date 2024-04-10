@@ -6,7 +6,7 @@ Contract Staking(
     accountTemplateId: ByteVec,         // Identifier of the account template used for creating subcontracts.
     stakingTokenId: ByteVec,            // Identifier of the token used for staking.
     rewardsTokenId: ByteVec,            // Identifier of the token used for rewards.
-    unstakeLockTime: U256,              // Time period in seconds to lock the unstaked tokens before withdrawal is allowed.
+    unstakeLockTime: U256,              // Time period in miliseconds to lock the unstaked tokens before withdrawal is allowed.
     upgradeDelay: U256,                 // The delay period required between initiating and applying an upgrade.
     mut amountStaked: U256,             // Total amount of tokens currently staked.
     mut rewardPerToken: U256,           // Tracking of rewards accrued so stakers can be paid out accordingly
