@@ -1,0 +1,53 @@
+/// Abstract Contract: AccountBase
+///
+/// Provides base functionalities for account subcontracts. It defines common operations
+/// and checks, ensuring compliance with the AccountInterface.
+///
+/// Parameters:
+/// - parentContractAddress (Address): Address of the parent contract managing this account.
+/// - accountHolder (Address): Address of the entity holding this account.
+///
+/// Implements:
+/// - AccountInterface: Standard interface for account-type subcontracts.
+///
+/// Error Codes:
+/// - UnauthorizedAccess (12101): Error raised if an unauthorized entity attempts an operation.
+/// - UnsafeDestroy (12102): Error raised if an attempt is made to destroy the account in an unsafe state.
+///
+/// Usage:
+/// The AccountBase contract serves as a foundational layer for specific account subcontracts, providing
+/// standardized destruction and access control mechanisms to ensure security and integrity of the accounts.
+Abstract Contract AccountBase (
+    parentContractAddress: Address,
+    accountHolder: Address
+) implements AccountInterface {
+
+    // Error code enumeration for AccountBase specific errors.
+    enum AccountBaseErrorCodes {
+        UnauthorizedAccess = 12101
+        UnsafeDestroy = 12102
+    }
+    
+    // Destroys the account subcontract, ensuring compliance with safety checks.
+    @using(assetsInContract = true)
+    pub fn destroy() -> () {
+        assertIsParentTheCaller(callerAddress!())
+        assertIsSafeToDestroy()
+        destroySelf!(accountHolder)
+    }
+
+    // Internal function to assert if it's safe to destroy the account.
+    fn assertIsSafeToDestroy() -> () { assert!(isSafeToDestroy(), AccountBaseErrorCodes.UnsafeDestroy) }
+
+    // Internal function to ensure only the parent contract can call certain operations.
+    fn assertIsParentTheCaller(caller: Address) -> () { checkCaller!(caller == parentContractAddress , AccountBaseErrorCodes.UnauthorizedAccess) }
+
+    // Checks if destroying the account subcontract is safe, ensuring no adverse effects on operations or data.
+    pub fn isSafeToDestroy() -> Bool
+
+    // Returns the parent contract address.
+    pub fn getParentContractAddress() -> Address { return parentContractAddress }
+
+    // Returns the account holder's address.
+    pub fn getAccountHolder() -> Address { return accountHolder }
+}

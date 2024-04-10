@@ -1,0 +1,92 @@
+// MerkleProof Verification Contract
+//
+// This abstract contract provides functionality for verifying Merkle proofs, which are essential
+// in various blockchain applications, particularly those involving cryptographic verification of
+// membership or correctness in a set of data (like state in a blockchain, contents in a file system, etc.).
+//
+// The contract maintains a Merkle root which represents the top hash of a Merkle tree. This root can be
+// updated when the underlying data set changes. The contract offers functionality to verify proofs against
+// this Merkle root, ensuring that a piece of data is part of the set represented by the root.
+//
+// Inheriting this contract:
+// - Inherit this contract in your implementation when you need to verify Merkle proofs.
+// - You can extend or modify functionalities based on your specific use case, particularly around
+//   how the Merkle root is updated and managed.
+//
+// Key Functionalities:
+// - Managing the Merkle root.
+// - Verifying Merkle proofs.
+//
+// Note: The contract assumes that the data and proofs are properly hashed and formatted.
+Abstract Contract MerkleProof(mut merkleRoot: ByteVec) {
+
+    // Event emitted when the Merkle root is updated.
+    // This event can be used by external observers or contracts to react to changes in the Merkle root,
+    // which usually signifies a change in the underlying data set.
+    event UpdateRoot(newMerkleRoot: ByteVec, updatedBy: Address)
+
+    // Error codes for Merkle proof verification:
+    // - InvalidProofSize (11001): Indicates the proof's byte length is not a multiple of 32,
+    //   suggesting it's not composed of concatenated 32-byte hashes.
+    // - InvalidDataHash (11002): Indicates the data's byte length is not 32, implying it's likely
+    //   not a properly hashed value. Data should be hashed before being sent for verification.
+    enum MerkleProofErrorCodes {
+        InvalidProofSize = 11001
+        InvalidDataHash = 11002
+    }
+
+    // Returns the current Merkle root.
+    // Accessing this function allows anyone to know the current top hash of the Merkle tree
+    // which this contract is verifying against.
+    pub fn getMerkleRoot() -> ByteVec {
+        return merkleRoot
+    }
+
+    // Updates the Merkle root.
+    // This function should be secured in the implementation contract to ensure
+    // that only authorized entities can modify the Merkle root.
+    // Emitting the UpdateRoot event helps in tracking when and by whom the root was updated.
+    @using(updateFields = true)
+    fn updateRoot(newMerkleRoot: ByteVec) -> () {
+        merkleRoot = newMerkleRoot
+        emit UpdateRoot(merkleRoot, callerAddress!())
+    }
+
+    // Verifies a Merkle proof.
+    // This function is the crux of the contract. It takes a Merkle proof and the hashed data
+    // and verifies whether the data, when combined in the Merkle tree manner with the provided proof,
+    // results in the Merkle root stored in the contract.
+    // This verification is crucial for many cryptographic applications where proving membership or
+    // correctness without revealing the entire data set is required.
+    fn verify(proof: ByteVec, dataHash: ByteVec) -> (Bool) {
+        assert!(size!(dataHash) == 32, MerkleProofErrorCodes.InvalidDataHash)
+        
+        let mut currentHash = dataHash
+        
+        let proofSize = size!(proof)
+        assert!(proofSize % 32 == 0, MerkleProofErrorCodes.InvalidProofSize) // Ensure proof is a multiple of 32 bytes
+    
+        for (let mut index = 0; index < proofSize; index = index + 32) {
+            let proofElement = byteVecSlice!(proof, index, index + 32)
+            currentHash = hashPair(proofElement, currentHash)
+        }
+        
+        return u256From32Byte!(currentHash) == u256From32Byte!(merkleRoot)
+    }
+
+    // Hashes a pair of values consistently.
+    // This internal function is vital for maintaining the consistency of how the tree hashes are combined.
+    // It ensures that the order in which hashes are combined is always the same, which is crucial
+    // for the integrity of the Merkle proof verification.
+    fn hashPair(a: ByteVec, b: ByteVec) -> ByteVec {
+        return if (u256From32Byte!(a) < u256From32Byte!(b)) hash(a ++ b) else hash(b ++ a)
+    }
+
+    // Hash function using keccak256.
+    // This function is used for hashing data in this contract. It currently uses keccak256,
+    // but it can be replaced with other hash functions as needed, depending on the security requirements
+    // and the nature of the application.
+    fn hash(dataToHash: ByteVec) -> ByteVec {
+        return keccak256!(dataToHash)
+    }
+}

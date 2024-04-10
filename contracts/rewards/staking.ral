@@ -1,0 +1,190 @@
+// Staking Contract
+//
+// Manages the staking process of tokens, including handling rewards, unstaking, and withdrawing staked assets.
+// Extends AccountFactory for account management functionalities.
+Contract Staking(
+    accountTemplateId: ByteVec,         // Identifier of the account template used for creating subcontracts.
+    stakingTokenId: ByteVec,            // Identifier of the token used for staking.
+    rewardsTokenId: ByteVec,            // Identifier of the token used for rewards.
+    unstakeLockTime: U256,              // Time period in miliseconds to lock the unstaked tokens before withdrawal is allowed.
+    upgradeDelay: U256,                 // The delay period required between initiating and applying an upgrade.
+    mut amountStaked: U256,             // Total amount of tokens currently staked.
+    mut rewardPerToken: U256,           // Tracking of rewards accrued so stakers can be paid out accordingly
+    mut owner: Address,                 // Current owner's address of the contract.
+    mut newOwner: Address,              // Address of the new owner, set during ownership transfer process.
+    mut upgradeCommenced: U256,         // Timestamp marking the start of an upgrade process.
+    mut newCode: ByteVec,               // New contract code to be migrated to.
+    mut newImmFieldsEncoded: ByteVec,   // Encoded immutable fields for the new contract.
+    mut newMutFieldsEncoded: ByteVec    // Encoded mutable fields for the new contract.
+) extends AccountFactory(accountTemplateId), Upgradable(upgradeDelay, owner, newOwner, upgradeCommenced, newCode, newImmFieldsEncoded, newMutFieldsEncoded) {
+
+    // Event declarations for tracking contract activities
+    event Stake(account: Address, amount: U256)
+    event Unstake(account: Address, amount: U256)
+    event Withdraw(account: Address, amount: U256)
+    event Claim(account: Address, amount: U256)
+    event DepositReward(account: Address, amount: U256)
+    event ClaimReward(account: Address, amount: U256)
+
+    // Error codes for contract operations
+    enum ErrorCodes {
+        UnstakeNotClaimable = 101
+        CanNotDepositRewardsToNoStakers=102
+    }
+
+    // Stake tokens with an optional vesting period. Creates or updates a staking account with the staked amount.
+    // Transfers staked tokens from the staker to this contract. Calculates and transfers any pending rewards.
+    @using(assetsInContract = true, preapprovedAssets = true, updateFields = true, checkExternalCaller = false)
+    pub fn stake(amount: U256, vestingPeriod: U256) -> () {
+        let staker = callerAddress!()
+
+        emit Stake(staker, amount)
+        transferTokenToSelf!(staker, stakingTokenId, amount)
+
+        if (accountExists(staker)) {
+            let stakingAccount = StakingAccount(getSubContractId(staker))
+
+            let accountPendingReward = calcPendingRewards(stakingAccount)
+            if (accountPendingReward > 0) {
+                emit ClaimReward(staker, accountPendingReward)
+                transferTokenFromSelf!(stakingAccount.getAccountHolder(), rewardsTokenId, accountPendingReward)
+                stakingAccount.setRewardPerToken(rewardPerToken)
+            }
+
+            stakingAccount.stake(amount)
+        } else {
+            let mut vestedAmount = 0
+            let mut vestedStart = 0
+            let mut vestedEnd = 0
+            
+            if (vestingPeriod > 0) {
+                vestedStart = blockTimeStamp!()
+                vestedEnd = vestedStart + vestingPeriod
+                vestedAmount = amount
+            } 
+
+            let (encodedImmFieldsReg, encodedMutFieldsReg) = StakingAccount.encodeFields!(
+                selfAddress!(),
+                staker, 
+                vestedStart, vestedEnd, vestedAmount,
+                amount, 0, 0, rewardPerToken
+            )
+            createAccount{staker -> ALPH: 1 alph}(staker,encodedImmFieldsReg, encodedMutFieldsReg)
+        }
+        amountStaked = amountStaked + amount
+    }
+
+    // Initiates the unstake process for a specified amount from the staker's account.
+    // Validates if the unstaking process can be initiated based on the current state.
+    @using(updateFields = true, checkExternalCaller = false)
+    pub fn unstake(amount: U256) -> () {
+        let staker = callerAddress!()
+        let stakingAccount = StakingAccount(getSubContractId(staker))
+
+        emit Unstake(staker, amount)
+
+        claimRewardsForAccount(stakingAccount)
+        stakingAccount.unstake(amount)
+        amountStaked = amountStaked - amount
+    }
+
+    // Withdraws the unstaked tokens after the lock time has elapsed.
+    // Transfers the unstaked tokens from this contract to the staker's account.
+    @using(updateFields = false, assetsInContract = true, checkExternalCaller = false)
+    pub fn withdraw() -> () {
+        let staker = callerAddress!()
+        let stakingAccount = StakingAccount(getSubContractId(staker))
+
+        assert!((unstakeLockTime + stakingAccount.getBeginUnstakeAt()) < blockTimeStamp!(), ErrorCodes.UnstakeNotClaimable)
+
+        emit Withdraw(staker, stakingAccount.getAmountUnstaked())
+        transferTokenFromSelf!(staker, stakingTokenId, stakingAccount.getAmountUnstaked())
+        
+        stakingAccount.withdraw()
+        if (stakingAccount.isSafeToDestroy()){ destroyAccount(staker) } 
+    }
+
+    // Deposits rewards for distribution among the stakers. The rewards are proportionally distributed based on the staked amount.
+    // Updates the reward per token ratio.
+    @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, checkExternalCaller = false)
+    pub fn depositRewards(amount: U256) -> () {
+        assert!(amountStaked > 0, ErrorCodes.CanNotDepositRewardsToNoStakers)
+
+        emit DepositReward(callerAddress!(), amount)
+        transferTokenToSelf!(callerAddress!(), rewardsTokenId, amount)
+
+        let amountScaled = amount * getRewardPerTokenScalingFactor()
+        rewardPerToken = rewardPerToken + (amountScaled/amountStaked)
+    }
+
+    // Claims accumulated rewards for the caller's account. Transfers the reward tokens from this contract to the caller's account.
+    @using(checkExternalCaller = false)
+    pub fn claimRewards() -> () {
+        let staker = callerAddress!()
+        let stakingAccount = StakingAccount(getSubContractId(staker))
+        claimRewardsForAccount(stakingAccount)
+    }
+
+    // Calculates the pending rewards for a given staker.
+    pub fn getPendingRewards(staker: Address) -> U256 {
+        let stakingAccount = StakingAccount(getSubContractId(staker))
+        return calcPendingRewards(stakingAccount)
+    }
+
+    // Internal function to calculate pending rewards for a specific staking account.
+    fn calcPendingRewards(account: StakingAccount) -> U256 {
+        let accountRewardPerToken = account.getRewardPerToken()
+        let accountAmountStaked = account.getAmountStaked()
+        let difference = rewardPerToken - accountRewardPerToken
+        return (accountAmountStaked * difference) / getRewardPerTokenScalingFactor()
+    }
+
+    // Internal function to claim rewards for a specific staking account.
+    @using(assetsInContract = true)
+    fn claimRewardsForAccount(account: StakingAccount) -> () {
+        let accountPendingReward = calcPendingRewards(account)
+        let staker = account.getAccountHolder()
+
+        emit ClaimReward(staker, accountPendingReward)
+        transferTokenFromSelf!(staker, rewardsTokenId, accountPendingReward)
+
+        account.setRewardPerToken(rewardPerToken)
+    }
+
+    pub fn getStakingTokenId() -> ByteVec { return stakingTokenId }
+    pub fn getRewardsTokenId() -> ByteVec { return rewardsTokenId }
+    pub fn getUnstakeLockTime() -> U256 { return unstakeLockTime }
+    pub fn getAmountStaked() -> U256 { return amountStaked }
+    pub fn getRewardPerToken() -> U256 { return rewardPerToken }
+    // This is the supply of APAD, it's good for use as scaling factor
+    fn getRewardPerTokenScalingFactor() -> U256 { return 100_000_000 * (10**18) }
+}
+
+// Transaction scripts to interact with the staking contract's functionalities like staking, claiming rewards, unstaking, etc.
+TxScript StakingStakeTX(staking: Staking, amount: U256, vestingPeriod: U256) {
+    let staker = callerAddress!()
+    let tokenId = staking.getStakingTokenId()
+    let stakingAccExists = staking.accountExists(staker)
+
+    if (stakingAccExists) {
+        staking.stake{staker -> tokenId: amount}(amount, vestingPeriod)
+    } else {
+        staking.stake{staker -> tokenId: amount, ALPH: 1 alph}(amount, vestingPeriod)
+    }
+}
+
+TxScript StakingClaimRewardsTX(staking: Staking) {
+    staking.claimRewards()
+}
+
+TxScript StakingUnstakeTX(staking: Staking, amount: U256) {
+    staking.unstake(amount)
+}
+
+TxScript StakingClaimTX(staking: Staking) {
+    staking.withdraw()
+}
+
+TxScript StakingDepositRewardsTX(staking: Staking, amount: U256) {
+    staking.depositRewards{callerAddress!() -> ALPH: amount}(amount)
+}

@@ -1,0 +1,87 @@
+// StakingAccount Contract
+//
+// This contract handles the logic for staking, unstaking, and withdrawing assets, particularly focusing on vested assets.
+// It extends from the AccountBase contract, inheriting basic account functionalities.
+Contract StakingAccount (
+    parentContractAddress: Address, // Address of the parent contract managing this account.
+    accountHolder: Address,         // Address of the entity holding this account.
+    vestedStart: U256,              // Timestamp indicating when vesting starts.
+    vestedTill: U256,               // Timestamp indicating when vesting ends.
+    vestedTotalAmount: U256,        // Total amount that is subjected to vesting.
+    mut amountStaked: U256,         // Amount currently staked by the account holder.
+    mut amountUnstaked: U256,       // Amount unstaked but not yet withdrawn by the account holder.
+    mut beginUnstakeAt: U256,       // Timestamp indicating when the last unstaking action began.
+    mut rewardPerToken: U256        // Current reward per token.
+) extends AccountBase(parentContractAddress, accountHolder) {
+    
+    // Error codes for contract operations
+    enum ErrorCodes {
+        InsufficientBalance = 111
+        AmountNotVested = 112
+        CanNotStakeToVestedAccounts = 113
+    }
+
+    // Calculates the claimable vested amount based on the current timestamp..
+    pub fn calcVestedClaimable() -> U256 {
+        let mut currentTimestamp = blockTimeStamp!()
+        if (vestedTotalAmount == 0) { return amountStaked }
+        if (currentTimestamp <= vestedStart) { return 0 }
+        if (currentTimestamp >= vestedTill) { currentTimestamp = vestedTill }
+
+        let timeElapsed = currentTimestamp - vestedStart
+        let totalVestingPeriod = vestedTill - vestedStart
+        let amountUnstakedToNow = vestedTotalAmount - amountStaked
+        let totalVestedNow = vestedTotalAmount * timeElapsed / totalVestingPeriod
+        return totalVestedNow - amountUnstakedToNow
+    }
+
+    // Allows staking of a certain amount. This function ensures that the account is not already vested.
+    // The total staked amount is increased by the staked amount.
+    @using(updateFields = true)
+    pub fn stake(amount: U256) -> () { 
+        assert!(vestedTotalAmount == 0, ErrorCodes.CanNotStakeToVestedAccounts)
+        assertIsParentTheCaller(callerAddress!())
+        amountStaked = amountStaked + amount
+    }
+
+    // Unstakes a specified amount from the staked balance.
+    // The function checks if the amount is vested and if the balance is sufficient before unstaking.
+    @using(updateFields = true)
+    pub fn unstake(amount: U256) -> () {
+        assertIsParentTheCaller(callerAddress!())
+
+        assert!(amountStaked >= amount, ErrorCodes.InsufficientBalance)
+        assert!(amount <= calcVestedClaimable(), ErrorCodes.AmountNotVested)
+
+        amountStaked = amountStaked - amount
+
+        amountUnstaked = amountUnstaked + amount
+        beginUnstakeAt = blockTimeStamp!()
+    }
+
+    // Withdraws the unstaked amount. This function can be called after a certain period post unstaking.
+    @using(updateFields = true)
+    pub fn withdraw() -> () {
+        assertIsParentTheCaller(callerAddress!())
+
+        beginUnstakeAt = 0
+        amountUnstaked = 0
+    }
+
+    // Updates the reward per token.
+    @using(updateFields = true)
+    pub fn setRewardPerToken(newRewardPerToken: U256) -> () {
+        assertIsParentTheCaller(callerAddress!())
+        rewardPerToken = newRewardPerToken
+    }
+
+    pub fn getVestedTotalAmount() -> U256 { return vestedTotalAmount }
+    pub fn getVestedTill() -> U256 { return vestedTill }
+    pub fn getVestedStart() -> U256 { return vestedStart }
+    pub fn getAmountStaked() -> U256 { return amountStaked }
+    pub fn getAmountUnstaked() -> U256 { return amountUnstaked }
+    pub fn getBeginUnstakeAt() -> U256 { return beginUnstakeAt }
+    pub fn getRewardPerToken() -> U256 { return rewardPerToken }
+    // It is safe to destroy if nothing is staked or pending unstake
+    pub fn isSafeToDestroy() -> Bool { return amountUnstaked == 0 && amountStaked == 0 }
+}

@@ -1,0 +1,49 @@
+import "std/fungible_token_interface"
+
+// ApadToken Contract
+//
+// Implements a basic fungible token burning functionalities.
+// The token follows standard fungible token interfaces.
+Contract ApadToken (
+    maxSupply: U256,    // Max supply of tokens that will be issued.
+    mut burned: U256    // Total amount of tokens burned.
+) implements IFungibleToken {
+
+    // Event for tracking token burning.
+    event Burn(burner: Address, amount: U256)
+
+    // Burn a specified amount of tokens from a given address.
+    // Increases the total burned amount and emits a burn event.
+    @using(preapprovedAssets = true, updateFields = true, checkExternalCaller = false)
+    pub fn burn(from: Address, amount: U256) -> () {
+        burnToken!(from, selfTokenId!(), amount)
+        burned = burned + amount
+
+        emit Burn(from, amount)
+    }
+
+    pub fn getSymbol() -> ByteVec {
+        return b`APAD`
+    }
+
+    pub fn getName() -> ByteVec {
+        return b`AlphPad`
+    }
+
+    pub fn getDecimals() -> U256 {
+        return 18
+    }
+
+    pub fn getTotalSupply() -> U256 {
+        return getMaxSupply() - burned
+    }
+
+    pub fn getMaxSupply() -> U256 {
+        return maxSupply
+    }
+}
+
+// Transaction script to burn a specified amount of Apad tokens.
+TxScript ApadTokenBurnTX(token: ApadToken, amount: U256) {
+    token.burn{callerAddress!() -> tokenId!(token): amount}(callerAddress!(), amount)
+}

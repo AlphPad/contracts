@@ -1,0 +1,28 @@
+{
+  "version": "v2.12.0",
+  "name": "IUpgradableResetUpgradeTX",
+  "bytecodeTemplate": "010103000000040c0c{0}0106",
+  "fieldsSig": {
+    "names": [
+      "upgradable"
+    ],
+    "types": [
+      "IUpgradable"
+    ],
+    "isMutable": [
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

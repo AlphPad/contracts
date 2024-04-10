@@ -1,0 +1,698 @@
+{
+  "version": "v2.12.0",
+  "name": "SaleManager",
+  "bytecode": "101940244047406e408d40b840eb40f640ff41084111411a4123412c4135414d415c416a4183425a42b842d442ff43214338435e010001010011b4000f00101600a1021400a1041400a1051400a10656a10305a001a0025f010001040011b4000f0010caa1021600a1041400a1051400a10656a10307a001a0045f010003030013b4000f0010caa1021600a1041601a1051602a10656a10309a001a004a005a0066101000000000fb4000f0011a002ca461372ce7b06a001a0025fa002a101000e010000000017b4000f0011a004140042a0051400411aa0061400411a1372cc7b08a001a0045fa004ba000e01000000001bb4000f0011a004140042a0051400421aa0061400421a1372cd7b0aa001a004a005a00661a004a005a006bb000e010000000003b4000f000e010000000102ce0602010000000102a00102010000000102a00202010000000102a00302010000000102a00402010000000102a00502010000000102a0060200000000000a0ca103caa1021400a1041400a1051400a1060000010100051600a001451372c87b000000000005a0030c2f1372c97b00000000000ca0030c301372ca7b56a003ce062a331372cb7b01030d1100406db4170d160000181601001416021603001716040015160500151607001616084c4024160916022f1341fe7b160a160933160a1603321a1341ff7b160b1604321342007b160b13c40de0b6b3a7640000341342017b160c4313202f1342027b160c710c301342037b160d1600a2160d16000e0cce010114ce00ce01160dce081601160216031604160516061607ce031609160a160b130f640c0c160c130364170f170e160d7a13c40de0b6b3a7640000a216061607a3a00040ce07160e160fc117101206160da000161060a0000d2aa100010000050140360c0ece020108170117000c0ece020107170317021602ce03411603ce04411a1603ce03411602ce04411a1b1342047b160016012c17041602ce03414c09160016041601ce052a2d2b024a08160116041600ce052a2d2b0200000101000e16000d130a1320832c321341f67b16000d341341f77b0000010100141600130a13800f42402c130a1312832c321341f87b1600134064130a1312832c341341f97b00000101001216000d130a1306832c341341fc7b16000d130a1324832c321341fd7b00000202000a561600311341fa7b16001601311341fb7b00000103001300131701ce0513322d17021600160116022b341600160116022a321a1341f57b",
+  "codeHash": "5c4c81ea3e03eec11fb9694037c97fd69db3fcb5b6ad934dc936cb3992f2e43b",
+  "fieldsSig": {
+    "names": [
+      "burnAlphContract",
+      "rewardDistributor",
+      "pair",
+      "alphTokenId",
+      "usdtTokenId",
+      "listingFeeAmount",
+      "upgradeDelay",
+      "saleFlatPriceAlphTemplateId",
+      "accountTemplateId",
+      "saleCounter",
+      "owner",
+      "newOwner",
+      "upgradeCommenced",
+      "newCode",
+      "newImmFieldsEncoded",
+      "newMutFieldsEncoded"
+    ],
+    "types": [
+      "BurnAlphInterface",
+      "RewardDistributor",
+      "DexPoolInterface",
+      "ByteVec",
+      "ByteVec",
+      "U256",
+      "U256",
+      "ByteVec",
+      "ByteVec",
+      "U256",
+      "Address",
+      "Address",
+      "U256",
+      "ByteVec",
+      "ByteVec",
+      "ByteVec"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "eventsSig": [
+    {
+      "name": "ChangeOwnerCommence",
+      "fieldNames": [
+        "owner",
+        "changeOwner"
+      ],
+      "fieldTypes": [
+        "Address",
+        "Address"
+      ]
+    },
+    {
+      "name": "ChangeOwnerApply",
+      "fieldNames": [
+        "owner",
+        "changeOwner"
+      ],
+      "fieldTypes": [
+        "Address",
+        "Address"
+      ]
+    },
+    {
+      "name": "MigrateCommence",
+      "fieldNames": [
+        "owner",
+        "changeCode"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "MigrateApply",
+      "fieldNames": [
+        "owner",
+        "changeCode"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "MigrateWithFieldsCommence",
+      "fieldNames": [
+        "owner",
+        "changeCode",
+        "changeImmFieldsEncoded",
+        "changeMutFieldsEncoded"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec",
+        "ByteVec",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "MigrateWithFieldsApply",
+      "fieldNames": [
+        "owner",
+        "changeCode",
+        "changeImmFieldsEncoded",
+        "changeMutFieldsEncoded"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec",
+        "ByteVec",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "CreateSaleFlatPriceAlph",
+      "fieldNames": [
+        "account",
+        "saleIndex",
+        "contractId"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "ByteVec"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "changeOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "changeOwner"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "migrate",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "changeCode"
+      ],
+      "paramTypes": [
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "migrateWithFields",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "changeCode",
+        "changeImmFieldsEncoded",
+        "changeMutFieldsEncoded"
+      ],
+      "paramTypes": [
+        "ByteVec",
+        "ByteVec",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "changeOwnerApply",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "migrateApply",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "migrateWithFieldsApply",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "resetUpgrade",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "getUpgradeDelay",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Address"
+      ]
+    },
+    {
+      "name": "getNewOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Address"
+      ]
+    },
+    {
+      "name": "getUpgradeCommenced",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getNewCode",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getNewImmFieldsEncoded",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getNewMutFieldsEncoded",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "resetFields",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertOnlyOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "caller"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertUpgradeNotPending",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertUpgradeDelayElapsed",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "createSaleFlatPriceAlph",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "amountAlph",
+        "tokenPrice",
+        "saleStart",
+        "saleEnd",
+        "minRaise",
+        "maxRaise",
+        "saleTokenId",
+        "saleTokenTotalAmount",
+        "isWLSale",
+        "whitelistSaleStart",
+        "whitelistSaleEnd",
+        "whitelistBuyerMaxBid",
+        "merkleRoot"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256",
+        "U256",
+        "U256",
+        "U256",
+        "U256",
+        "ByteVec",
+        "U256",
+        "Bool",
+        "U256",
+        "U256",
+        "U256",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "calculateListingFee",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "assertPriceInRange",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "tokenPrice"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertAlphAmountInRange",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "alphAmount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertSaleAmountInRange",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "saleAmount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertSaleDates",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "saleStart",
+        "saleEnd"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertListingFeePaid",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "amountAlph"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    }
+  ],
+  "constants": [],
+  "enums": [
+    {
+      "name": "UpgradeErrorCodes",
+      "fields": [
+        {
+          "name": "Forbidden",
+          "value": {
+            "type": "U256",
+            "value": "13000"
+          }
+        },
+        {
+          "name": "UpgradePending",
+          "value": {
+            "type": "U256",
+            "value": "13001"
+          }
+        },
+        {
+          "name": "UpgradeNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13002"
+          }
+        },
+        {
+          "name": "UpgradeDelayNotExpired",
+          "value": {
+            "type": "U256",
+            "value": "13003"
+          }
+        },
+        {
+          "name": "MigrateNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13004"
+          }
+        },
+        {
+          "name": "MigrateWithFieldsNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13005"
+          }
+        },
+        {
+          "name": "ChangeOwnerNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13006"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "ListingFeeMustBePaid",
+          "value": {
+            "type": "U256",
+            "value": "501"
+          }
+        },
+        {
+          "name": "PriceLargerThanMax",
+          "value": {
+            "type": "U256",
+            "value": "502"
+          }
+        },
+        {
+          "name": "PriceSmallerThanMin",
+          "value": {
+            "type": "U256",
+            "value": "503"
+          }
+        },
+        {
+          "name": "RaiseLargerThanMax",
+          "value": {
+            "type": "U256",
+            "value": "504"
+          }
+        },
+        {
+          "name": "RaiseSmallerThanMin",
+          "value": {
+            "type": "U256",
+            "value": "505"
+          }
+        },
+        {
+          "name": "SaleStartMustBeInFuture",
+          "value": {
+            "type": "U256",
+            "value": "506"
+          }
+        },
+        {
+          "name": "SaleEndMustBeAfterSaleStart",
+          "value": {
+            "type": "U256",
+            "value": "507"
+          }
+        },
+        {
+          "name": "SaleAmountSmallerThanMin",
+          "value": {
+            "type": "U256",
+            "value": "508"
+          }
+        },
+        {
+          "name": "SaleAmountLargerThanMax",
+          "value": {
+            "type": "U256",
+            "value": "509"
+          }
+        },
+        {
+          "name": "WLSaleStartMustBeSaleStart",
+          "value": {
+            "type": "U256",
+            "value": "510"
+          }
+        },
+        {
+          "name": "WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart",
+          "value": {
+            "type": "U256",
+            "value": "511"
+          }
+        },
+        {
+          "name": "WLSaleMaxBidLargerThanMinRaise",
+          "value": {
+            "type": "U256",
+            "value": "512"
+          }
+        },
+        {
+          "name": "WLSaleMaxBidSmallerThan1Alph",
+          "value": {
+            "type": "U256",
+            "value": "513"
+          }
+        },
+        {
+          "name": "WLSaleInvalidMerkleRootSize",
+          "value": {
+            "type": "U256",
+            "value": "514"
+          }
+        },
+        {
+          "name": "WLSaleMerkleRootMustNotBeZeroes",
+          "value": {
+            "type": "U256",
+            "value": "515"
+          }
+        },
+        {
+          "name": "IncorrectPairSetup",
+          "value": {
+            "type": "U256",
+            "value": "516"
+          }
+        }
+      ]
+    }
+  ]
+}

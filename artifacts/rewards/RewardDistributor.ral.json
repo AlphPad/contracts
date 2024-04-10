@@ -1,0 +1,669 @@
+{
+  "version": "v2.12.0",
+  "name": "RewardDistributor",
+  "bytecode": "111f40244047406e408d40b840eb40f640ff41084111411a4123412c4135414d415c416a4183421d427a42ea43134324432d4336433f434843514364438a43a9010001010011b4000f00101600a1061400a1081400a1091400a10a56a10705a005a0065f010001040011b4000f0010caa1061600a1081400a1091400a10a56a10707a005a0085f010003030013b4000f0010caa1061600a1081601a1091602a10a56a10709a005a008a009a00a6101000000000fb4000f0011a006ca461372ce7b06a005a0065fa006a105000e010000000017b4000f0011a008140042a0091400411aa00a1400411a1372cc7b08a005a0085fa008ba000e01000000001bb4000f0011a008140042a0091400421aa00a1400421a1372cd7b0aa005a008a009a00a61a008a009a00abb000e010000000003b4000f000e010000000102ce0502010000000102a00502010000000102a00602010000000102a00702010000000102a00802010000000102a00902010000000102a00a0200000000000a0ca107caa1061400a1081400a1091400a10a0000010100051600a005451372c87b000000000005a0070c2f1372c97b00000000000ca0070c301372ca7b56a007ce052a331372cb7b01020007004058001c00161700a0021600304c1aa003a0042b1701a0011600001e1702160216012aa1030ca104a00116000c001da1011600a10212061600a003b46056ce022bce032e1703a00316032cce032da0042b1704160411130a1312832c341340ca7b130f130a130f832c1705b4ce001605ab160416052b1706b2ce001606a316060d0cce01011aa00416042aa104120716001604b46001000007014034001ca0041700a003170100161702a0021602304c0e160116002b1703a0011602001e1704160416032a17010c170056ce022bce032e1705160116052cce032d16002b1706160611130a1312832c344c0303024a0204020101020600403dce040c301340cb7b1600ce001601aca00016012aa1001601ce042d1702140017030c17041604ce04314c1da00143ce0413202c2f4c0ca0011604001e17051603160516022a6b4417034a05160316026b44170316040d2a17044a7fdf1208001616011600601603a1010100000201150c17000c17011601ce04314c0b1600a0011601001e2a170016010d2a17014a3116000201000000010856ce022bce032dce042e02010000000102ce0202010000000102ce0302010000000102ce0402010000000102a00002010000000102a00102000000000008a00143ce0413202c2f1340c97b000003040115001c160113202c170316000c16036216026b441600160313202a16004362440200000206010f001c160113202c170216001602160213202a62170316037102",
+  "codeHash": "b913efd25718eeda658a22dfdd9da1d6be770e05b97d607e54ea9f273f724c16",
+  "fieldsSig": {
+    "names": [
+      "rewardTokenId",
+      "stakingContract",
+      "genesisDate",
+      "epochDuration",
+      "totalEpochs",
+      "upgradeDelay",
+      "accumulatedRewards",
+      "totalRewards",
+      "currentHarvestEpoch",
+      "currentHarvestTotal",
+      "currentHarvestDistributed",
+      "owner",
+      "newOwner",
+      "upgradeCommenced",
+      "newCode",
+      "newImmFieldsEncoded",
+      "newMutFieldsEncoded"
+    ],
+    "types": [
+      "ByteVec",
+      "Staking",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "ByteVec",
+      "U256",
+      "U256",
+      "U256",
+      "Address",
+      "Address",
+      "U256",
+      "ByteVec",
+      "ByteVec",
+      "ByteVec"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "eventsSig": [
+    {
+      "name": "ChangeOwnerCommence",
+      "fieldNames": [
+        "owner",
+        "changeOwner"
+      ],
+      "fieldTypes": [
+        "Address",
+        "Address"
+      ]
+    },
+    {
+      "name": "ChangeOwnerApply",
+      "fieldNames": [
+        "owner",
+        "changeOwner"
+      ],
+      "fieldTypes": [
+        "Address",
+        "Address"
+      ]
+    },
+    {
+      "name": "MigrateCommence",
+      "fieldNames": [
+        "owner",
+        "changeCode"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "MigrateApply",
+      "fieldNames": [
+        "owner",
+        "changeCode"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "MigrateWithFieldsCommence",
+      "fieldNames": [
+        "owner",
+        "changeCode",
+        "changeImmFieldsEncoded",
+        "changeMutFieldsEncoded"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec",
+        "ByteVec",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "MigrateWithFieldsApply",
+      "fieldNames": [
+        "owner",
+        "changeCode",
+        "changeImmFieldsEncoded",
+        "changeMutFieldsEncoded"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec",
+        "ByteVec",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "EpochChanged",
+      "fieldNames": [
+        "epoch",
+        "rewardsTransfered",
+        "updatedBy"
+      ],
+      "fieldTypes": [
+        "U256",
+        "U256",
+        "Address"
+      ]
+    },
+    {
+      "name": "RewardHarvested",
+      "fieldNames": [
+        "epoch",
+        "harvestedAmount",
+        "harvestedBy"
+      ],
+      "fieldTypes": [
+        "U256",
+        "U256",
+        "Address"
+      ]
+    },
+    {
+      "name": "RewardAdded",
+      "fieldNames": [
+        "epoch",
+        "addedAmount",
+        "addedBy"
+      ],
+      "fieldTypes": [
+        "U256",
+        "U256",
+        "Address"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "changeOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "changeOwner"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "migrate",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "changeCode"
+      ],
+      "paramTypes": [
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "migrateWithFields",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "changeCode",
+        "changeImmFieldsEncoded",
+        "changeMutFieldsEncoded"
+      ],
+      "paramTypes": [
+        "ByteVec",
+        "ByteVec",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "changeOwnerApply",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "migrateApply",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "migrateWithFieldsApply",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "resetUpgrade",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "getUpgradeDelay",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Address"
+      ]
+    },
+    {
+      "name": "getNewOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Address"
+      ]
+    },
+    {
+      "name": "getUpgradeCommenced",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getNewCode",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getNewImmFieldsEncoded",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getNewMutFieldsEncoded",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "resetFields",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertOnlyOwner",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "caller"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertUpgradeNotPending",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertUpgradeDelayElapsed",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "harvest",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "canHarvest",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "addRewards",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "sender",
+        "amount"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "getTotalPendingRewards",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getCurrentEpoch",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getGenesisDate",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getEpochDuration",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getTotalEpochs",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getAccumulatedRewards",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getTotalRewards",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "assertTotalRewardsIsInitialized",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "update",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "array",
+        "index",
+        "value"
+      ],
+      "paramTypes": [
+        "ByteVec",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "get",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "array",
+        "index"
+      ],
+      "paramTypes": [
+        "ByteVec",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": [
+        "U256"
+      ]
+    }
+  ],
+  "constants": [],
+  "enums": [
+    {
+      "name": "UpgradeErrorCodes",
+      "fields": [
+        {
+          "name": "Forbidden",
+          "value": {
+            "type": "U256",
+            "value": "13000"
+          }
+        },
+        {
+          "name": "UpgradePending",
+          "value": {
+            "type": "U256",
+            "value": "13001"
+          }
+        },
+        {
+          "name": "UpgradeNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13002"
+          }
+        },
+        {
+          "name": "UpgradeDelayNotExpired",
+          "value": {
+            "type": "U256",
+            "value": "13003"
+          }
+        },
+        {
+          "name": "MigrateNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13004"
+          }
+        },
+        {
+          "name": "MigrateWithFieldsNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13005"
+          }
+        },
+        {
+          "name": "ChangeOwnerNotPending",
+          "value": {
+            "type": "U256",
+            "value": "13006"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "RewardsNotInitialized",
+          "value": {
+            "type": "U256",
+            "value": "201"
+          }
+        },
+        {
+          "name": "HarvestValueTooSmall",
+          "value": {
+            "type": "U256",
+            "value": "202"
+          }
+        },
+        {
+          "name": "EpochsIsZero",
+          "value": {
+            "type": "U256",
+            "value": "203"
+          }
+        }
+      ]
+    }
+  ]
+}

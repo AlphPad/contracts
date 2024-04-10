@@ -1,0 +1,28 @@
+{
+  "version": "v2.12.0",
+  "name": "RewardDistributorHarvestTX",
+  "bytecodeTemplate": "010103000000040c0c{0}0112",
+  "fieldsSig": {
+    "names": [
+      "rd"
+    ],
+    "types": [
+      "RewardDistributor"
+    ],
+    "isMutable": [
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}
