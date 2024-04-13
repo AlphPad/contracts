@@ -1,8 +1,8 @@
 {
   "version": "v2.12.0",
   "name": "SaleFlatPriceAlph",
-  "bytecode": "12402c4034406840c640dc419a41c541e141fd421f424d426d427b4287429242bd42e94303430f431b432a433a434843584363436f437f438c439843a143aa43b343bc43c543ce43d743e043e943f243fb4404441444684488449200020206001b1600000d170216010c0d160201092f13425d7b16010d0c160201071600ce091601ab0c0d160201014c021600000a00020203001b1600000d170216010c0d1602010a2f13425d7b16010d0c160201081600ce0b1601ab0c0d160201014c021600000a000201050040351600a0012f13425d7ba00113142d1701160113142d1702160116022b1703b2ce0b1603a3b216030e0cce010114b2ce0b1602a3b216020e0cce000100ce02ce0ba00116012babce0aa000334c06ce02ce09ce0aa0002bab0002010100091600ce0a2f13425d7bce02ce09ce0aab010102080040640011b417021602ce024613425f7b001a00191a4c1d16011602474f00291342607b1602000c4c0e1602000d170316000c0d1603010a2ace0e3213425b7b4a051600ce0e3213425b7b160000051704a00016042ace0a3213425e7b1602ce0b1600ac1602000c4b14b21602130264160416000c0c13046417061705160213c40de0b6b3a7640000a216021605160600094a091602000d1707160416000e0c16070106a00016042aa100a00116002aa101051602160016046001000102011600060008160000070c0dce090102170116011312321342617b1600130a1601832cce042d0200000000000ece040d130a1320832c321342597bce040d3413425a7b00000101000e16000d130a1320832c3213425b7b16000d3413425c7b000000000012ce0a0d130a1306832c341342627bce0a0d130a1324832c321342637b0003030400131600000c19136ee17b160013c40de0b6b3a7640000a2160047ce0316011602c1170306160016035f00000103000f1600000b1600000d1701160117020c0c1602010007160016015f0000010100041600000c136ee27b0100010101041600000dc502010001010104160047cb020100010f001500120013b417011601001b4c07160000020a160116005f4a0716011600000008160116005f01000102001500120014b417011601001b4c07160000031206160116005f4a0716011600000109160116005f01000101000bb4ce02451343ee7b001a1343ef7b00151600002800000000000300161343e97b00000000000300171343ea7b000000000005001700181a1343eb7b00000000000600170018191a1343ec7b000000000005ce0556311343ed7b010000000108ce05563156ce06311a0201000000010456ce063302010000000104a001ce073402010000000108ce0c563156ce0d311a02010000000105a0024313202f020100010101041600ce024502010000000102ce0202010000000102ce0502010000000102ce0602010000000102ce0702010000000102ce0802010000000102ce0902010000000102ce0b02010000000102ce0c02010000000102ce0d02010000000102a00002010000000102a00102010000000102a002020000010100061600a1021207a002b45f0000020601402e16014313202f136afa7b160117021600431703160313202e0c2f136af97b0c170416041603314c1016001604160413202a62170516051602002a1702160413202a17044a2c160271a002712f02000002020110160071160171314c051600160144002b4a041601160044002b0200000103010316004f02",
-  "codeHash": "4faf86493222343633c41282aefa03e6902b4e9472673f6a56b12c4694b93ab9",
+  "bytecode": "1240324034406840c640dc419a41c541da4204422042374253427542a342c342d142dd42e843144340435a43ad43b943c543d443e443f8440f44394449445444604470447d44894492449b44a444ad44b644bf44c844d144da44e344ec44f5450545594579458300020206001b16000010170216010c0d160201092f13425d7b16010d0c160201071600ce071601ab0c0d160201014c021600000d00020203001b16000010170216010c0d1602010a2f13425d7b16010d0c160201081600ce091601ab0c0d160201014c021600000d000201050040351600a0062f13425d7ba00613142d1701160113142d1702160116022b1703b2ce091603a3b216030e0cce010114b2ce091602a3b216020e0cce000100ce02ce09a00616012babce08a005334c06ce02ce07ce08a0052bab0002010100091600ce082f13425d7bce02ce07ce08ab010102080040640015b417021602ce024613425f7b0020001f1a4c1d16011602474f002f1342607b1602000f4c0e16020010170316000c0d1603010a2aa0043213425b7b4a051600a0043213425b7b160000051704a00516042ace083213425e7b1602ce091600ac1602000f4b14b21602130264160416000c0c13046417061705160213c40de0b6b3a7640000a2160216051606000c4a09160200101707160416000e0c16070106a00516042aa105a00616002aa10605160216001604600100010201160008000b1600000a0c0dce070102170116011312321342617b1600130a1601832cce042d0201000202010a00204c0616011600474f002f020402010001020014b417011601ce02451343ee7b00201343ef7b1600000900190616011600a004601600a10400000000000ece040d130a1320832c321342597bce040d3413425a7b00000101000a1600ce053213425b7b16000d3413425c7b00000101000e16000d130a1320832c3213425b7b16000d3413425c7b000000000012ce080d130a1306832c341342627bce080d130a1324832c321342637b0003030400131600000f19136ee17b160013c40de0b6b3a7640000a2160047ce0316011602c1170307160016035f00000103000f1600000e160000101701160117020c0c1602010008160016015f0000010100041600000f136ee27b01000101010416000010c502010001010104160047cb020100010f001500160017b41701160100214c07160000021206160116005f4a0716011600000009160116005f01000102001500160018b41701160100214c07160000031207160116005f4a071601160000010a160116005f01000101000bb4ce02451343ee7b00201343ef7b00191600002e01000405004028b417041604ce02451343ee7b001916001601001a120816041600a0001601a001731600a1001601a10100204c101600160116021603001b120916041602a0021603a003731602a1021603a103000000000003001c1343e97b000000000003001d1343ea7b000000000005001d001e1a1343eb7b000000000006001d001e191a1343ec7b000000000007a0005613801b77402a331343ed7b00000202000a561600311343f07b16001601321343f17b000004040016160216003416021601321a1343f27b160316003416031601321a16031602341a1343f37b010000000108a000563156a001311a0201000000010456a0013302010000000104a006ce053402010000000108a002563156a003311a02010000000105a0074313202f020100010101041600ce024502010000000102ce0202010000000102a00002010000000102a00102010000000102ce0502010000000102ce0602010000000102ce0702010000000102ce0902010000000102a00202010000000102a00302010000000102a00502010000000102a00602010000000102a007020000010100061600a107120aa007b45f0000020601402e16014313202f136afa7b160117021600431703160313202e0c2f136af97b0c170416041603314c1016001604160413202a6217051605160200301702160413202a17044a2c160271a007712f02000002020110160071160171314c05160016014400314a04160116004400310200000103010316004f02",
+  "codeHash": "abdf782eff786e55f4da73a47f2b961758438e2d65d7b63e8dc44ce2db90e314",
   "fieldsSig": {
     "names": [
       "burnAlphContract",
@@ -10,13 +10,13 @@
       "saleOwner",
       "accountTemplateId",
       "tokenPrice",
-      "saleStart",
-      "saleEnd",
       "minRaise",
       "maxRaise",
       "saleTokenId",
       "saleTokenTotalAmount",
       "bidTokenId",
+      "saleStart",
+      "saleEnd",
       "whitelistSaleStart",
       "whitelistSaleEnd",
       "whitelistBuyerMaxBid",
@@ -32,11 +32,11 @@
       "U256",
       "U256",
       "U256",
-      "U256",
-      "U256",
       "ByteVec",
       "U256",
       "ByteVec",
+      "U256",
+      "U256",
       "U256",
       "U256",
       "U256",
@@ -55,11 +55,11 @@
       false,
       false,
       false,
-      false,
-      false,
-      false,
-      false,
-      false,
+      true,
+      true,
+      true,
+      true,
+      true,
       true,
       true,
       true
@@ -72,6 +72,19 @@
         "account",
         "buyBidAmount",
         "buyTokenAmount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "UpdateWhitelistBuyerMaxBid",
+      "fieldNames": [
+        "caller",
+        "newWhitelistBuyerMaxBid",
+        "oldWhitelistBuyerMaxBid"
       ],
       "fieldTypes": [
         "Address",
@@ -142,6 +155,40 @@
       ],
       "fieldTypes": [
         "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "SaleDatesUpdate",
+      "fieldNames": [
+        "caller",
+        "newSaleStartDate",
+        "oldSaleStartDate",
+        "newSaleEndDate",
+        "oldSaleEndDate"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "WhitelistSaleDatesUpdate",
+      "fieldNames": [
+        "caller",
+        "newWLSaleStartDate",
+        "oldWLSaleStartDate",
+        "newWLSaleEndDate",
+        "oldWLSaleEndDate"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256",
+        "U256",
         "U256"
       ]
     },
@@ -266,6 +313,43 @@
       ]
     },
     {
+      "name": "checkIsWhitelisted",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "account",
+        "wlMerkleProof"
+      ],
+      "paramTypes": [
+        "Address",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "setWhitelistBuyerMaxBid",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "newWhitelistBuyerMaxBid"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
       "name": "assertPriceInRange",
       "usePreapprovedAssets": false,
       "useAssetsInContract": false,
@@ -273,6 +357,22 @@
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertMaxBidAmountInRange",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "maxBidAmount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
       "returnTypes": []
     },
     {
@@ -440,6 +540,31 @@
       "returnTypes": []
     },
     {
+      "name": "setSaleDates",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "newSaleStart",
+        "newSaleEnd",
+        "newWhitelistSaleStart",
+        "newWhitelistSaleEnd"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
       "name": "assertSaleLive",
       "usePreapprovedAssets": false,
       "useAssetsInContract": false,
@@ -480,13 +605,57 @@
       "returnTypes": []
     },
     {
-      "name": "assertSaleNotStarted",
+      "name": "assertSaleEditable",
       "usePreapprovedAssets": false,
       "useAssetsInContract": false,
       "isPublic": false,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertValidSaleDates",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "asSaleStart",
+        "asSaleEnd"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertValidWLSaleDates",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "asSaleStart",
+        "asSaleEnd",
+        "asWLSaleStart",
+        "asWLSaleEnd"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false
+      ],
       "returnTypes": []
     },
     {
@@ -942,7 +1111,7 @@
           }
         },
         {
-          "name": "SaleAlreadyStarted",
+          "name": "SaleCanNotBeEditedAtThisTime",
           "value": {
             "type": "U256",
             "value": "1005"
@@ -960,6 +1129,34 @@
           "value": {
             "type": "U256",
             "value": "1007"
+          }
+        },
+        {
+          "name": "SaleStartMustBeInFuture",
+          "value": {
+            "type": "U256",
+            "value": "1008"
+          }
+        },
+        {
+          "name": "SaleEndMustBeAfterSaleStart",
+          "value": {
+            "type": "U256",
+            "value": "1009"
+          }
+        },
+        {
+          "name": "WLSaleStartMustBeWithinSaleDates",
+          "value": {
+            "type": "U256",
+            "value": "1010"
+          }
+        },
+        {
+          "name": "WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart",
+          "value": {
+            "type": "U256",
+            "value": "1011"
           }
         }
       ]

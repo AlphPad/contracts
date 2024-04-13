@@ -257,8 +257,6 @@ describe('Sale Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT
     })
 
-    console.log("CHECK THIS: " + tx.txId);
-
     let apadBalance = await balanceOf(tokenId, seller2.address);
     let alphBalance = await balanceOf(ALPH_TOKEN_ID, seller2.address);
     expect(apadBalance).toBe(add18Decimals(BigInt(1e6) / 2n));

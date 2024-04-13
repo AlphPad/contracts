@@ -37,13 +37,13 @@ export namespace SaleFlatPriceAlphTypes {
     saleOwner: Address;
     accountTemplateId: HexString;
     tokenPrice: bigint;
-    saleStart: bigint;
-    saleEnd: bigint;
     minRaise: bigint;
     maxRaise: bigint;
     saleTokenId: HexString;
     saleTokenTotalAmount: bigint;
     bidTokenId: HexString;
+    saleStart: bigint;
+    saleEnd: bigint;
     whitelistSaleStart: bigint;
     whitelistSaleEnd: bigint;
     whitelistBuyerMaxBid: bigint;
@@ -58,6 +58,11 @@ export namespace SaleFlatPriceAlphTypes {
     account: Address;
     buyBidAmount: bigint;
     buyTokenAmount: bigint;
+  }>;
+  export type UpdateWhitelistBuyerMaxBidEvent = ContractEvent<{
+    caller: Address;
+    newWhitelistBuyerMaxBid: bigint;
+    oldWhitelistBuyerMaxBid: bigint;
   }>;
   export type AccountCreateEvent = ContractEvent<{
     account: Address;
@@ -83,6 +88,20 @@ export namespace SaleFlatPriceAlphTypes {
     account: Address;
     saleTokenAmount: bigint;
   }>;
+  export type SaleDatesUpdateEvent = ContractEvent<{
+    caller: Address;
+    newSaleStartDate: bigint;
+    oldSaleStartDate: bigint;
+    newSaleEndDate: bigint;
+    oldSaleEndDate: bigint;
+  }>;
+  export type WhitelistSaleDatesUpdateEvent = ContractEvent<{
+    caller: Address;
+    newWLSaleStartDate: bigint;
+    oldWLSaleStartDate: bigint;
+    newWLSaleEndDate: bigint;
+    oldWLSaleEndDate: bigint;
+  }>;
   export type UpdateRootEvent = ContractEvent<{
     newMerkleRoot: HexString;
     updatedBy: Address;
@@ -92,6 +111,13 @@ export namespace SaleFlatPriceAlphTypes {
     calculateSaleTokensReceivedPerBidTokens: {
       params: CallContractParams<{ bidAmount: bigint }>;
       result: CallContractResult<bigint>;
+    };
+    checkIsWhitelisted: {
+      params: CallContractParams<{
+        account: Address;
+        wlMerkleProof: HexString;
+      }>;
+      result: CallContractResult<boolean>;
     };
     accountExists: {
       params: CallContractParams<{ account: Address }>;
@@ -198,13 +224,16 @@ class Factory extends ContractFactory<
 
   eventIndex = {
     Buy: 0,
-    AccountCreate: 1,
-    AccountDestroy: 2,
-    ClaimBuyer: 3,
-    ClaimBuyerRefund: 4,
-    ClaimSeller: 5,
-    ClaimSellerRefund: 6,
-    UpdateRoot: 7,
+    UpdateWhitelistBuyerMaxBid: 1,
+    AccountCreate: 2,
+    AccountDestroy: 3,
+    ClaimBuyer: 4,
+    ClaimBuyerRefund: 5,
+    ClaimSeller: 6,
+    ClaimSellerRefund: 7,
+    SaleDatesUpdate: 8,
+    WhitelistSaleDatesUpdate: 9,
+    UpdateRoot: 10,
   };
   consts = {
     ErrorCodes: {
@@ -233,9 +262,13 @@ class Factory extends ContractFactory<
       SaleNotFinished: BigInt(1002),
       SaleClaimNotAvailable: BigInt(1003),
       SaleRefundNotAvailable: BigInt(1004),
-      SaleAlreadyStarted: BigInt(1005),
+      SaleCanNotBeEditedAtThisTime: BigInt(1005),
       SaleUpdateUnauthorized: BigInt(1006),
       SaleIsNotWLSale: BigInt(1007),
+      SaleStartMustBeInFuture: BigInt(1008),
+      SaleEndMustBeAfterSaleStart: BigInt(1009),
+      WLSaleStartMustBeWithinSaleDates: BigInt(1010),
+      WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart: BigInt(1011),
     },
   };
 
@@ -296,6 +329,22 @@ class Factory extends ContractFactory<
         params
       );
     },
+    checkIsWhitelisted: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { account: Address; wlMerkleProof: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
+      return testMethod(this, "checkIsWhitelisted", params);
+    },
+    setWhitelistBuyerMaxBid: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { newWhitelistBuyerMaxBid: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "setWhitelistBuyerMaxBid", params);
+    },
     assertPriceInRange: async (
       params: Omit<
         TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
@@ -303,6 +352,14 @@ class Factory extends ContractFactory<
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertPriceInRange", params);
+    },
+    assertMaxBidAmountInRange: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { maxBidAmount: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "assertMaxBidAmountInRange", params);
     },
     assertBidAmountInRange: async (
       params: TestContractParamsWithoutMaps<
@@ -388,6 +445,19 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setMerkleRoot", params);
     },
+    setSaleDates: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        {
+          newSaleStart: bigint;
+          newSaleEnd: bigint;
+          newWhitelistSaleStart: bigint;
+          newWhitelistSaleEnd: bigint;
+        }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "setSaleDates", params);
+    },
     assertSaleLive: async (
       params: Omit<
         TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
@@ -420,13 +490,34 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "assertCanClaimRefund", params);
     },
-    assertSaleNotStarted: async (
+    assertSaleEditable: async (
       params: Omit<
         TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertSaleNotStarted", params);
+      return testMethod(this, "assertSaleEditable", params);
+    },
+    assertValidSaleDates: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        { asSaleStart: bigint; asSaleEnd: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "assertValidSaleDates", params);
+    },
+    assertValidWLSaleDates: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphTypes.Fields,
+        {
+          asSaleStart: bigint;
+          asSaleEnd: bigint;
+          asWLSaleStart: bigint;
+          asWLSaleEnd: bigint;
+        }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "assertValidWLSaleDates", params);
     },
     isSaleLive: async (
       params: Omit<
@@ -612,7 +703,7 @@ export const SaleFlatPriceAlph = new Factory(
   Contract.fromJson(
     SaleFlatPriceAlphContractJson,
     "",
-    "4faf86493222343633c41282aefa03e6902b4e9472673f6a56b12c4694b93ab9"
+    "abdf782eff786e55f4da73a47f2b961758438e2d65d7b63e8dc44ce2db90e314"
   )
 );
 
@@ -639,6 +730,19 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       this,
       options,
       "Buy",
+      fromCount
+    );
+  }
+
+  subscribeUpdateWhitelistBuyerMaxBidEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.UpdateWhitelistBuyerMaxBidEvent>,
+    fromCount?: number
+  ): EventSubscription {
+    return subscribeContractEvent(
+      SaleFlatPriceAlph.contract,
+      this,
+      options,
+      "UpdateWhitelistBuyerMaxBid",
       fromCount
     );
   }
@@ -721,6 +825,32 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
     );
   }
 
+  subscribeSaleDatesUpdateEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.SaleDatesUpdateEvent>,
+    fromCount?: number
+  ): EventSubscription {
+    return subscribeContractEvent(
+      SaleFlatPriceAlph.contract,
+      this,
+      options,
+      "SaleDatesUpdate",
+      fromCount
+    );
+  }
+
+  subscribeWhitelistSaleDatesUpdateEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.WhitelistSaleDatesUpdateEvent>,
+    fromCount?: number
+  ): EventSubscription {
+    return subscribeContractEvent(
+      SaleFlatPriceAlph.contract,
+      this,
+      options,
+      "WhitelistSaleDatesUpdate",
+      fromCount
+    );
+  }
+
   subscribeUpdateRootEvent(
     options: EventSubscribeOptions<SaleFlatPriceAlphTypes.UpdateRootEvent>,
     fromCount?: number
@@ -737,12 +867,15 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   subscribeAllEvents(
     options: EventSubscribeOptions<
       | SaleFlatPriceAlphTypes.BuyEvent
+      | SaleFlatPriceAlphTypes.UpdateWhitelistBuyerMaxBidEvent
       | SaleFlatPriceAlphTypes.AccountCreateEvent
       | SaleFlatPriceAlphTypes.AccountDestroyEvent
       | SaleFlatPriceAlphTypes.ClaimBuyerEvent
       | SaleFlatPriceAlphTypes.ClaimBuyerRefundEvent
       | SaleFlatPriceAlphTypes.ClaimSellerEvent
       | SaleFlatPriceAlphTypes.ClaimSellerRefundEvent
+      | SaleFlatPriceAlphTypes.SaleDatesUpdateEvent
+      | SaleFlatPriceAlphTypes.WhitelistSaleDatesUpdateEvent
       | SaleFlatPriceAlphTypes.UpdateRootEvent
     >,
     fromCount?: number
@@ -765,6 +898,19 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
         SaleFlatPriceAlph,
         this,
         "calculateSaleTokensReceivedPerBidTokens",
+        params,
+        getContractByCodeHash
+      );
+    },
+    checkIsWhitelisted: async (
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"checkIsWhitelisted">
+    ): Promise<
+      SaleFlatPriceAlphTypes.CallMethodResult<"checkIsWhitelisted">
+    > => {
+      return callMethod(
+        SaleFlatPriceAlph,
+        this,
+        "checkIsWhitelisted",
         params,
         getContractByCodeHash
       );
