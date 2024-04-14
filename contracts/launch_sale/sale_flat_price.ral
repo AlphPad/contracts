@@ -6,28 +6,28 @@ Abstract Contract SaleFlatPrice(
     saleOwner: Address,                     // Owner of the sale
     accountTemplateId: ByteVec,             // Template ID for creating buyer accounts
     tokenPrice: U256,                       // Price of the token in the sale
-    saleStart: U256,                        // Start time of the sale
-    saleEnd: U256,                          // End time of the sale
     minRaise: U256,                         // Minimum amount to be raised
     maxRaise: U256,                         // Maximum amount to be raised
     saleTokenId: ByteVec,                   // ID of the token being sold
     saleTokenTotalAmount: U256,             // Total amount of tokens available for sale
     bidTokenId: ByteVec,                    // Token used for bidding
-    whitelistSaleStart: U256,               // Start time of the whitelist sale
-    whitelistSaleEnd: U256,                 // End time of the whitelist sale
-    whitelistBuyerMaxBid: U256,             // Maximum bid amount for whitelisted buyers
+    mut saleStart: U256,                    // Start time of the sale
+    mut saleEnd: U256,                      // End time of the sale
+    mut whitelistSaleStart: U256,           // Start time of the whitelist sale
+    mut whitelistSaleEnd: U256,             // End time of the whitelist sale
+    mut whitelistBuyerMaxBid: U256,         // Maximum bid amount for whitelisted buyers
     mut tokensSold: U256,                   // Amount of tokens sold
     mut totalRaised: U256,                  // Total funds raised in the sale
     mut merkleRoot: ByteVec                 // Merkle root for whitelist verification
 ) extends AccountFactory(accountTemplateId), 
     SaleBase(
         saleOwner,
-        saleStart, 
-        saleEnd, 
         minRaise, 
         maxRaise, 
         saleTokenId, 
         bidTokenId, 
+        saleStart, 
+        saleEnd, 
         whitelistSaleStart, 
         whitelistSaleEnd, 
         tokensSold,
@@ -37,6 +37,7 @@ Abstract Contract SaleFlatPrice(
 
     // Event declarations
     event Buy(account: Address, buyBidAmount: U256, buyTokenAmount: U256)
+    event UpdateWhitelistBuyerMaxBid(caller: Address, newWhitelistBuyerMaxBid: U256, oldWhitelistBuyerMaxBid: U256)
 
     // Error codes specific to claiming operations in this contract.
     enum ErrorCodes {
@@ -135,10 +136,35 @@ Abstract Contract SaleFlatPrice(
         return bidAmount * (10 ** saleTokenDecimals) / tokenPrice
     }
 
+    @using(checkExternalCaller = false)
+    pub fn checkIsWhitelisted(account: Address, wlMerkleProof: ByteVec) -> Bool {
+        if(isWhitelistSale()){
+            return verify(wlMerkleProof, keccak256!(toByteVec!(account)))
+        }
+        return false
+    }
+
+    // Setter for WhitelistBuyerMaxBid before sale starts.
+    @using(updateFields = true)
+    pub fn setWhitelistBuyerMaxBid(newWhitelistBuyerMaxBid: U256) -> () {
+        let caller = callerAddress!() 
+        checkCaller!(caller == saleOwner, SaleBaseErrorCodes.SaleUpdateUnauthorized)
+        assert!(isWhitelistSale(), SaleBaseErrorCodes.SaleIsNotWLSale)
+        assertMaxBidAmountInRange(newWhitelistBuyerMaxBid)
+        assertSaleEditable()
+        emit UpdateWhitelistBuyerMaxBid(caller, newWhitelistBuyerMaxBid, whitelistBuyerMaxBid)
+        whitelistBuyerMaxBid = newWhitelistBuyerMaxBid
+    }
+
     fn assertPriceInRange() -> () {
         assert!(tokenPrice <= 1 * (10**32), ErrorCodes.PriceMoreThanMax) // price can't be bigger than 32 digits to avoid overflows on multiplication
         assert!(tokenPrice >= 1, ErrorCodes.PriceLessThanMin) // price must be bigger than 0 to avoid dividing with 0
     }
+
+    fn assertMaxBidAmountInRange(maxBidAmount: U256) -> () {
+        assert!(maxBidAmount <= minRaise, ErrorCodes.BidMoreThanMax) // max bid per wl must be equal or less than minRaise
+        assert!(maxBidAmount >= 1, ErrorCodes.BidLessThanMin) // bid must be bigger than 0 to avoid dividing with 0
+    }    
     
     fn assertBidAmountInRange(bidAmount: U256) -> () {
         assert!(bidAmount <= 1 * (10**32), ErrorCodes.BidMoreThanMax) // bid can't be bigger than 32 digits to avoid overflows on multiplication

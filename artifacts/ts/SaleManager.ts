@@ -412,7 +412,7 @@ export const SaleManager = new Factory(
   Contract.fromJson(
     SaleManagerContractJson,
     "",
-    "5c4c81ea3e03eec11fb9694037c97fd69db3fcb5b6ad934dc936cb3992f2e43b"
+    "d6347b9ef1f6c73af3138b01ebba2990f078316aaa7f135be763c3bdd3851888"
   )
 );
 

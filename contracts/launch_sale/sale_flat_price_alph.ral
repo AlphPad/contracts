@@ -7,16 +7,16 @@ Contract SaleFlatPriceAlph(
     saleOwner: Address,                     // Owner of the sale
     accountTemplateId: ByteVec,             // Template ID for creating buyer accounts
     tokenPrice: U256,                       // Price of the token in the sale
-    saleStart: U256,                        // Start time of the sale
-    saleEnd: U256,                          // End time of the sale
     minRaise: U256,                         // Minimum amount to be raised
     maxRaise: U256,                         // Maximum amount to be raised
     saleTokenId: ByteVec,                   // ID of the token being sold
     saleTokenTotalAmount: U256,             // Total amount of tokens available for sale
     bidTokenId: ByteVec,                    // Token used for bidding (ALPH)
-    whitelistSaleStart: U256,               // Start time of the whitelist sale
-    whitelistSaleEnd: U256,                 // End time of the whitelist sale
-    whitelistBuyerMaxBid: U256,             // Maximum bid amount for whitelisted buyers
+    mut saleStart: U256,                    // Start time of the sale
+    mut saleEnd: U256,                      // End time of the sale
+    mut whitelistSaleStart: U256,           // Start time of the whitelist sale
+    mut whitelistSaleEnd: U256,             // End time of the whitelist sale
+    mut whitelistBuyerMaxBid: U256,         // Maximum bid amount for whitelisted buyers
     mut tokensSold: U256,                   // Amount of tokens sold
     mut totalRaised: U256,                  // Total funds raised in the sale
     mut merkleRoot: ByteVec                 // Merkle root for whitelist verification
@@ -25,13 +25,13 @@ Contract SaleFlatPriceAlph(
         saleOwner,
         accountTemplateId,
         tokenPrice,
-        saleStart,
-        saleEnd,
         minRaise,
         maxRaise,
         saleTokenId,
         saleTokenTotalAmount,
         bidTokenId, 
+        saleStart,
+        saleEnd,
         whitelistSaleStart, 
         whitelistSaleEnd,
         whitelistBuyerMaxBid,
@@ -62,6 +62,12 @@ Contract SaleFlatPriceAlph(
 // Transaction scripts
 TxScript SaleFlatPriceAlphSetMerkleRootTX (saleFlatPrice: SaleFlatPriceAlph, newMerkleRoot: ByteVec) {
     saleFlatPrice.setMerkleRoot(newMerkleRoot)
+}
+TxScript SaleFlatPriceAlphSetWLMaxBidTX (saleFlatPrice: SaleFlatPriceAlph, newWLMaxBid: U256) {
+    saleFlatPrice.setWhitelistBuyerMaxBid(newWLMaxBid)
+}
+TxScript SaleFlatPriceAlphSetSaleDatesTX (saleFlatPrice: SaleFlatPriceAlph, newSaleStart: U256, newSaleEnd: U256, newWhitelistSaleStart: U256, newWhitelistSaleEnd: U256) {
+    saleFlatPrice.setSaleDates(newSaleStart, newSaleEnd, newWhitelistSaleStart, newWhitelistSaleEnd)
 }
 
 TxScript SaleFlatPriceAlphBuyTX (saleFlatPrice: SaleFlatPriceAlph, amountAlph: U256, merkleProof: ByteVec) {

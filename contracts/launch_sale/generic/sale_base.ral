@@ -6,14 +6,14 @@
 // It extends the `MerkleProof` contract for whitelist functionalities.
 Abstract Contract SaleBase(
     saleOwner: Address,
-    saleStart: U256,
-    saleEnd: U256,
     minRaise: U256,
     maxRaise: U256,
     saleTokenId: ByteVec,
     bidTokenId: ByteVec,
-    whitelistSaleStart: U256,
-    whitelistSaleEnd: U256,
+    mut saleStart: U256,
+    mut saleEnd: U256,
+    mut whitelistSaleStart: U256,
+    mut whitelistSaleEnd: U256,
     mut tokensSold: U256,
     mut totalRaised: U256,
     mut merkleRoot: ByteVec
@@ -27,6 +27,10 @@ Abstract Contract SaleBase(
     event ClaimSeller(account: Address, bidTokenAmount: U256)
     // Event emitted when the seller claims their refund.
     event ClaimSellerRefund(account: Address, saleTokenAmount: U256)
+    // Event emitted when the seller updates sale dates
+    event SaleDatesUpdate(caller:Address, newSaleStartDate: U256, oldSaleStartDate: U256, newSaleEndDate: U256, oldSaleEndDate: U256)
+    // Event emitted when the seller updates whitelist sale dates
+    event WhitelistSaleDatesUpdate(caller:Address, newWLSaleStartDate: U256, oldWLSaleStartDate: U256, newWLSaleEndDate: U256, oldWLSaleEndDate: U256)
 
     // Enumerates custom error codes specific to the SaleBase contract.
     enum SaleBaseErrorCodes {
@@ -34,9 +38,14 @@ Abstract Contract SaleBase(
         SaleNotFinished = 1002
         SaleClaimNotAvailable = 1003
         SaleRefundNotAvailable = 1004
-        SaleAlreadyStarted = 1005
+        SaleCanNotBeEditedAtThisTime = 1005
         SaleUpdateUnauthorized = 1006
         SaleIsNotWLSale = 1007
+        SaleStartMustBeInFuture = 1008
+        SaleEndMustBeAfterSaleStart = 1009
+        WLSaleStartMustBeWithinSaleDates = 1010
+        WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart = 1011
+        InvalidMerkleRoot = 1012
     }
 
     // Function allowing participants to claim tokens or the seller to claim unsold tokens after sale success.
@@ -75,8 +84,27 @@ Abstract Contract SaleBase(
     pub fn setMerkleRoot(newMerkleRoot: ByteVec) -> () {
         checkCaller!(callerAddress!() == saleOwner, SaleBaseErrorCodes.SaleUpdateUnauthorized)
         assert!(isWhitelistSale(), SaleBaseErrorCodes.SaleIsNotWLSale)
-        assertSaleNotStarted()
+        assert!(size!(newMerkleRoot) == 32, SaleBaseErrorCodes.InvalidMerkleRoot)
+        assertSaleEditable()
         updateRoot(newMerkleRoot)
+    }
+    
+    // Setter for sale dates before sale starts.
+    @using(updateFields = true)
+    pub fn setSaleDates(newSaleStart: U256, newSaleEnd: U256, newWhitelistSaleStart: U256, newWhitelistSaleEnd: U256) -> () {
+        let caller = callerAddress!()
+        checkCaller!(caller == saleOwner, SaleBaseErrorCodes.SaleUpdateUnauthorized)
+        assertSaleEditable()
+        assertValidSaleDates(newSaleStart, newSaleEnd)
+        emit SaleDatesUpdate(caller, newSaleStart, saleStart, newSaleEnd, saleEnd)
+        saleStart = newSaleStart
+        saleEnd = newSaleEnd
+        if(isWhitelistSale()) {
+            assertValidWLSaleDates(newSaleStart, newSaleEnd, newWhitelistSaleStart, newWhitelistSaleEnd)
+            emit WhitelistSaleDatesUpdate(caller, newWhitelistSaleStart, whitelistSaleStart, newWhitelistSaleEnd, whitelistSaleEnd)
+            whitelistSaleStart = newWhitelistSaleStart
+            whitelistSaleEnd = newWhitelistSaleEnd
+        }
     }
 
     // Internal functions for processing claims and refunds for buyers and sellers.
@@ -90,7 +118,19 @@ Abstract Contract SaleBase(
     fn assertSaleFinished() -> () { assert!(isSaleFinished(), SaleBaseErrorCodes.SaleNotFinished) }
     fn assertCanClaim() -> () { assert!(isSaleFinished() && isSaleSuccess(), SaleBaseErrorCodes.SaleClaimNotAvailable) }
     fn assertCanClaimRefund() -> () { assert!(isSaleFinished() && !isSaleSuccess(), SaleBaseErrorCodes.SaleRefundNotAvailable) }
-    fn assertSaleNotStarted() -> () { assert!(saleStart < blockTimeStamp!(), SaleBaseErrorCodes.SaleAlreadyStarted) }
+    // Dont allow edits 30 minutes before launch or later
+    fn assertSaleEditable() -> () { assert!(saleStart > blockTimeStamp!() + 1800000, SaleBaseErrorCodes.SaleCanNotBeEditedAtThisTime) }
+    fn assertValidSaleDates(asSaleStart: U256, asSaleEnd: U256) -> () {
+        assert!(blockTimeStamp!() < asSaleStart, SaleBaseErrorCodes.SaleStartMustBeInFuture) // Must be a future date
+        assert!(asSaleStart <= asSaleEnd, SaleBaseErrorCodes.SaleEndMustBeAfterSaleStart) // End must be after start
+    }  
+    fn assertValidWLSaleDates(asSaleStart: U256, asSaleEnd: U256, asWLSaleStart: U256, asWLSaleEnd: U256) -> () {
+        assert!(asWLSaleStart >= asSaleStart && asWLSaleStart <= asSaleEnd, SaleBaseErrorCodes.WLSaleStartMustBeWithinSaleDates)
+        assert!(
+            asWLSaleEnd >= asSaleStart && // not before sale start
+            asWLSaleEnd <= asSaleEnd &&  // not after sale end
+            asWLSaleEnd >= asWLSaleStart, SaleBaseErrorCodes.WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart) // not before wl sale start
+    }  
 
     // Utility functions to determine the current state of the sale.
     pub fn isSaleLive() -> Bool { return saleStart < blockTimeStamp!() && blockTimeStamp!() < saleEnd }

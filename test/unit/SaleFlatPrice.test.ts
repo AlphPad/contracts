@@ -183,6 +183,40 @@ describe('Sale Flat Price Contract Testing', () => {
     });
   }
 
+
+  function updateSaleDate(state: ContractState<SaleFlatPriceAlphTypes.Fields>, caller: string, newSaleStart: bigint, newSaleEnd: bigint, newWhitelistSaleStart: bigint, newWhitelistSaleEnd: bigint, timestamp: bigint, existingContracts: ContractState[]) {
+    const inputAssets = [{ address: caller, asset: { alphAmount: (DUST_AMOUNT * 150n) } }]
+    return SaleFlatPriceAlph.tests.setSaleDates({
+      initialFields: state.fields,
+      initialAsset: state.asset,
+      address: state.address,
+      existingContracts: existingContracts,
+      blockTimeStamp: Number(timestamp),
+      testArgs: {
+        newSaleStart,
+        newSaleEnd,
+        newWhitelistSaleStart,
+        newWhitelistSaleEnd
+      },
+      inputAssets: inputAssets,
+    });
+  }
+
+  function updateWLMAxBid(state: ContractState<SaleFlatPriceAlphTypes.Fields>, caller: string, newWLMaxBid: bigint, timestamp: bigint, existingContracts: ContractState[]) {
+    const inputAssets = [{ address: caller, asset: { alphAmount: (DUST_AMOUNT * 150n) } }]
+    return SaleFlatPriceAlph.tests.setWhitelistBuyerMaxBid({
+      initialFields: state.fields,
+      initialAsset: state.asset,
+      address: state.address,
+      existingContracts: existingContracts,
+      blockTimeStamp: Number(timestamp),
+      testArgs: {
+        newWhitelistBuyerMaxBid: newWLMaxBid
+      },
+      inputAssets: inputAssets,
+    });
+  }
+
   function accountExists(state: ContractState<SaleFlatPriceAlphTypes.Fields>, address: string, existingContracts: ContractState[]) {
     return SaleFlatPriceAlph.tests.accountExists({
       initialFields: state.fields,
@@ -422,11 +456,128 @@ describe('Sale Flat Price Contract Testing', () => {
         Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.SaleIsNotWLSale)
       );
     });
+    test("Setting Merkle Root should fail if the merkle root is not the correct size", async () => {
+      await expectAssertionError(
+        updateMerkle(fixtureWLAndRegularSale.selfState, seller, "", BigInt(genesis + 1), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.InvalidMerkleRoot)
+      );
+    });
+    test("Setting Merkle Root should pass if the sale has not started", async () => {
+      var result = await updateMerkle(fixtureWLAndRegularSale.selfState, seller, wlRoot, BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies);
+      expect(checkEvent(result, "UpdateRoot")).toBe(true);
+    });
     test("Setting Merkle Root should fail if the sale has already started", async () => {
       await expectAssertionError(
-        updateMerkle(fixtureWLAndRegularSale.selfState, seller, wlRoot, BigInt(genesis + 1), fixtureWLAndRegularSale.dependencies),
+        updateMerkle(fixtureWLAndRegularSale.selfState, seller, wlRoot, BigInt(genesis + 86400001), fixtureWLAndRegularSale.dependencies),
         fixtureWLAndRegularSale.address,
-        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.SaleAlreadyStarted)
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.SaleCanNotBeEditedAtThisTime)
+      );
+    });
+    test("Setting Merkle Root should fail if caller is not owner", async () => {
+      await expectAssertionError(
+        updateMerkle(fixtureWLAndRegularSale.selfState, buyer1, wlRoot, BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.SaleUpdateUnauthorized)
+      );
+    });
+
+    test("Setting WL Max Bid should pass if the sale has not started", async () => {
+      var result = await updateWLMAxBid(fixtureWLAndRegularSale.selfState, seller, 100n * ONE_ALPH, BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies);
+      expect(checkEvent(result, "UpdateWhitelistBuyerMaxBid")).toBe(true);
+    });
+    test("Setting WL Max Bid should fail if the sale has already started", async () => {
+      await expectAssertionError(
+        updateWLMAxBid(fixtureWLAndRegularSale.selfState, seller, 100n * ONE_ALPH, BigInt(genesis + 86400001), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.SaleCanNotBeEditedAtThisTime)
+      );
+    });
+    test("Setting WL Max Bid should fail if caller is not owner", async () => {
+      await expectAssertionError(
+        updateWLMAxBid(fixtureWLAndRegularSale.selfState, buyer1, 100n * ONE_ALPH, BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.SaleUpdateUnauthorized)
+      );
+    });
+    test("Setting WL Max Bid should fail if value is out of range", async () => {
+      await expectAssertionError(
+        updateWLMAxBid(fixtureWLAndRegularSale.selfState, seller, 0n, BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.ErrorCodes.BidLessThanMin)
+      );
+      await expectAssertionError(
+        updateWLMAxBid(fixtureWLAndRegularSale.selfState, seller, 20001n * ONE_ALPH, BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.ErrorCodes.BidMoreThanMax)
+      );
+    });
+
+
+
+    test("Setting Sale Dates should pass if the sale has not started", async () => {
+      var result = await updateSaleDate(fixtureWLAndRegularSale.selfState, seller, 
+        BigInt(genesis + (86300000 + 1800000)),
+        BigInt(genesis + (86300000 + 2 * 1800000)),
+        BigInt(genesis + (86300000 + 1800000)),
+        BigInt(genesis + (86300000 + 2 * 1800000)),
+        BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies);
+      expect(checkEvent(result, "SaleDatesUpdate")).toBe(true);
+    });
+    test("Setting Sale Dates should fail if the sale has already started", async () => {
+      await expectAssertionError(
+        updateSaleDate(fixtureWLAndRegularSale.selfState, seller, 
+          BigInt(genesis + (86300000 + 1800000)),
+          BigInt(genesis + (86300000 + 2 * 1800000)),
+          0n,
+          0n 
+          , BigInt(genesis + (86400001)), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.SaleCanNotBeEditedAtThisTime)
+      );
+    });
+    test("Setting Sale Dates should fail if caller is not owner", async () => {
+      await expectAssertionError(
+        updateSaleDate(fixtureWLAndRegularSale.selfState, buyer1, 
+          BigInt(genesis + (86300000 + 1800000)),
+          BigInt(genesis + (86300000 + 2 * 1800000)),
+          0n,
+          0n 
+          , BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.SaleUpdateUnauthorized)
+      );
+    });
+    test("Setting Sale Dates should fail if value is out of range", async () => {
+      await expectAssertionError(
+        updateSaleDate(fixtureWLAndRegularSale.selfState, seller, 
+          BigInt(genesis + (86300000 + 1800000)),
+          BigInt(genesis + (86300000 + 2 * 1800000)),
+          BigInt(genesis + (86300000 + 1700000)),
+          BigInt(genesis + (86300000 + 2 * 1800000)),
+          BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.WLSaleStartMustBeWithinSaleDates)
+      );
+      await expectAssertionError(
+        updateSaleDate(fixtureWLAndRegularSale.selfState, seller, 
+          BigInt(genesis + (86300000 + 1800000)),
+          BigInt(genesis + (86300000 + 2 * 1800000)),
+          BigInt(genesis + (86300000 + 1800000)),
+          BigInt(genesis + (86300000 + 2 * 1900000)),
+          BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart)
+      );
+      await expectAssertionError(
+        updateSaleDate(fixtureWLAndRegularSale.selfState, seller, 
+          BigInt(genesis + (86300000 + 1800000)),
+          BigInt(genesis + (86300000 + 2 * 1800000)),
+          BigInt(genesis + (86300000 + 1800000)),
+          BigInt(genesis + (86300000 + 1700000)),
+          BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart)
       );
     });
   })
@@ -436,6 +587,34 @@ describe('Sale Flat Price Contract Testing', () => {
       var result = await buy(fixtureWLAndRegularSale.selfState, wlBuyers[0].address, 10n * ONE_ALPH, wlBuyers[0].proof, BigInt(genesis + 1) + (86400000n * 1n), fixtureWLAndRegularSale.dependencies);
       var state = getContractState<SaleFlatPriceAlphTypes.Fields>(result.contracts, fixtureWLAndRegularSale.contractId)
       expect(checkEvent(result, "Buy", { account: wlBuyers[0].address, buyBidAmount: 10n * ONE_ALPH, buyTokenAmount: 20000n * ONE_ALPH })).toBe(true)
+    });
+
+    test('Allows WL buyers to Check Eligibility', async () => {
+      const result = await SaleFlatPriceAlph.tests.checkIsWhitelisted({
+        testArgs: {
+          account: wlBuyers[0].address,
+          wlMerkleProof: wlBuyers[0].proof
+        },
+        initialFields: fixtureWLAndRegularSale.selfState.fields,
+        initialAsset: fixtureWLAndRegularSale.selfState.asset,
+        address: fixtureWLAndRegularSale.address,
+        existingContracts: fixtureWLAndRegularSale.dependencies,
+        blockTimeStamp: Number(genesis),
+      })
+      expect(result.returns).toBe(true)
+
+      const result2 = await SaleFlatPriceAlph.tests.checkIsWhitelisted({
+        testArgs: {
+          account: wlBuyers[0].address,
+          wlMerkleProof: wlBuyers[1].proof
+        },
+        initialFields: fixtureWLAndRegularSale.selfState.fields,
+        initialAsset: fixtureWLAndRegularSale.selfState.asset,
+        address: fixtureWLAndRegularSale.address,
+        existingContracts: fixtureWLAndRegularSale.dependencies,
+        blockTimeStamp: Number(genesis),
+      })
+      expect(result2.returns).toBe(false)
     });
 
     test('Prevents WL buyers from bidding more than max', async () => {

@@ -25,6 +25,8 @@ import { default as SaleFlatPriceAlphBuyTXScriptJson } from "../launch_sale/Sale
 import { default as SaleFlatPriceAlphClaimRefundTXScriptJson } from "../launch_sale/SaleFlatPriceAlphClaimRefundTX.ral.json";
 import { default as SaleFlatPriceAlphClaimTXScriptJson } from "../launch_sale/SaleFlatPriceAlphClaimTX.ral.json";
 import { default as SaleFlatPriceAlphSetMerkleRootTXScriptJson } from "../launch_sale/SaleFlatPriceAlphSetMerkleRootTX.ral.json";
+import { default as SaleFlatPriceAlphSetSaleDatesTXScriptJson } from "../launch_sale/SaleFlatPriceAlphSetSaleDatesTX.ral.json";
+import { default as SaleFlatPriceAlphSetWLMaxBidTXScriptJson } from "../launch_sale/SaleFlatPriceAlphSetWLMaxBidTX.ral.json";
 import { default as SaleManagerCreateSaleFlatPriceTXScriptJson } from "../launch_sale/SaleManagerCreateSaleFlatPriceTX.ral.json";
 import { default as StakingClaimRewardsTXScriptJson } from "../rewards/StakingClaimRewardsTX.ral.json";
 import { default as StakingClaimTXScriptJson } from "../rewards/StakingClaimTX.ral.json";
@@ -99,6 +101,19 @@ export const SaleFlatPriceAlphSetMerkleRootTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   newMerkleRoot: HexString;
 }>(Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXScriptJson, ""));
+
+export const SaleFlatPriceAlphSetSaleDatesTX = new ExecutableScript<{
+  saleFlatPrice: HexString;
+  newSaleStart: bigint;
+  newSaleEnd: bigint;
+  newWhitelistSaleStart: bigint;
+  newWhitelistSaleEnd: bigint;
+}>(Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXScriptJson, ""));
+
+export const SaleFlatPriceAlphSetWLMaxBidTX = new ExecutableScript<{
+  saleFlatPrice: HexString;
+  newWLMaxBid: bigint;
+}>(Script.fromJson(SaleFlatPriceAlphSetWLMaxBidTXScriptJson, ""));
 
 export const SaleManagerCreateSaleFlatPriceTX = new ExecutableScript<{
   saleManager: HexString;

@@ -1,15 +1,15 @@
 {
   "version": "v2.12.0",
-  "name": "SaleFlatPriceAlphSetMerkleRootTX",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}0113",
+  "name": "SaleFlatPriceAlphSetWLMaxBidTX",
+  "bytecodeTemplate": "01010300000005{1}0d0c{0}0107",
   "fieldsSig": {
     "names": [
       "saleFlatPrice",
-      "newMerkleRoot"
+      "newWLMaxBid"
     ],
     "types": [
       "SaleFlatPriceAlph",
-      "ByteVec"
+      "U256"
     ],
     "isMutable": [
       false,

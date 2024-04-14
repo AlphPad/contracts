@@ -10,6 +10,7 @@
     "devnet:stop": "npx --yes @alephium/cli@latest devnet stop",
     "compile": "npx --yes @alephium/cli@latest compile",
     "deploy": "npx --yes @alephium/cli@latest deploy",
+    "deploy-testnet": "env $(cat ./testnet.env | xargs) npx --yes @alephium/cli@latest deploy -n testnet",
     "lint": "eslint . --ext ts",
     "lint:fix": "eslint . --fix --ext ts",
     "test": "jest -i --config ./jest-config.json --verbose"

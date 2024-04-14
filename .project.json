@@ -1,7 +1,7 @@
 {
   "fullNodeVersion": "v2.12.0",
   "compilerOptionsUsed": {
-    "ignoreUnusedConstantsWarnings": false,
+    "ignoreUnusedConstantsWarnings": true,
     "ignoreUnusedVariablesWarnings": false,
     "ignoreUnusedFieldsWarnings": false,
     "ignoreUnusedPrivateFunctionsWarnings": false,
@@ -172,7 +172,7 @@
     },
     "SaleBase": {
       "sourceFile": "launch_sale/generic/sale_base.ral",
-      "sourceCodeHash": "9dabc8c9877fd97c2cfb29dc6d0f617f7bb965519b0009fe96efad9afb43cf63",
+      "sourceCodeHash": "b13a27f468750c3e1a6a462ad0db13f56e2eb2911806373b8ce7c525a4fcc344",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -186,56 +186,70 @@
     },
     "SaleFlatPrice": {
       "sourceFile": "launch_sale/sale_flat_price.ral",
-      "sourceCodeHash": "c2586d3e2fed942f4a977bf26784a496b222bb4f68e0db9aa429532750ada612",
+      "sourceCodeHash": "d005c99d6cbbc911a79a9ff83584912573d974e5b816c81353ffbd3eafeb694c",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleFlatPriceAlph": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
+      "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "4faf86493222343633c41282aefa03e6902b4e9472673f6a56b12c4694b93ab9",
+      "codeHashDebug": "7f2045736051296ec17e13d9a47d60ef2cd522fe14eece4a7fde340ba966c2b8",
       "warnings": []
     },
     "SaleFlatPriceAlphBuyTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
+      "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleFlatPriceAlphClaimRefundTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
+      "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleFlatPriceAlphClaimTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
+      "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleFlatPriceAlphSetMerkleRootTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
-      "sourceCodeHash": "8dbc125e0b75e19916499e3333e728c1add2bc553aac328574baa2a229c375b1",
+      "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphSetSaleDatesTX": {
+      "sourceFile": "launch_sale/sale_flat_price_alph.ral",
+      "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphSetWLMaxBidTX": {
+      "sourceFile": "launch_sale/sale_flat_price_alph.ral",
+      "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "SaleManager": {
       "sourceFile": "launch_sale/sale_manager.ral",
-      "sourceCodeHash": "475b7f8008c0fea5abf41313dfd656aaca8314ad96ab5277b228c12946c35b6d",
+      "sourceCodeHash": "c5b1cec3ac4143238e31c8814393b8791b2a96f8a524466480e8e461c36b2493",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "5c4c81ea3e03eec11fb9694037c97fd69db3fcb5b6ad934dc936cb3992f2e43b",
+      "codeHashDebug": "d6347b9ef1f6c73af3138b01ebba2990f078316aaa7f135be763c3bdd3851888",
       "warnings": []
     },
     "SaleManagerCreateSaleFlatPriceTX": {
       "sourceFile": "launch_sale/sale_manager.ral",
-      "sourceCodeHash": "475b7f8008c0fea5abf41313dfd656aaca8314ad96ab5277b228c12946c35b6d",
+      "sourceCodeHash": "c5b1cec3ac4143238e31c8814393b8791b2a96f8a524466480e8e461c36b2493",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
