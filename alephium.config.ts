@@ -120,7 +120,8 @@ const configuration: Configuration<Settings> = {
       privateKeys: process.env.PRIVATE_KEYS === undefined ? [] : process.env.PRIVATE_KEYS.split(','),
       settings: mainnetSettings
     }
-  }
+  },
+  skipRecompile: true
 }
 
 export default configuration

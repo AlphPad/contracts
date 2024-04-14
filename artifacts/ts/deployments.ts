@@ -19,13 +19,14 @@ import {
   TokenPairInstance,
   DummyToken,
   DummyTokenInstance,
-  BurnALPH,
-  BurnALPHInstance,
   SaleFlatPriceAlph,
   SaleFlatPriceAlphInstance,
   SaleManager,
   SaleManagerInstance,
+  BurnALPH,
+  BurnALPHInstance,
 } from ".";
+import { default as testnetDeployments } from "../.deployments.testnet.json";
 import { default as devnetDeployments } from "../.deployments.devnet.json";
 
 export type Deployments = {
@@ -38,9 +39,9 @@ export type Deployments = {
     SaleBuyerAccount: DeployContractExecutionResult<SaleBuyerAccountInstance>;
     TokenPair: DeployContractExecutionResult<TokenPairInstance>;
     DummyToken: DeployContractExecutionResult<DummyTokenInstance>;
-    BurnALPH: DeployContractExecutionResult<BurnALPHInstance>;
     SaleFlatPriceAlph: DeployContractExecutionResult<SaleFlatPriceAlphInstance>;
     SaleManager: DeployContractExecutionResult<SaleManagerInstance>;
+    BurnALPH?: DeployContractExecutionResult<BurnALPHInstance>;
   };
   scripts: { StakingStakeTX: RunScriptResult };
 };
@@ -89,12 +90,6 @@ function toDeployments(json: any): Deployments {
         json.contracts["DummyToken"].contractInstance.address
       ),
     },
-    BurnALPH: {
-      ...json.contracts["BurnALPH"],
-      contractInstance: BurnALPH.at(
-        json.contracts["BurnALPH"].contractInstance.address
-      ),
-    },
     SaleFlatPriceAlph: {
       ...json.contracts["SaleFlatPriceAlph"],
       contractInstance: SaleFlatPriceAlph.at(
@@ -107,6 +102,15 @@ function toDeployments(json: any): Deployments {
         json.contracts["SaleManager"].contractInstance.address
       ),
     },
+    BurnALPH:
+      json.contracts["BurnALPH"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["BurnALPH"],
+            contractInstance: BurnALPH.at(
+              json.contracts["BurnALPH"].contractInstance.address
+            ),
+          },
   };
   return {
     ...json,
@@ -119,7 +123,12 @@ export function loadDeployments(
   networkId: NetworkId,
   deployerAddress?: string
 ): Deployments {
-  const deployments = networkId === "devnet" ? devnetDeployments : undefined;
+  const deployments =
+    networkId === "testnet"
+      ? testnetDeployments
+      : networkId === "devnet"
+      ? devnetDeployments
+      : undefined;
   if (deployments === undefined) {
     throw Error("The contract has not been deployed to the " + networkId);
   }
