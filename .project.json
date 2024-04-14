@@ -172,7 +172,7 @@
     },
     "SaleBase": {
       "sourceFile": "launch_sale/generic/sale_base.ral",
-      "sourceCodeHash": "1a21c3b3bce1fb6f0c4dbb69368172690be87b28b285c9533c1fd9dc90e5bf38",
+      "sourceCodeHash": "b13a27f468750c3e1a6a462ad0db13f56e2eb2911806373b8ce7c525a4fcc344",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -195,7 +195,7 @@
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "abdf782eff786e55f4da73a47f2b961758438e2d65d7b63e8dc44ce2db90e314",
+      "codeHashDebug": "7f2045736051296ec17e13d9a47d60ef2cd522fe14eece4a7fde340ba966c2b8",
       "warnings": []
     },
     "SaleFlatPriceAlphBuyTX": {

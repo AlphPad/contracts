@@ -45,6 +45,7 @@ Abstract Contract SaleBase(
         SaleEndMustBeAfterSaleStart = 1009
         WLSaleStartMustBeWithinSaleDates = 1010
         WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart = 1011
+        InvalidMerkleRoot = 1012
     }
 
     // Function allowing participants to claim tokens or the seller to claim unsold tokens after sale success.
@@ -83,6 +84,7 @@ Abstract Contract SaleBase(
     pub fn setMerkleRoot(newMerkleRoot: ByteVec) -> () {
         checkCaller!(callerAddress!() == saleOwner, SaleBaseErrorCodes.SaleUpdateUnauthorized)
         assert!(isWhitelistSale(), SaleBaseErrorCodes.SaleIsNotWLSale)
+        assert!(size!(newMerkleRoot) == 32, SaleBaseErrorCodes.InvalidMerkleRoot)
         assertSaleEditable()
         updateRoot(newMerkleRoot)
     }

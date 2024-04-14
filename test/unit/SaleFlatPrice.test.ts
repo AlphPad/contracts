@@ -456,6 +456,13 @@ describe('Sale Flat Price Contract Testing', () => {
         Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.SaleIsNotWLSale)
       );
     });
+    test("Setting Merkle Root should fail if the merkle root is not the correct size", async () => {
+      await expectAssertionError(
+        updateMerkle(fixtureWLAndRegularSale.selfState, seller, "", BigInt(genesis + 1), fixtureWLAndRegularSale.dependencies),
+        fixtureWLAndRegularSale.address,
+        Number(SaleFlatPriceAlph.consts.SaleBaseErrorCodes.InvalidMerkleRoot)
+      );
+    });
     test("Setting Merkle Root should pass if the sale has not started", async () => {
       var result = await updateMerkle(fixtureWLAndRegularSale.selfState, seller, wlRoot, BigInt(genesis + (86300000 - 1800000)), fixtureWLAndRegularSale.dependencies);
       expect(checkEvent(result, "UpdateRoot")).toBe(true);

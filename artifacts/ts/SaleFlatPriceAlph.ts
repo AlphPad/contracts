@@ -269,6 +269,7 @@ class Factory extends ContractFactory<
       SaleEndMustBeAfterSaleStart: BigInt(1009),
       WLSaleStartMustBeWithinSaleDates: BigInt(1010),
       WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart: BigInt(1011),
+      InvalidMerkleRoot: BigInt(1012),
     },
   };
 
@@ -703,7 +704,7 @@ export const SaleFlatPriceAlph = new Factory(
   Contract.fromJson(
     SaleFlatPriceAlphContractJson,
     "",
-    "abdf782eff786e55f4da73a47f2b961758438e2d65d7b63e8dc44ce2db90e314"
+    "7f2045736051296ec17e13d9a47d60ef2cd522fe14eece4a7fde340ba966c2b8"
   )
 );
 
