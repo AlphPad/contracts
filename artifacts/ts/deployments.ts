@@ -15,19 +15,17 @@ import {
   RewardDistributorInstance,
   SaleBuyerAccount,
   SaleBuyerAccountInstance,
-  TokenPair,
-  TokenPairInstance,
-  DummyToken,
-  DummyTokenInstance,
   SaleFlatPriceAlph,
   SaleFlatPriceAlphInstance,
   SaleManager,
   SaleManagerInstance,
-  BurnALPH,
-  BurnALPHInstance,
+  TokenPair,
+  TokenPairInstance,
+  DummyToken,
+  DummyTokenInstance,
 } from ".";
+import { default as mainnetDeployments } from "../.deployments.mainnet.json";
 import { default as testnetDeployments } from "../.deployments.testnet.json";
-import { default as devnetDeployments } from "../.deployments.devnet.json";
 
 export type Deployments = {
   deployerAddress: string;
@@ -37,11 +35,10 @@ export type Deployments = {
     Staking: DeployContractExecutionResult<StakingInstance>;
     RewardDistributor: DeployContractExecutionResult<RewardDistributorInstance>;
     SaleBuyerAccount: DeployContractExecutionResult<SaleBuyerAccountInstance>;
-    TokenPair: DeployContractExecutionResult<TokenPairInstance>;
-    DummyToken: DeployContractExecutionResult<DummyTokenInstance>;
     SaleFlatPriceAlph: DeployContractExecutionResult<SaleFlatPriceAlphInstance>;
     SaleManager: DeployContractExecutionResult<SaleManagerInstance>;
-    BurnALPH?: DeployContractExecutionResult<BurnALPHInstance>;
+    TokenPair?: DeployContractExecutionResult<TokenPairInstance>;
+    DummyToken?: DeployContractExecutionResult<DummyTokenInstance>;
   };
   scripts: { StakingStakeTX: RunScriptResult };
 };
@@ -78,18 +75,6 @@ function toDeployments(json: any): Deployments {
         json.contracts["SaleBuyerAccount"].contractInstance.address
       ),
     },
-    TokenPair: {
-      ...json.contracts["TokenPair"],
-      contractInstance: TokenPair.at(
-        json.contracts["TokenPair"].contractInstance.address
-      ),
-    },
-    DummyToken: {
-      ...json.contracts["DummyToken"],
-      contractInstance: DummyToken.at(
-        json.contracts["DummyToken"].contractInstance.address
-      ),
-    },
     SaleFlatPriceAlph: {
       ...json.contracts["SaleFlatPriceAlph"],
       contractInstance: SaleFlatPriceAlph.at(
@@ -102,13 +87,22 @@ function toDeployments(json: any): Deployments {
         json.contracts["SaleManager"].contractInstance.address
       ),
     },
-    BurnALPH:
-      json.contracts["BurnALPH"] === undefined
+    TokenPair:
+      json.contracts["TokenPair"] === undefined
         ? undefined
         : {
-            ...json.contracts["BurnALPH"],
-            contractInstance: BurnALPH.at(
-              json.contracts["BurnALPH"].contractInstance.address
+            ...json.contracts["TokenPair"],
+            contractInstance: TokenPair.at(
+              json.contracts["TokenPair"].contractInstance.address
+            ),
+          },
+    DummyToken:
+      json.contracts["DummyToken"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["DummyToken"],
+            contractInstance: DummyToken.at(
+              json.contracts["DummyToken"].contractInstance.address
             ),
           },
   };
@@ -124,10 +118,10 @@ export function loadDeployments(
   deployerAddress?: string
 ): Deployments {
   const deployments =
-    networkId === "testnet"
+    networkId === "mainnet"
+      ? mainnetDeployments
+      : networkId === "testnet"
       ? testnetDeployments
-      : networkId === "devnet"
-      ? devnetDeployments
       : undefined;
   if (deployments === undefined) {
     throw Error("The contract has not been deployed to the " + networkId);
