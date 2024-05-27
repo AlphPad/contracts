@@ -23,9 +23,16 @@ import {
   TokenPairInstance,
   DummyToken,
   DummyTokenInstance,
+  BurnALPH,
+  BurnALPHInstance,
+  SaleFlatPriceAlphV2,
+  SaleFlatPriceAlphV2Instance,
+  SaleManagerV2,
+  SaleManagerV2Instance,
 } from ".";
 import { default as mainnetDeployments } from "../.deployments.mainnet.json";
 import { default as testnetDeployments } from "../.deployments.testnet.json";
+import { default as devnetDeployments } from "../.deployments.devnet.json";
 
 export type Deployments = {
   deployerAddress: string;
@@ -39,6 +46,9 @@ export type Deployments = {
     SaleManager: DeployContractExecutionResult<SaleManagerInstance>;
     TokenPair?: DeployContractExecutionResult<TokenPairInstance>;
     DummyToken?: DeployContractExecutionResult<DummyTokenInstance>;
+    BurnALPH?: DeployContractExecutionResult<BurnALPHInstance>;
+    SaleFlatPriceAlphV2?: DeployContractExecutionResult<SaleFlatPriceAlphV2Instance>;
+    SaleManagerV2?: DeployContractExecutionResult<SaleManagerV2Instance>;
   };
   scripts: { StakingStakeTX: RunScriptResult };
 };
@@ -105,6 +115,33 @@ function toDeployments(json: any): Deployments {
               json.contracts["DummyToken"].contractInstance.address
             ),
           },
+    BurnALPH:
+      json.contracts["BurnALPH"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["BurnALPH"],
+            contractInstance: BurnALPH.at(
+              json.contracts["BurnALPH"].contractInstance.address
+            ),
+          },
+    SaleFlatPriceAlphV2:
+      json.contracts["SaleFlatPriceAlphV2"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["SaleFlatPriceAlphV2"],
+            contractInstance: SaleFlatPriceAlphV2.at(
+              json.contracts["SaleFlatPriceAlphV2"].contractInstance.address
+            ),
+          },
+    SaleManagerV2:
+      json.contracts["SaleManagerV2"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["SaleManagerV2"],
+            contractInstance: SaleManagerV2.at(
+              json.contracts["SaleManagerV2"].contractInstance.address
+            ),
+          },
   };
   return {
     ...json,
@@ -122,6 +159,8 @@ export function loadDeployments(
       ? mainnetDeployments
       : networkId === "testnet"
       ? testnetDeployments
+      : networkId === "devnet"
+      ? devnetDeployments
       : undefined;
   if (deployments === undefined) {
     throw Error("The contract has not been deployed to the " + networkId);

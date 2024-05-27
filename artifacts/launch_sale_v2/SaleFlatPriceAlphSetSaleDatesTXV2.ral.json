@@ -1,0 +1,40 @@
+{
+  "version": "v2.12.0",
+  "name": "SaleFlatPriceAlphSetSaleDatesTXV2",
+  "bytecodeTemplate": "01010300000008{1}{2}{3}{4}100c{0}011a",
+  "fieldsSig": {
+    "names": [
+      "saleFlatPrice",
+      "newSaleStart",
+      "newSaleEnd",
+      "newWhitelistSaleStart",
+      "newWhitelistSaleEnd"
+    ],
+    "types": [
+      "SaleFlatPriceAlphV2",
+      "U256",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}
