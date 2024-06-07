@@ -25,6 +25,11 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as SaleBuyerAccountContractJson } from "../launch_sale/generic/SaleBuyerAccount.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -43,6 +48,10 @@ export namespace SaleBuyerAccountTypes {
   export type State = ContractState<Fields>;
 
   export interface CallMethodTable {
+    destroy: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
     isSafeToDestroy: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<boolean>;
@@ -54,6 +63,21 @@ export namespace SaleBuyerAccountTypes {
     getAccountHolder: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<Address>;
+    };
+    buy: {
+      params: CallContractParams<{
+        addAmountBuy: bigint;
+        addAmountBid: bigint;
+      }>;
+      result: CallContractResult<null>;
+    };
+    claim: {
+      params: CallContractParams<{ claimAmount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    claimRefund: {
+      params: CallContractParams<{ claimAmount: bigint }>;
+      result: CallContractResult<null>;
     };
     getAmountBuy: {
       params: Omit<CallContractParams<{}>, "args">;
@@ -84,12 +108,74 @@ export namespace SaleBuyerAccountTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+
+  export interface SignExecuteMethodTable {
+    destroy: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    isSafeToDestroy: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getParentContractAddress: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAccountHolder: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    buy: {
+      params: SignExecuteContractMethodParams<{
+        addAmountBuy: bigint;
+        addAmountBid: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    claim: {
+      params: SignExecuteContractMethodParams<{ claimAmount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    claimRefund: {
+      params: SignExecuteContractMethodParams<{ claimAmount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getAmountBuy: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAmountBid: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAmountClaimed: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAmountClaimedRefund: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
   SaleBuyerAccountInstance,
   SaleBuyerAccountTypes.Fields
 > {
+  encodeFields(fields: SaleBuyerAccountTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as SaleBuyerAccountTypes.Fields;
   }
@@ -116,7 +202,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "destroy", params);
+      return testMethod(this, "destroy", params, getContractByCodeHash);
     },
     isSafeToDestroy: async (
       params: Omit<
@@ -124,7 +210,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "isSafeToDestroy", params);
+      return testMethod(this, "isSafeToDestroy", params, getContractByCodeHash);
     },
     assertIsSafeToDestroy: async (
       params: Omit<
@@ -132,7 +218,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertIsSafeToDestroy", params);
+      return testMethod(
+        this,
+        "assertIsSafeToDestroy",
+        params,
+        getContractByCodeHash
+      );
     },
     assertIsParentTheCaller: async (
       params: TestContractParamsWithoutMaps<
@@ -140,7 +231,12 @@ class Factory extends ContractFactory<
         { caller: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertIsParentTheCaller", params);
+      return testMethod(
+        this,
+        "assertIsParentTheCaller",
+        params,
+        getContractByCodeHash
+      );
     },
     getParentContractAddress: async (
       params: Omit<
@@ -148,7 +244,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getParentContractAddress", params);
+      return testMethod(
+        this,
+        "getParentContractAddress",
+        params,
+        getContractByCodeHash
+      );
     },
     getAccountHolder: async (
       params: Omit<
@@ -156,7 +257,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getAccountHolder", params);
+      return testMethod(
+        this,
+        "getAccountHolder",
+        params,
+        getContractByCodeHash
+      );
     },
     buy: async (
       params: TestContractParamsWithoutMaps<
@@ -164,7 +270,7 @@ class Factory extends ContractFactory<
         { addAmountBuy: bigint; addAmountBid: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "buy", params);
+      return testMethod(this, "buy", params, getContractByCodeHash);
     },
     claim: async (
       params: TestContractParamsWithoutMaps<
@@ -172,7 +278,7 @@ class Factory extends ContractFactory<
         { claimAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claim", params);
+      return testMethod(this, "claim", params, getContractByCodeHash);
     },
     claimRefund: async (
       params: TestContractParamsWithoutMaps<
@@ -180,7 +286,7 @@ class Factory extends ContractFactory<
         { claimAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claimRefund", params);
+      return testMethod(this, "claimRefund", params, getContractByCodeHash);
     },
     getAmountBuy: async (
       params: Omit<
@@ -188,7 +294,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getAmountBuy", params);
+      return testMethod(this, "getAmountBuy", params, getContractByCodeHash);
     },
     getAmountBid: async (
       params: Omit<
@@ -196,7 +302,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getAmountBid", params);
+      return testMethod(this, "getAmountBid", params, getContractByCodeHash);
     },
     getAmountClaimed: async (
       params: Omit<
@@ -204,7 +310,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getAmountClaimed", params);
+      return testMethod(
+        this,
+        "getAmountClaimed",
+        params,
+        getContractByCodeHash
+      );
     },
     getAmountClaimedRefund: async (
       params: Omit<
@@ -212,7 +323,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getAmountClaimedRefund", params);
+      return testMethod(
+        this,
+        "getAmountClaimedRefund",
+        params,
+        getContractByCodeHash
+      );
     },
   };
 }
@@ -222,7 +338,8 @@ export const SaleBuyerAccount = new Factory(
   Contract.fromJson(
     SaleBuyerAccountContractJson,
     "",
-    "5b85bbcf941c0e29fa634eccc5c21a0545245218348b1c27c9c7fc3980f5913a"
+    "5b85bbcf941c0e29fa634eccc5c21a0545245218348b1c27c9c7fc3980f5913a",
+    []
   )
 );
 
@@ -237,6 +354,17 @@ export class SaleBuyerAccountInstance extends ContractInstance {
   }
 
   methods = {
+    destroy: async (
+      params?: SaleBuyerAccountTypes.CallMethodParams<"destroy">
+    ): Promise<SaleBuyerAccountTypes.CallMethodResult<"destroy">> => {
+      return callMethod(
+        SaleBuyerAccount,
+        this,
+        "destroy",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
     isSafeToDestroy: async (
       params?: SaleBuyerAccountTypes.CallMethodParams<"isSafeToDestroy">
     ): Promise<SaleBuyerAccountTypes.CallMethodResult<"isSafeToDestroy">> => {
@@ -269,6 +397,39 @@ export class SaleBuyerAccountInstance extends ContractInstance {
         this,
         "getAccountHolder",
         params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    buy: async (
+      params: SaleBuyerAccountTypes.CallMethodParams<"buy">
+    ): Promise<SaleBuyerAccountTypes.CallMethodResult<"buy">> => {
+      return callMethod(
+        SaleBuyerAccount,
+        this,
+        "buy",
+        params,
+        getContractByCodeHash
+      );
+    },
+    claim: async (
+      params: SaleBuyerAccountTypes.CallMethodParams<"claim">
+    ): Promise<SaleBuyerAccountTypes.CallMethodResult<"claim">> => {
+      return callMethod(
+        SaleBuyerAccount,
+        this,
+        "claim",
+        params,
+        getContractByCodeHash
+      );
+    },
+    claimRefund: async (
+      params: SaleBuyerAccountTypes.CallMethodParams<"claimRefund">
+    ): Promise<SaleBuyerAccountTypes.CallMethodResult<"claimRefund">> => {
+      return callMethod(
+        SaleBuyerAccount,
+        this,
+        "claimRefund",
+        params,
         getContractByCodeHash
       );
     },
@@ -316,6 +477,107 @@ export class SaleBuyerAccountInstance extends ContractInstance {
         "getAmountClaimedRefund",
         params === undefined ? {} : params,
         getContractByCodeHash
+      );
+    },
+  };
+
+  view = this.methods;
+
+  transact = {
+    destroy: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"destroy">
+    ): Promise<SaleBuyerAccountTypes.SignExecuteMethodResult<"destroy">> => {
+      return signExecuteMethod(SaleBuyerAccount, this, "destroy", params);
+    },
+    isSafeToDestroy: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"isSafeToDestroy">
+    ): Promise<
+      SaleBuyerAccountTypes.SignExecuteMethodResult<"isSafeToDestroy">
+    > => {
+      return signExecuteMethod(
+        SaleBuyerAccount,
+        this,
+        "isSafeToDestroy",
+        params
+      );
+    },
+    getParentContractAddress: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"getParentContractAddress">
+    ): Promise<
+      SaleBuyerAccountTypes.SignExecuteMethodResult<"getParentContractAddress">
+    > => {
+      return signExecuteMethod(
+        SaleBuyerAccount,
+        this,
+        "getParentContractAddress",
+        params
+      );
+    },
+    getAccountHolder: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"getAccountHolder">
+    ): Promise<
+      SaleBuyerAccountTypes.SignExecuteMethodResult<"getAccountHolder">
+    > => {
+      return signExecuteMethod(
+        SaleBuyerAccount,
+        this,
+        "getAccountHolder",
+        params
+      );
+    },
+    buy: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"buy">
+    ): Promise<SaleBuyerAccountTypes.SignExecuteMethodResult<"buy">> => {
+      return signExecuteMethod(SaleBuyerAccount, this, "buy", params);
+    },
+    claim: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"claim">
+    ): Promise<SaleBuyerAccountTypes.SignExecuteMethodResult<"claim">> => {
+      return signExecuteMethod(SaleBuyerAccount, this, "claim", params);
+    },
+    claimRefund: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"claimRefund">
+    ): Promise<
+      SaleBuyerAccountTypes.SignExecuteMethodResult<"claimRefund">
+    > => {
+      return signExecuteMethod(SaleBuyerAccount, this, "claimRefund", params);
+    },
+    getAmountBuy: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"getAmountBuy">
+    ): Promise<
+      SaleBuyerAccountTypes.SignExecuteMethodResult<"getAmountBuy">
+    > => {
+      return signExecuteMethod(SaleBuyerAccount, this, "getAmountBuy", params);
+    },
+    getAmountBid: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"getAmountBid">
+    ): Promise<
+      SaleBuyerAccountTypes.SignExecuteMethodResult<"getAmountBid">
+    > => {
+      return signExecuteMethod(SaleBuyerAccount, this, "getAmountBid", params);
+    },
+    getAmountClaimed: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"getAmountClaimed">
+    ): Promise<
+      SaleBuyerAccountTypes.SignExecuteMethodResult<"getAmountClaimed">
+    > => {
+      return signExecuteMethod(
+        SaleBuyerAccount,
+        this,
+        "getAmountClaimed",
+        params
+      );
+    },
+    getAmountClaimedRefund: async (
+      params: SaleBuyerAccountTypes.SignExecuteMethodParams<"getAmountClaimedRefund">
+    ): Promise<
+      SaleBuyerAccountTypes.SignExecuteMethodResult<"getAmountClaimedRefund">
+    > => {
+      return signExecuteMethod(
+        SaleBuyerAccount,
+        this,
+        "getAmountClaimedRefund",
+        params
       );
     },
   };

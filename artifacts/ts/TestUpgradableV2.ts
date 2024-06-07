@@ -25,6 +25,11 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as TestUpgradableV2ContractJson } from "../lib/dummy/TestUpgradableV2.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -75,6 +80,38 @@ export namespace TestUpgradableV2Types {
   }>;
 
   export interface CallMethodTable {
+    changeOwner: {
+      params: CallContractParams<{ changeOwner: Address }>;
+      result: CallContractResult<null>;
+    };
+    migrate: {
+      params: CallContractParams<{ changeCode: HexString }>;
+      result: CallContractResult<null>;
+    };
+    migrateWithFields: {
+      params: CallContractParams<{
+        changeCode: HexString;
+        changeImmFieldsEncoded: HexString;
+        changeMutFieldsEncoded: HexString;
+      }>;
+      result: CallContractResult<null>;
+    };
+    changeOwnerApply: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    migrateApply: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    migrateWithFieldsApply: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    resetUpgrade: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
     getUpgradeDelay: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
@@ -115,6 +152,10 @@ export namespace TestUpgradableV2Types {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
+    setMutValue: {
+      params: CallContractParams<{ newMutValue: bigint }>;
+      result: CallContractResult<null>;
+    };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
     CallMethodTable[T]["params"];
@@ -128,12 +169,103 @@ export namespace TestUpgradableV2Types {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+
+  export interface SignExecuteMethodTable {
+    changeOwner: {
+      params: SignExecuteContractMethodParams<{ changeOwner: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    migrate: {
+      params: SignExecuteContractMethodParams<{ changeCode: HexString }>;
+      result: SignExecuteScriptTxResult;
+    };
+    migrateWithFields: {
+      params: SignExecuteContractMethodParams<{
+        changeCode: HexString;
+        changeImmFieldsEncoded: HexString;
+        changeMutFieldsEncoded: HexString;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    changeOwnerApply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    migrateApply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    migrateWithFieldsApply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    resetUpgrade: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getUpgradeDelay: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getOwner: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewOwner: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getUpgradeCommenced: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewCode: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewImmFieldsEncoded: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewMutFieldsEncoded: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getImmValue: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getMutValue: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getTotal: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    setMutValue: {
+      params: SignExecuteContractMethodParams<{ newMutValue: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
   TestUpgradableV2Instance,
   TestUpgradableV2Types.Fields
 > {
+  encodeFields(fields: TestUpgradableV2Types.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as TestUpgradableV2Types.Fields;
   }
@@ -169,7 +301,7 @@ class Factory extends ContractFactory<
         { changeOwner: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "changeOwner", params);
+      return testMethod(this, "changeOwner", params, getContractByCodeHash);
     },
     migrate: async (
       params: TestContractParamsWithoutMaps<
@@ -177,7 +309,7 @@ class Factory extends ContractFactory<
         { changeCode: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrate", params);
+      return testMethod(this, "migrate", params, getContractByCodeHash);
     },
     migrateWithFields: async (
       params: TestContractParamsWithoutMaps<
@@ -189,7 +321,12 @@ class Factory extends ContractFactory<
         }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrateWithFields", params);
+      return testMethod(
+        this,
+        "migrateWithFields",
+        params,
+        getContractByCodeHash
+      );
     },
     changeOwnerApply: async (
       params: Omit<
@@ -197,7 +334,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "changeOwnerApply", params);
+      return testMethod(
+        this,
+        "changeOwnerApply",
+        params,
+        getContractByCodeHash
+      );
     },
     migrateApply: async (
       params: Omit<
@@ -205,7 +347,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrateApply", params);
+      return testMethod(this, "migrateApply", params, getContractByCodeHash);
     },
     migrateWithFieldsApply: async (
       params: Omit<
@@ -213,7 +355,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrateWithFieldsApply", params);
+      return testMethod(
+        this,
+        "migrateWithFieldsApply",
+        params,
+        getContractByCodeHash
+      );
     },
     resetUpgrade: async (
       params: Omit<
@@ -221,7 +368,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "resetUpgrade", params);
+      return testMethod(this, "resetUpgrade", params, getContractByCodeHash);
     },
     getUpgradeDelay: async (
       params: Omit<
@@ -229,7 +376,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getUpgradeDelay", params);
+      return testMethod(this, "getUpgradeDelay", params, getContractByCodeHash);
     },
     getOwner: async (
       params: Omit<
@@ -237,7 +384,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getOwner", params);
+      return testMethod(this, "getOwner", params, getContractByCodeHash);
     },
     getNewOwner: async (
       params: Omit<
@@ -245,7 +392,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getNewOwner", params);
+      return testMethod(this, "getNewOwner", params, getContractByCodeHash);
     },
     getUpgradeCommenced: async (
       params: Omit<
@@ -253,7 +400,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getUpgradeCommenced", params);
+      return testMethod(
+        this,
+        "getUpgradeCommenced",
+        params,
+        getContractByCodeHash
+      );
     },
     getNewCode: async (
       params: Omit<
@@ -261,7 +413,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getNewCode", params);
+      return testMethod(this, "getNewCode", params, getContractByCodeHash);
     },
     getNewImmFieldsEncoded: async (
       params: Omit<
@@ -269,7 +421,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getNewImmFieldsEncoded", params);
+      return testMethod(
+        this,
+        "getNewImmFieldsEncoded",
+        params,
+        getContractByCodeHash
+      );
     },
     getNewMutFieldsEncoded: async (
       params: Omit<
@@ -277,7 +434,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getNewMutFieldsEncoded", params);
+      return testMethod(
+        this,
+        "getNewMutFieldsEncoded",
+        params,
+        getContractByCodeHash
+      );
     },
     resetFields: async (
       params: Omit<
@@ -285,7 +447,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "resetFields", params);
+      return testMethod(this, "resetFields", params, getContractByCodeHash);
     },
     assertOnlyOwner: async (
       params: TestContractParamsWithoutMaps<
@@ -293,7 +455,7 @@ class Factory extends ContractFactory<
         { caller: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertOnlyOwner", params);
+      return testMethod(this, "assertOnlyOwner", params, getContractByCodeHash);
     },
     assertUpgradeNotPending: async (
       params: Omit<
@@ -301,7 +463,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertUpgradeNotPending", params);
+      return testMethod(
+        this,
+        "assertUpgradeNotPending",
+        params,
+        getContractByCodeHash
+      );
     },
     assertUpgradeDelayElapsed: async (
       params: Omit<
@@ -309,7 +476,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertUpgradeDelayElapsed", params);
+      return testMethod(
+        this,
+        "assertUpgradeDelayElapsed",
+        params,
+        getContractByCodeHash
+      );
     },
     getImmValue: async (
       params: Omit<
@@ -317,7 +489,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getImmValue", params);
+      return testMethod(this, "getImmValue", params, getContractByCodeHash);
     },
     getMutValue: async (
       params: Omit<
@@ -325,7 +497,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getMutValue", params);
+      return testMethod(this, "getMutValue", params, getContractByCodeHash);
     },
     getTotal: async (
       params: Omit<
@@ -333,7 +505,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getTotal", params);
+      return testMethod(this, "getTotal", params, getContractByCodeHash);
     },
     setMutValue: async (
       params: TestContractParamsWithoutMaps<
@@ -341,7 +513,7 @@ class Factory extends ContractFactory<
         { newMutValue: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "setMutValue", params);
+      return testMethod(this, "setMutValue", params, getContractByCodeHash);
     },
   };
 }
@@ -351,7 +523,8 @@ export const TestUpgradableV2 = new Factory(
   Contract.fromJson(
     TestUpgradableV2ContractJson,
     "",
-    "acb86f28101a38a11d92aaad09ec4e4af2367ef7b61c319b28075d321677b0d5"
+    "acb86f28101a38a11d92aaad09ec4e4af2367ef7b61c319b28075d321677b0d5",
+    []
   )
 );
 
@@ -467,6 +640,85 @@ export class TestUpgradableV2Instance extends ContractInstance {
   }
 
   methods = {
+    changeOwner: async (
+      params: TestUpgradableV2Types.CallMethodParams<"changeOwner">
+    ): Promise<TestUpgradableV2Types.CallMethodResult<"changeOwner">> => {
+      return callMethod(
+        TestUpgradableV2,
+        this,
+        "changeOwner",
+        params,
+        getContractByCodeHash
+      );
+    },
+    migrate: async (
+      params: TestUpgradableV2Types.CallMethodParams<"migrate">
+    ): Promise<TestUpgradableV2Types.CallMethodResult<"migrate">> => {
+      return callMethod(
+        TestUpgradableV2,
+        this,
+        "migrate",
+        params,
+        getContractByCodeHash
+      );
+    },
+    migrateWithFields: async (
+      params: TestUpgradableV2Types.CallMethodParams<"migrateWithFields">
+    ): Promise<TestUpgradableV2Types.CallMethodResult<"migrateWithFields">> => {
+      return callMethod(
+        TestUpgradableV2,
+        this,
+        "migrateWithFields",
+        params,
+        getContractByCodeHash
+      );
+    },
+    changeOwnerApply: async (
+      params?: TestUpgradableV2Types.CallMethodParams<"changeOwnerApply">
+    ): Promise<TestUpgradableV2Types.CallMethodResult<"changeOwnerApply">> => {
+      return callMethod(
+        TestUpgradableV2,
+        this,
+        "changeOwnerApply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    migrateApply: async (
+      params?: TestUpgradableV2Types.CallMethodParams<"migrateApply">
+    ): Promise<TestUpgradableV2Types.CallMethodResult<"migrateApply">> => {
+      return callMethod(
+        TestUpgradableV2,
+        this,
+        "migrateApply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    migrateWithFieldsApply: async (
+      params?: TestUpgradableV2Types.CallMethodParams<"migrateWithFieldsApply">
+    ): Promise<
+      TestUpgradableV2Types.CallMethodResult<"migrateWithFieldsApply">
+    > => {
+      return callMethod(
+        TestUpgradableV2,
+        this,
+        "migrateWithFieldsApply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    resetUpgrade: async (
+      params?: TestUpgradableV2Types.CallMethodParams<"resetUpgrade">
+    ): Promise<TestUpgradableV2Types.CallMethodResult<"resetUpgrade">> => {
+      return callMethod(
+        TestUpgradableV2,
+        this,
+        "resetUpgrade",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
     getUpgradeDelay: async (
       params?: TestUpgradableV2Types.CallMethodParams<"getUpgradeDelay">
     ): Promise<TestUpgradableV2Types.CallMethodResult<"getUpgradeDelay">> => {
@@ -582,6 +834,175 @@ export class TestUpgradableV2Instance extends ContractInstance {
         params === undefined ? {} : params,
         getContractByCodeHash
       );
+    },
+    setMutValue: async (
+      params: TestUpgradableV2Types.CallMethodParams<"setMutValue">
+    ): Promise<TestUpgradableV2Types.CallMethodResult<"setMutValue">> => {
+      return callMethod(
+        TestUpgradableV2,
+        this,
+        "setMutValue",
+        params,
+        getContractByCodeHash
+      );
+    },
+  };
+
+  view = this.methods;
+
+  transact = {
+    changeOwner: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"changeOwner">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"changeOwner">
+    > => {
+      return signExecuteMethod(TestUpgradableV2, this, "changeOwner", params);
+    },
+    migrate: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"migrate">
+    ): Promise<TestUpgradableV2Types.SignExecuteMethodResult<"migrate">> => {
+      return signExecuteMethod(TestUpgradableV2, this, "migrate", params);
+    },
+    migrateWithFields: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"migrateWithFields">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"migrateWithFields">
+    > => {
+      return signExecuteMethod(
+        TestUpgradableV2,
+        this,
+        "migrateWithFields",
+        params
+      );
+    },
+    changeOwnerApply: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"changeOwnerApply">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"changeOwnerApply">
+    > => {
+      return signExecuteMethod(
+        TestUpgradableV2,
+        this,
+        "changeOwnerApply",
+        params
+      );
+    },
+    migrateApply: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"migrateApply">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"migrateApply">
+    > => {
+      return signExecuteMethod(TestUpgradableV2, this, "migrateApply", params);
+    },
+    migrateWithFieldsApply: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"migrateWithFieldsApply">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"migrateWithFieldsApply">
+    > => {
+      return signExecuteMethod(
+        TestUpgradableV2,
+        this,
+        "migrateWithFieldsApply",
+        params
+      );
+    },
+    resetUpgrade: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"resetUpgrade">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"resetUpgrade">
+    > => {
+      return signExecuteMethod(TestUpgradableV2, this, "resetUpgrade", params);
+    },
+    getUpgradeDelay: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getUpgradeDelay">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"getUpgradeDelay">
+    > => {
+      return signExecuteMethod(
+        TestUpgradableV2,
+        this,
+        "getUpgradeDelay",
+        params
+      );
+    },
+    getOwner: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getOwner">
+    ): Promise<TestUpgradableV2Types.SignExecuteMethodResult<"getOwner">> => {
+      return signExecuteMethod(TestUpgradableV2, this, "getOwner", params);
+    },
+    getNewOwner: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getNewOwner">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"getNewOwner">
+    > => {
+      return signExecuteMethod(TestUpgradableV2, this, "getNewOwner", params);
+    },
+    getUpgradeCommenced: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getUpgradeCommenced">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"getUpgradeCommenced">
+    > => {
+      return signExecuteMethod(
+        TestUpgradableV2,
+        this,
+        "getUpgradeCommenced",
+        params
+      );
+    },
+    getNewCode: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getNewCode">
+    ): Promise<TestUpgradableV2Types.SignExecuteMethodResult<"getNewCode">> => {
+      return signExecuteMethod(TestUpgradableV2, this, "getNewCode", params);
+    },
+    getNewImmFieldsEncoded: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getNewImmFieldsEncoded">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"getNewImmFieldsEncoded">
+    > => {
+      return signExecuteMethod(
+        TestUpgradableV2,
+        this,
+        "getNewImmFieldsEncoded",
+        params
+      );
+    },
+    getNewMutFieldsEncoded: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getNewMutFieldsEncoded">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"getNewMutFieldsEncoded">
+    > => {
+      return signExecuteMethod(
+        TestUpgradableV2,
+        this,
+        "getNewMutFieldsEncoded",
+        params
+      );
+    },
+    getImmValue: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getImmValue">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"getImmValue">
+    > => {
+      return signExecuteMethod(TestUpgradableV2, this, "getImmValue", params);
+    },
+    getMutValue: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getMutValue">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"getMutValue">
+    > => {
+      return signExecuteMethod(TestUpgradableV2, this, "getMutValue", params);
+    },
+    getTotal: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"getTotal">
+    ): Promise<TestUpgradableV2Types.SignExecuteMethodResult<"getTotal">> => {
+      return signExecuteMethod(TestUpgradableV2, this, "getTotal", params);
+    },
+    setMutValue: async (
+      params: TestUpgradableV2Types.SignExecuteMethodParams<"setMutValue">
+    ): Promise<
+      TestUpgradableV2Types.SignExecuteMethodResult<"setMutValue">
+    > => {
+      return signExecuteMethod(TestUpgradableV2, this, "setMutValue", params);
     },
   };
 

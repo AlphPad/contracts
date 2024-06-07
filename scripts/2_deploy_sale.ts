@@ -1,7 +1,7 @@
 import { Deployer, DeployFunction, Network } from '@alephium/cli'
 import { Settings } from '../alephium.config'
 import { ALPH_TOKEN_ID, binToHex, contractIdFromAddress, DUST_AMOUNT, stringToHex, ZERO_ADDRESS } from '@alephium/web3'
-import { ApadToken, BurnALPH, DummyToken, RewardDistributor, SaleBuyerAccount, SaleFlatPriceAlph, SaleFlatPriceAlphV2, SaleManager, SaleManagerV2, Staking, StakingAccount, TokenPair } from '../artifacts/ts'
+import { ApadToken, BurnALPH, DummyToken, RewardDistributor, SaleBuyerAccount, SaleFlatPriceAlph, SaleManager, Staking, StakingAccount, TokenPair } from '../artifacts/ts'
 
 const deployStaking: DeployFunction<Settings> = async (
   deployer: Deployer,
@@ -9,7 +9,16 @@ const deployStaking: DeployFunction<Settings> = async (
 ): Promise<void> => {
   const rewardDistributor = deployer.getDeployContractResult('RewardDistributor');
 
-  const buyerTemplateAccount = deployer.getDeployContractResult('SaleBuyerAccount');
+  const buyerTemplateAccount = await deployer.deployContract(SaleBuyerAccount, {
+    initialFields: {
+      accountHolder: ZERO_ADDRESS,
+      amountBid: 0n,
+      amountBuy: 0n,
+      amountClaimed: 0n,
+      amountClaimedRefund: 0n,
+      parentContractAddress: ZERO_ADDRESS
+    }
+  })
 
   let tokenPairAddress = network.settings.sale.tokenPair;
   if (tokenPairAddress == "") {
@@ -76,8 +85,17 @@ const deployStaking: DeployFunction<Settings> = async (
     })
   }
 
-  const flatpriceSaleAlphTemplate = await deployer.deployContract(SaleFlatPriceAlphV2, {
+  let burnAlphAddress = network.settings.sale.burnAlph
+  if (burnAlphAddress == "") {
+    const burnAlph = await deployer.deployContract(BurnALPH, {
+      initialFields: {}
+    })
+    burnAlphAddress = burnAlph.contractInstance.address;
+  }
+
+  const flatpriceSaleAlphTemplate = await deployer.deployContract(SaleFlatPriceAlph, {
     initialFields: {
+      burnAlphContract: binToHex(contractIdFromAddress(burnAlphAddress)),
       accountTemplateId: buyerTemplateAccount.contractInstance.contractId,
       bidTokenId: ALPH_TOKEN_ID,
       maxRaise: 0n,
@@ -94,17 +112,13 @@ const deployStaking: DeployFunction<Settings> = async (
       totalRaised: 0n,
       whitelistBuyerMaxBid: 0n,
       whitelistSaleEnd: 0n,
-      whitelistSaleStart: 0n,
-      cliffEnd: 0n,
-      publicSaleMaxBid: 0n,
-      sellerClaimed: 0n,
-      upfrontRelease: 0n,
-      vestingEnd: 0n
+      whitelistSaleStart: 0n
     }
   })
 
-  const saleManager = await deployer.deployContract(SaleManagerV2, {
+  const saleManager = await deployer.deployContract(SaleManager, {
     initialFields: {
+      burnAlphContract: binToHex(contractIdFromAddress(burnAlphAddress)),
       pair: binToHex(contractIdFromAddress(tokenPairAddress)),
       alphTokenId: ALPH_TOKEN_ID,
       usdtTokenId: "556d9582463fe44fbd108aedc9f409f69086dc78d994b88ea6c9e65f8bf98e00",
@@ -114,7 +128,7 @@ const deployStaking: DeployFunction<Settings> = async (
       saleFlatPriceAlphTemplateId: flatpriceSaleAlphTemplate.contractInstance.contractId,
       saleCounter: 0n,
       owner: deployer.account.address,
-      upgradeDelay: 0n,
+      upgradeDelay: network.settings.upgradeDelay,
       newCode: "",
       newImmFieldsEncoded: "",
       newMutFieldsEncoded: "",

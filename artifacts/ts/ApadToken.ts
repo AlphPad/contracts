@@ -25,6 +25,11 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as ApadTokenContractJson } from "../ApadToken.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -57,6 +62,10 @@ export namespace ApadTokenTypes {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
+    burn: {
+      params: CallContractParams<{ from: Address; amount: bigint }>;
+      result: CallContractResult<null>;
+    };
     getMaxSupply: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
@@ -74,12 +83,54 @@ export namespace ApadTokenTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+
+  export interface SignExecuteMethodTable {
+    getSymbol: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getName: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getDecimals: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getTotalSupply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    burn: {
+      params: SignExecuteContractMethodParams<{
+        from: Address;
+        amount: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getMaxSupply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
   ApadTokenInstance,
   ApadTokenTypes.Fields
 > {
+  encodeFields(fields: ApadTokenTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as ApadTokenTypes.Fields;
   }
@@ -97,7 +148,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getSymbol", params);
+      return testMethod(this, "getSymbol", params, getContractByCodeHash);
     },
     getName: async (
       params: Omit<
@@ -105,7 +156,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getName", params);
+      return testMethod(this, "getName", params, getContractByCodeHash);
     },
     getDecimals: async (
       params: Omit<
@@ -113,7 +164,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getDecimals", params);
+      return testMethod(this, "getDecimals", params, getContractByCodeHash);
     },
     getTotalSupply: async (
       params: Omit<
@@ -121,7 +172,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getTotalSupply", params);
+      return testMethod(this, "getTotalSupply", params, getContractByCodeHash);
     },
     burn: async (
       params: TestContractParamsWithoutMaps<
@@ -129,7 +180,7 @@ class Factory extends ContractFactory<
         { from: Address; amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "burn", params);
+      return testMethod(this, "burn", params, getContractByCodeHash);
     },
     getMaxSupply: async (
       params: Omit<
@@ -137,7 +188,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getMaxSupply", params);
+      return testMethod(this, "getMaxSupply", params, getContractByCodeHash);
     },
   };
 }
@@ -147,7 +198,8 @@ export const ApadToken = new Factory(
   Contract.fromJson(
     ApadTokenContractJson,
     "",
-    "da7543ebc9e29ae7fe1d75043dedead5564b44998b4f5076c4eee829bc814ca3"
+    "da7543ebc9e29ae7fe1d75043dedead5564b44998b4f5076c4eee829bc814ca3",
+    []
   )
 );
 
@@ -223,6 +275,11 @@ export class ApadTokenInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    burn: async (
+      params: ApadTokenTypes.CallMethodParams<"burn">
+    ): Promise<ApadTokenTypes.CallMethodResult<"burn">> => {
+      return callMethod(ApadToken, this, "burn", params, getContractByCodeHash);
+    },
     getMaxSupply: async (
       params?: ApadTokenTypes.CallMethodParams<"getMaxSupply">
     ): Promise<ApadTokenTypes.CallMethodResult<"getMaxSupply">> => {
@@ -233,6 +290,41 @@ export class ApadTokenInstance extends ContractInstance {
         params === undefined ? {} : params,
         getContractByCodeHash
       );
+    },
+  };
+
+  view = this.methods;
+
+  transact = {
+    getSymbol: async (
+      params: ApadTokenTypes.SignExecuteMethodParams<"getSymbol">
+    ): Promise<ApadTokenTypes.SignExecuteMethodResult<"getSymbol">> => {
+      return signExecuteMethod(ApadToken, this, "getSymbol", params);
+    },
+    getName: async (
+      params: ApadTokenTypes.SignExecuteMethodParams<"getName">
+    ): Promise<ApadTokenTypes.SignExecuteMethodResult<"getName">> => {
+      return signExecuteMethod(ApadToken, this, "getName", params);
+    },
+    getDecimals: async (
+      params: ApadTokenTypes.SignExecuteMethodParams<"getDecimals">
+    ): Promise<ApadTokenTypes.SignExecuteMethodResult<"getDecimals">> => {
+      return signExecuteMethod(ApadToken, this, "getDecimals", params);
+    },
+    getTotalSupply: async (
+      params: ApadTokenTypes.SignExecuteMethodParams<"getTotalSupply">
+    ): Promise<ApadTokenTypes.SignExecuteMethodResult<"getTotalSupply">> => {
+      return signExecuteMethod(ApadToken, this, "getTotalSupply", params);
+    },
+    burn: async (
+      params: ApadTokenTypes.SignExecuteMethodParams<"burn">
+    ): Promise<ApadTokenTypes.SignExecuteMethodResult<"burn">> => {
+      return signExecuteMethod(ApadToken, this, "burn", params);
+    },
+    getMaxSupply: async (
+      params: ApadTokenTypes.SignExecuteMethodParams<"getMaxSupply">
+    ): Promise<ApadTokenTypes.SignExecuteMethodResult<"getMaxSupply">> => {
+      return signExecuteMethod(ApadToken, this, "getMaxSupply", params);
     },
   };
 

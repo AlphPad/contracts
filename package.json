@@ -10,17 +10,17 @@
     "devnet:stop": "npx --yes @alephium/cli devnet stop",
     "compile": "npx --yes @alephium/cli compile",
     "deploy": "npx --yes @alephium/cli deploy",
-    "deploy-testnet": "env $(cat ./testnet.env | xargs) npx --yes @alephium/cli deploy -n testnet",
-    "deploy-mainnet": "env $(cat ./mainnet.env | xargs) npx --yes @alephium/cli deploy -n mainnet",
+    "deploy-testnet": "env $(cat ./testnet.env | xargs) npx --yes @alephium/cli deploy -n testnet -f 3",
+    "deploy-mainnet": "env $(cat ./mainnet.env | xargs) npx --yes @alephium/cli deploy -n mainnet -f 3",
     "lint": "eslint . --ext ts",
     "lint:fix": "eslint . --fix --ext ts",
     "test": "jest -i --config ./jest-config.json --verbose"
   },
   "dependencies": {
-    "@alephium/cli": "0.38.2",
-    "@alephium/web3": "0.38.2",
-    "@alephium/web3-test": "0.38.2",
-    "@alephium/web3-wallet": "0.38.2",
+    "@alephium/cli": "0.44.0",
+    "@alephium/web3": "0.44.0",
+    "@alephium/web3-test": "0.44.0",
+    "@alephium/web3-wallet": "0.44.0",
     "keccak256": "^1.0.6"
   },
   "devDependencies": {

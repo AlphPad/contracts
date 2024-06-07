@@ -25,6 +25,11 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as SaleFlatPriceAlphContractJson } from "../launch_sale/SaleFlatPriceAlph.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -108,6 +113,13 @@ export namespace SaleFlatPriceAlphTypes {
   }>;
 
   export interface CallMethodTable {
+    buy: {
+      params: CallContractParams<{
+        bidAmount: bigint;
+        wlMerkleProof: HexString;
+      }>;
+      result: CallContractResult<null>;
+    };
     calculateSaleTokensReceivedPerBidTokens: {
       params: CallContractParams<{ bidAmount: bigint }>;
       result: CallContractResult<bigint>;
@@ -119,6 +131,10 @@ export namespace SaleFlatPriceAlphTypes {
       }>;
       result: CallContractResult<boolean>;
     };
+    setWhitelistBuyerMaxBid: {
+      params: CallContractParams<{ newWhitelistBuyerMaxBid: bigint }>;
+      result: CallContractResult<null>;
+    };
     accountExists: {
       params: CallContractParams<{ account: Address }>;
       result: CallContractResult<boolean>;
@@ -126,6 +142,27 @@ export namespace SaleFlatPriceAlphTypes {
     getSubContractId: {
       params: CallContractParams<{ account: Address }>;
       result: CallContractResult<HexString>;
+    };
+    claim: {
+      params: CallContractParams<{ amount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    claimRefund: {
+      params: CallContractParams<{ amount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    setMerkleRoot: {
+      params: CallContractParams<{ newMerkleRoot: HexString }>;
+      result: CallContractResult<null>;
+    };
+    setSaleDates: {
+      params: CallContractParams<{
+        newSaleStart: bigint;
+        newSaleEnd: bigint;
+        newWhitelistSaleStart: bigint;
+        newWhitelistSaleEnd: bigint;
+      }>;
+      result: CallContractResult<null>;
     };
     isSaleLive: {
       params: Omit<CallContractParams<{}>, "args">;
@@ -212,12 +249,152 @@ export namespace SaleFlatPriceAlphTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+
+  export interface SignExecuteMethodTable {
+    buy: {
+      params: SignExecuteContractMethodParams<{
+        bidAmount: bigint;
+        wlMerkleProof: HexString;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    calculateSaleTokensReceivedPerBidTokens: {
+      params: SignExecuteContractMethodParams<{ bidAmount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    checkIsWhitelisted: {
+      params: SignExecuteContractMethodParams<{
+        account: Address;
+        wlMerkleProof: HexString;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    setWhitelistBuyerMaxBid: {
+      params: SignExecuteContractMethodParams<{
+        newWhitelistBuyerMaxBid: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    accountExists: {
+      params: SignExecuteContractMethodParams<{ account: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getSubContractId: {
+      params: SignExecuteContractMethodParams<{ account: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    claim: {
+      params: SignExecuteContractMethodParams<{ amount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    claimRefund: {
+      params: SignExecuteContractMethodParams<{ amount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    setMerkleRoot: {
+      params: SignExecuteContractMethodParams<{ newMerkleRoot: HexString }>;
+      result: SignExecuteScriptTxResult;
+    };
+    setSaleDates: {
+      params: SignExecuteContractMethodParams<{
+        newSaleStart: bigint;
+        newSaleEnd: bigint;
+        newWhitelistSaleStart: bigint;
+        newWhitelistSaleEnd: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    isSaleLive: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    isSaleFinished: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    isSaleSuccess: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    isWhitelistSaleLive: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    isWhitelistSale: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    isCallerSaleOwner: {
+      params: SignExecuteContractMethodParams<{ caller: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getSaleOwner: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getSaleStart: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getSaleEnd: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getMinRaise: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getMaxRaise: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getSaleTokenId: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getBidTokenId: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getWhitelistSaleStart: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getWhitelistSaleEnd: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getTokensSold: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getTotalRaised: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getMerkleRoot: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
   SaleFlatPriceAlphInstance,
   SaleFlatPriceAlphTypes.Fields
 > {
+  encodeFields(fields: SaleFlatPriceAlphTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as SaleFlatPriceAlphTypes.Fields;
   }
@@ -284,7 +461,7 @@ class Factory extends ContractFactory<
         { caller: Address; amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claimBuyer", params);
+      return testMethod(this, "claimBuyer", params, getContractByCodeHash);
     },
     claimBuyerRefund: async (
       params: TestContractParamsWithoutMaps<
@@ -292,7 +469,12 @@ class Factory extends ContractFactory<
         { caller: Address; amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claimBuyerRefund", params);
+      return testMethod(
+        this,
+        "claimBuyerRefund",
+        params,
+        getContractByCodeHash
+      );
     },
     claimSeller: async (
       params: TestContractParamsWithoutMaps<
@@ -300,7 +482,7 @@ class Factory extends ContractFactory<
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claimSeller", params);
+      return testMethod(this, "claimSeller", params, getContractByCodeHash);
     },
     claimSellerRefund: async (
       params: TestContractParamsWithoutMaps<
@@ -308,7 +490,12 @@ class Factory extends ContractFactory<
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claimSellerRefund", params);
+      return testMethod(
+        this,
+        "claimSellerRefund",
+        params,
+        getContractByCodeHash
+      );
     },
     buy: async (
       params: TestContractParamsWithoutMaps<
@@ -316,7 +503,7 @@ class Factory extends ContractFactory<
         { bidAmount: bigint; wlMerkleProof: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "buy", params);
+      return testMethod(this, "buy", params, getContractByCodeHash);
     },
     calculateSaleTokensReceivedPerBidTokens: async (
       params: TestContractParamsWithoutMaps<
@@ -327,7 +514,8 @@ class Factory extends ContractFactory<
       return testMethod(
         this,
         "calculateSaleTokensReceivedPerBidTokens",
-        params
+        params,
+        getContractByCodeHash
       );
     },
     checkIsWhitelisted: async (
@@ -336,7 +524,12 @@ class Factory extends ContractFactory<
         { account: Address; wlMerkleProof: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "checkIsWhitelisted", params);
+      return testMethod(
+        this,
+        "checkIsWhitelisted",
+        params,
+        getContractByCodeHash
+      );
     },
     setWhitelistBuyerMaxBid: async (
       params: TestContractParamsWithoutMaps<
@@ -344,7 +537,12 @@ class Factory extends ContractFactory<
         { newWhitelistBuyerMaxBid: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "setWhitelistBuyerMaxBid", params);
+      return testMethod(
+        this,
+        "setWhitelistBuyerMaxBid",
+        params,
+        getContractByCodeHash
+      );
     },
     assertPriceInRange: async (
       params: Omit<
@@ -352,7 +550,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertPriceInRange", params);
+      return testMethod(
+        this,
+        "assertPriceInRange",
+        params,
+        getContractByCodeHash
+      );
     },
     assertMaxBidAmountInRange: async (
       params: TestContractParamsWithoutMaps<
@@ -360,7 +563,12 @@ class Factory extends ContractFactory<
         { maxBidAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertMaxBidAmountInRange", params);
+      return testMethod(
+        this,
+        "assertMaxBidAmountInRange",
+        params,
+        getContractByCodeHash
+      );
     },
     assertBidAmountInRange: async (
       params: TestContractParamsWithoutMaps<
@@ -368,7 +576,12 @@ class Factory extends ContractFactory<
         { bidAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertBidAmountInRange", params);
+      return testMethod(
+        this,
+        "assertBidAmountInRange",
+        params,
+        getContractByCodeHash
+      );
     },
     assertSaleAmountInRange: async (
       params: Omit<
@@ -376,7 +589,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertSaleAmountInRange", params);
+      return testMethod(
+        this,
+        "assertSaleAmountInRange",
+        params,
+        getContractByCodeHash
+      );
     },
     createAccount: async (
       params: TestContractParamsWithoutMaps<
@@ -388,7 +606,7 @@ class Factory extends ContractFactory<
         }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "createAccount", params);
+      return testMethod(this, "createAccount", params, getContractByCodeHash);
     },
     destroyAccount: async (
       params: TestContractParamsWithoutMaps<
@@ -396,7 +614,7 @@ class Factory extends ContractFactory<
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "destroyAccount", params);
+      return testMethod(this, "destroyAccount", params, getContractByCodeHash);
     },
     assertAccountExists: async (
       params: TestContractParamsWithoutMaps<
@@ -404,7 +622,12 @@ class Factory extends ContractFactory<
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertAccountExists", params);
+      return testMethod(
+        this,
+        "assertAccountExists",
+        params,
+        getContractByCodeHash
+      );
     },
     accountExists: async (
       params: TestContractParamsWithoutMaps<
@@ -412,7 +635,7 @@ class Factory extends ContractFactory<
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "accountExists", params);
+      return testMethod(this, "accountExists", params, getContractByCodeHash);
     },
     getSubContractId: async (
       params: TestContractParamsWithoutMaps<
@@ -420,7 +643,12 @@ class Factory extends ContractFactory<
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getSubContractId", params);
+      return testMethod(
+        this,
+        "getSubContractId",
+        params,
+        getContractByCodeHash
+      );
     },
     claim: async (
       params: TestContractParamsWithoutMaps<
@@ -428,7 +656,7 @@ class Factory extends ContractFactory<
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claim", params);
+      return testMethod(this, "claim", params, getContractByCodeHash);
     },
     claimRefund: async (
       params: TestContractParamsWithoutMaps<
@@ -436,7 +664,7 @@ class Factory extends ContractFactory<
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claimRefund", params);
+      return testMethod(this, "claimRefund", params, getContractByCodeHash);
     },
     setMerkleRoot: async (
       params: TestContractParamsWithoutMaps<
@@ -444,7 +672,7 @@ class Factory extends ContractFactory<
         { newMerkleRoot: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "setMerkleRoot", params);
+      return testMethod(this, "setMerkleRoot", params, getContractByCodeHash);
     },
     setSaleDates: async (
       params: TestContractParamsWithoutMaps<
@@ -457,7 +685,7 @@ class Factory extends ContractFactory<
         }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "setSaleDates", params);
+      return testMethod(this, "setSaleDates", params, getContractByCodeHash);
     },
     assertSaleLive: async (
       params: Omit<
@@ -465,7 +693,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertSaleLive", params);
+      return testMethod(this, "assertSaleLive", params, getContractByCodeHash);
     },
     assertSaleFinished: async (
       params: Omit<
@@ -473,7 +701,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertSaleFinished", params);
+      return testMethod(
+        this,
+        "assertSaleFinished",
+        params,
+        getContractByCodeHash
+      );
     },
     assertCanClaim: async (
       params: Omit<
@@ -481,7 +714,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertCanClaim", params);
+      return testMethod(this, "assertCanClaim", params, getContractByCodeHash);
     },
     assertCanClaimRefund: async (
       params: Omit<
@@ -489,7 +722,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertCanClaimRefund", params);
+      return testMethod(
+        this,
+        "assertCanClaimRefund",
+        params,
+        getContractByCodeHash
+      );
     },
     assertSaleEditable: async (
       params: Omit<
@@ -497,7 +735,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertSaleEditable", params);
+      return testMethod(
+        this,
+        "assertSaleEditable",
+        params,
+        getContractByCodeHash
+      );
     },
     assertValidSaleDates: async (
       params: TestContractParamsWithoutMaps<
@@ -505,7 +748,12 @@ class Factory extends ContractFactory<
         { asSaleStart: bigint; asSaleEnd: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertValidSaleDates", params);
+      return testMethod(
+        this,
+        "assertValidSaleDates",
+        params,
+        getContractByCodeHash
+      );
     },
     assertValidWLSaleDates: async (
       params: TestContractParamsWithoutMaps<
@@ -518,7 +766,12 @@ class Factory extends ContractFactory<
         }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertValidWLSaleDates", params);
+      return testMethod(
+        this,
+        "assertValidWLSaleDates",
+        params,
+        getContractByCodeHash
+      );
     },
     isSaleLive: async (
       params: Omit<
@@ -526,7 +779,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "isSaleLive", params);
+      return testMethod(this, "isSaleLive", params, getContractByCodeHash);
     },
     isSaleFinished: async (
       params: Omit<
@@ -534,7 +787,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "isSaleFinished", params);
+      return testMethod(this, "isSaleFinished", params, getContractByCodeHash);
     },
     isSaleSuccess: async (
       params: Omit<
@@ -542,7 +795,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "isSaleSuccess", params);
+      return testMethod(this, "isSaleSuccess", params, getContractByCodeHash);
     },
     isWhitelistSaleLive: async (
       params: Omit<
@@ -550,7 +803,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "isWhitelistSaleLive", params);
+      return testMethod(
+        this,
+        "isWhitelistSaleLive",
+        params,
+        getContractByCodeHash
+      );
     },
     isWhitelistSale: async (
       params: Omit<
@@ -558,7 +816,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "isWhitelistSale", params);
+      return testMethod(this, "isWhitelistSale", params, getContractByCodeHash);
     },
     isCallerSaleOwner: async (
       params: TestContractParamsWithoutMaps<
@@ -566,7 +824,12 @@ class Factory extends ContractFactory<
         { caller: Address }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "isCallerSaleOwner", params);
+      return testMethod(
+        this,
+        "isCallerSaleOwner",
+        params,
+        getContractByCodeHash
+      );
     },
     getSaleOwner: async (
       params: Omit<
@@ -574,7 +837,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getSaleOwner", params);
+      return testMethod(this, "getSaleOwner", params, getContractByCodeHash);
     },
     getSaleStart: async (
       params: Omit<
@@ -582,7 +845,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getSaleStart", params);
+      return testMethod(this, "getSaleStart", params, getContractByCodeHash);
     },
     getSaleEnd: async (
       params: Omit<
@@ -590,7 +853,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getSaleEnd", params);
+      return testMethod(this, "getSaleEnd", params, getContractByCodeHash);
     },
     getMinRaise: async (
       params: Omit<
@@ -598,7 +861,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getMinRaise", params);
+      return testMethod(this, "getMinRaise", params, getContractByCodeHash);
     },
     getMaxRaise: async (
       params: Omit<
@@ -606,7 +869,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getMaxRaise", params);
+      return testMethod(this, "getMaxRaise", params, getContractByCodeHash);
     },
     getSaleTokenId: async (
       params: Omit<
@@ -614,7 +877,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getSaleTokenId", params);
+      return testMethod(this, "getSaleTokenId", params, getContractByCodeHash);
     },
     getBidTokenId: async (
       params: Omit<
@@ -622,7 +885,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getBidTokenId", params);
+      return testMethod(this, "getBidTokenId", params, getContractByCodeHash);
     },
     getWhitelistSaleStart: async (
       params: Omit<
@@ -630,7 +893,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getWhitelistSaleStart", params);
+      return testMethod(
+        this,
+        "getWhitelistSaleStart",
+        params,
+        getContractByCodeHash
+      );
     },
     getWhitelistSaleEnd: async (
       params: Omit<
@@ -638,7 +906,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getWhitelistSaleEnd", params);
+      return testMethod(
+        this,
+        "getWhitelistSaleEnd",
+        params,
+        getContractByCodeHash
+      );
     },
     getTokensSold: async (
       params: Omit<
@@ -646,7 +919,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getTokensSold", params);
+      return testMethod(this, "getTokensSold", params, getContractByCodeHash);
     },
     getTotalRaised: async (
       params: Omit<
@@ -654,7 +927,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getTotalRaised", params);
+      return testMethod(this, "getTotalRaised", params, getContractByCodeHash);
     },
     getMerkleRoot: async (
       params: Omit<
@@ -662,7 +935,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getMerkleRoot", params);
+      return testMethod(this, "getMerkleRoot", params, getContractByCodeHash);
     },
     updateRoot: async (
       params: TestContractParamsWithoutMaps<
@@ -670,7 +943,7 @@ class Factory extends ContractFactory<
         { newMerkleRoot: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "updateRoot", params);
+      return testMethod(this, "updateRoot", params, getContractByCodeHash);
     },
     verify: async (
       params: TestContractParamsWithoutMaps<
@@ -678,7 +951,7 @@ class Factory extends ContractFactory<
         { proof: HexString; dataHash: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "verify", params);
+      return testMethod(this, "verify", params, getContractByCodeHash);
     },
     hashPair: async (
       params: TestContractParamsWithoutMaps<
@@ -686,7 +959,7 @@ class Factory extends ContractFactory<
         { a: HexString; b: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "hashPair", params);
+      return testMethod(this, "hashPair", params, getContractByCodeHash);
     },
     hash: async (
       params: TestContractParamsWithoutMaps<
@@ -694,7 +967,7 @@ class Factory extends ContractFactory<
         { dataToHash: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "hash", params);
+      return testMethod(this, "hash", params, getContractByCodeHash);
     },
   };
 }
@@ -704,7 +977,8 @@ export const SaleFlatPriceAlph = new Factory(
   Contract.fromJson(
     SaleFlatPriceAlphContractJson,
     "",
-    "7f2045736051296ec17e13d9a47d60ef2cd522fe14eece4a7fde340ba966c2b8"
+    "7f2045736051296ec17e13d9a47d60ef2cd522fe14eece4a7fde340ba966c2b8",
+    []
   )
 );
 
@@ -890,6 +1164,17 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   methods = {
+    buy: async (
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"buy">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"buy">> => {
+      return callMethod(
+        SaleFlatPriceAlph,
+        this,
+        "buy",
+        params,
+        getContractByCodeHash
+      );
+    },
     calculateSaleTokensReceivedPerBidTokens: async (
       params: SaleFlatPriceAlphTypes.CallMethodParams<"calculateSaleTokensReceivedPerBidTokens">
     ): Promise<
@@ -916,6 +1201,19 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    setWhitelistBuyerMaxBid: async (
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"setWhitelistBuyerMaxBid">
+    ): Promise<
+      SaleFlatPriceAlphTypes.CallMethodResult<"setWhitelistBuyerMaxBid">
+    > => {
+      return callMethod(
+        SaleFlatPriceAlph,
+        this,
+        "setWhitelistBuyerMaxBid",
+        params,
+        getContractByCodeHash
+      );
+    },
     accountExists: async (
       params: SaleFlatPriceAlphTypes.CallMethodParams<"accountExists">
     ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"accountExists">> => {
@@ -934,6 +1232,50 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
         SaleFlatPriceAlph,
         this,
         "getSubContractId",
+        params,
+        getContractByCodeHash
+      );
+    },
+    claim: async (
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"claim">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"claim">> => {
+      return callMethod(
+        SaleFlatPriceAlph,
+        this,
+        "claim",
+        params,
+        getContractByCodeHash
+      );
+    },
+    claimRefund: async (
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"claimRefund">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"claimRefund">> => {
+      return callMethod(
+        SaleFlatPriceAlph,
+        this,
+        "claimRefund",
+        params,
+        getContractByCodeHash
+      );
+    },
+    setMerkleRoot: async (
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"setMerkleRoot">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"setMerkleRoot">> => {
+      return callMethod(
+        SaleFlatPriceAlph,
+        this,
+        "setMerkleRoot",
+        params,
+        getContractByCodeHash
+      );
+    },
+    setSaleDates: async (
+      params: SaleFlatPriceAlphTypes.CallMethodParams<"setSaleDates">
+    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"setSaleDates">> => {
+      return callMethod(
+        SaleFlatPriceAlph,
+        this,
+        "setSaleDates",
         params,
         getContractByCodeHash
       );
@@ -1142,6 +1484,293 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
         "getMerkleRoot",
         params === undefined ? {} : params,
         getContractByCodeHash
+      );
+    },
+  };
+
+  view = this.methods;
+
+  transact = {
+    buy: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"buy">
+    ): Promise<SaleFlatPriceAlphTypes.SignExecuteMethodResult<"buy">> => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "buy", params);
+    },
+    calculateSaleTokensReceivedPerBidTokens: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"calculateSaleTokensReceivedPerBidTokens">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"calculateSaleTokensReceivedPerBidTokens">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "calculateSaleTokensReceivedPerBidTokens",
+        params
+      );
+    },
+    checkIsWhitelisted: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"checkIsWhitelisted">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"checkIsWhitelisted">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "checkIsWhitelisted",
+        params
+      );
+    },
+    setWhitelistBuyerMaxBid: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"setWhitelistBuyerMaxBid">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"setWhitelistBuyerMaxBid">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "setWhitelistBuyerMaxBid",
+        params
+      );
+    },
+    accountExists: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"accountExists">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"accountExists">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "accountExists",
+        params
+      );
+    },
+    getSubContractId: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSubContractId">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSubContractId">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "getSubContractId",
+        params
+      );
+    },
+    claim: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"claim">
+    ): Promise<SaleFlatPriceAlphTypes.SignExecuteMethodResult<"claim">> => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "claim", params);
+    },
+    claimRefund: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"claimRefund">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"claimRefund">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "claimRefund", params);
+    },
+    setMerkleRoot: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"setMerkleRoot">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"setMerkleRoot">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "setMerkleRoot",
+        params
+      );
+    },
+    setSaleDates: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"setSaleDates">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"setSaleDates">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "setSaleDates", params);
+    },
+    isSaleLive: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isSaleLive">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isSaleLive">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "isSaleLive", params);
+    },
+    isSaleFinished: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isSaleFinished">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isSaleFinished">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "isSaleFinished",
+        params
+      );
+    },
+    isSaleSuccess: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isSaleSuccess">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isSaleSuccess">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "isSaleSuccess",
+        params
+      );
+    },
+    isWhitelistSaleLive: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isWhitelistSaleLive">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isWhitelistSaleLive">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "isWhitelistSaleLive",
+        params
+      );
+    },
+    isWhitelistSale: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isWhitelistSale">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isWhitelistSale">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "isWhitelistSale",
+        params
+      );
+    },
+    isCallerSaleOwner: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isCallerSaleOwner">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isCallerSaleOwner">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "isCallerSaleOwner",
+        params
+      );
+    },
+    getSaleOwner: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSaleOwner">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSaleOwner">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "getSaleOwner", params);
+    },
+    getSaleStart: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSaleStart">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSaleStart">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "getSaleStart", params);
+    },
+    getSaleEnd: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSaleEnd">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSaleEnd">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "getSaleEnd", params);
+    },
+    getMinRaise: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getMinRaise">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getMinRaise">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "getMinRaise", params);
+    },
+    getMaxRaise: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getMaxRaise">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getMaxRaise">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlph, this, "getMaxRaise", params);
+    },
+    getSaleTokenId: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSaleTokenId">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSaleTokenId">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "getSaleTokenId",
+        params
+      );
+    },
+    getBidTokenId: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getBidTokenId">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getBidTokenId">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "getBidTokenId",
+        params
+      );
+    },
+    getWhitelistSaleStart: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getWhitelistSaleStart">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getWhitelistSaleStart">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "getWhitelistSaleStart",
+        params
+      );
+    },
+    getWhitelistSaleEnd: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getWhitelistSaleEnd">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getWhitelistSaleEnd">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "getWhitelistSaleEnd",
+        params
+      );
+    },
+    getTokensSold: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getTokensSold">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getTokensSold">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "getTokensSold",
+        params
+      );
+    },
+    getTotalRaised: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getTotalRaised">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getTotalRaised">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "getTotalRaised",
+        params
+      );
+    },
+    getMerkleRoot: async (
+      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getMerkleRoot">
+    ): Promise<
+      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getMerkleRoot">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlph,
+        this,
+        "getMerkleRoot",
+        params
       );
     },
   };

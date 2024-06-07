@@ -48,101 +48,101 @@ import { default as StakingUnstakeTXScriptJson } from "../rewards/StakingUnstake
 export const ApadTokenBurnTX = new ExecutableScript<{
   token: HexString;
   amount: bigint;
-}>(Script.fromJson(ApadTokenBurnTXScriptJson, ""));
+}>(Script.fromJson(ApadTokenBurnTXScriptJson, "", []));
 
 export const IUpgradableChangeOwnerApplyTX = new ExecutableScript<{
   upgradable: HexString;
-}>(Script.fromJson(IUpgradableChangeOwnerApplyTXScriptJson, ""));
+}>(Script.fromJson(IUpgradableChangeOwnerApplyTXScriptJson, "", []));
 
 export const IUpgradableChangeOwnerTX = new ExecutableScript<{
   upgradable: HexString;
   changeOwner: Address;
-}>(Script.fromJson(IUpgradableChangeOwnerTXScriptJson, ""));
+}>(Script.fromJson(IUpgradableChangeOwnerTXScriptJson, "", []));
 
 export const IUpgradableMigrateApplyTX = new ExecutableScript<{
   upgradable: HexString;
-}>(Script.fromJson(IUpgradableMigrateApplyTXScriptJson, ""));
+}>(Script.fromJson(IUpgradableMigrateApplyTXScriptJson, "", []));
 
 export const IUpgradableMigrateTX = new ExecutableScript<{
   upgradable: HexString;
   changeCode: HexString;
-}>(Script.fromJson(IUpgradableMigrateTXScriptJson, ""));
+}>(Script.fromJson(IUpgradableMigrateTXScriptJson, "", []));
 
 export const IUpgradableMigrateWithFieldsApplyTX = new ExecutableScript<{
   upgradable: HexString;
-}>(Script.fromJson(IUpgradableMigrateWithFieldsApplyTXScriptJson, ""));
+}>(Script.fromJson(IUpgradableMigrateWithFieldsApplyTXScriptJson, "", []));
 
 export const IUpgradableMigrateWithFieldsTX = new ExecutableScript<{
   upgradable: HexString;
   changeCode: HexString;
   changeImmFieldsEncoded: HexString;
   changeMutFieldsEncoded: HexString;
-}>(Script.fromJson(IUpgradableMigrateWithFieldsTXScriptJson, ""));
+}>(Script.fromJson(IUpgradableMigrateWithFieldsTXScriptJson, "", []));
 
 export const IUpgradableResetUpgradeTX = new ExecutableScript<{
   upgradable: HexString;
-}>(Script.fromJson(IUpgradableResetUpgradeTXScriptJson, ""));
+}>(Script.fromJson(IUpgradableResetUpgradeTXScriptJson, "", []));
 
 export const RewardDistributorAddRewardsTX = new ExecutableScript<{
   rd: HexString;
   amount: bigint;
-}>(Script.fromJson(RewardDistributorAddRewardsTXScriptJson, ""));
+}>(Script.fromJson(RewardDistributorAddRewardsTXScriptJson, "", []));
 
 export const RewardDistributorHarvestTX = new ExecutableScript<{
   rd: HexString;
-}>(Script.fromJson(RewardDistributorHarvestTXScriptJson, ""));
+}>(Script.fromJson(RewardDistributorHarvestTXScriptJson, "", []));
 
 export const SaleFlatPriceAlphBuyTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   amountAlph: bigint;
   merkleProof: HexString;
-}>(Script.fromJson(SaleFlatPriceAlphBuyTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphBuyTXScriptJson, "", []));
 
 export const SaleFlatPriceAlphBuyTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   amountAlph: bigint;
   merkleProof: HexString;
-}>(Script.fromJson(SaleFlatPriceAlphBuyTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphBuyTXV2ScriptJson, "", []));
 
 export const SaleFlatPriceAlphClaimRefundTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphClaimRefundTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphClaimRefundTXScriptJson, "", []));
 
 export const SaleFlatPriceAlphClaimRefundTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphClaimRefundTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphClaimRefundTXV2ScriptJson, "", []));
 
 export const SaleFlatPriceAlphClaimTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphClaimTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphClaimTXScriptJson, "", []));
 
 export const SaleFlatPriceAlphClaimTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphClaimTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphClaimTXV2ScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetCliffEndTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newCliffEnd: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetCliffEndTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetCliffEndTXV2ScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetMerkleRootTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   newMerkleRoot: HexString;
-}>(Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetMerkleRootTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newMerkleRoot: HexString;
-}>(Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXV2ScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetPublicSaleMaxBidTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newPublicSaleMaxBid: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetPublicSaleMaxBidTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetPublicSaleMaxBidTXV2ScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetSaleDatesTX = new ExecutableScript<{
   saleFlatPrice: HexString;
@@ -150,7 +150,7 @@ export const SaleFlatPriceAlphSetSaleDatesTX = new ExecutableScript<{
   newSaleEnd: bigint;
   newWhitelistSaleStart: bigint;
   newWhitelistSaleEnd: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetSaleDatesTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
@@ -158,27 +158,27 @@ export const SaleFlatPriceAlphSetSaleDatesTXV2 = new ExecutableScript<{
   newSaleEnd: bigint;
   newWhitelistSaleStart: bigint;
   newWhitelistSaleEnd: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXV2ScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetUpfrontReleaseTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newUpfrontRelease: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetUpfrontReleaseTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetUpfrontReleaseTXV2ScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetVestingEndTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newVestingEnd: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetVestingEndTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetVestingEndTXV2ScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetWLMaxBidTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   newWLMaxBid: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetWLMaxBidTXScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetWLMaxBidTXScriptJson, "", []));
 
 export const SaleFlatPriceAlphSetWLMaxBidTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newWLMaxBid: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetWLMaxBidTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleFlatPriceAlphSetWLMaxBidTXV2ScriptJson, "", []));
 
 export const SaleManagerCreateSaleFlatPriceTX = new ExecutableScript<{
   saleManager: HexString;
@@ -195,7 +195,7 @@ export const SaleManagerCreateSaleFlatPriceTX = new ExecutableScript<{
   whitelistSaleEnd: bigint;
   whitelistBuyerMaxBid: bigint;
   merkleRoot: HexString;
-}>(Script.fromJson(SaleManagerCreateSaleFlatPriceTXScriptJson, ""));
+}>(Script.fromJson(SaleManagerCreateSaleFlatPriceTXScriptJson, "", []));
 
 export const SaleManagerCreateSaleFlatPriceTXV2 = new ExecutableScript<{
   saleManager: HexString;
@@ -216,28 +216,28 @@ export const SaleManagerCreateSaleFlatPriceTXV2 = new ExecutableScript<{
   whitelistSaleEnd: bigint;
   whitelistBuyerMaxBid: bigint;
   merkleRoot: HexString;
-}>(Script.fromJson(SaleManagerCreateSaleFlatPriceTXV2ScriptJson, ""));
+}>(Script.fromJson(SaleManagerCreateSaleFlatPriceTXV2ScriptJson, "", []));
 
 export const StakingClaimRewardsTX = new ExecutableScript<{
   staking: HexString;
-}>(Script.fromJson(StakingClaimRewardsTXScriptJson, ""));
+}>(Script.fromJson(StakingClaimRewardsTXScriptJson, "", []));
 
 export const StakingClaimTX = new ExecutableScript<{ staking: HexString }>(
-  Script.fromJson(StakingClaimTXScriptJson, "")
+  Script.fromJson(StakingClaimTXScriptJson, "", [])
 );
 
 export const StakingDepositRewardsTX = new ExecutableScript<{
   staking: HexString;
   amount: bigint;
-}>(Script.fromJson(StakingDepositRewardsTXScriptJson, ""));
+}>(Script.fromJson(StakingDepositRewardsTXScriptJson, "", []));
 
 export const StakingStakeTX = new ExecutableScript<{
   staking: HexString;
   amount: bigint;
   vestingPeriod: bigint;
-}>(Script.fromJson(StakingStakeTXScriptJson, ""));
+}>(Script.fromJson(StakingStakeTXScriptJson, "", []));
 
 export const StakingUnstakeTX = new ExecutableScript<{
   staking: HexString;
   amount: bigint;
-}>(Script.fromJson(StakingUnstakeTXScriptJson, ""));
+}>(Script.fromJson(StakingUnstakeTXScriptJson, "", []));

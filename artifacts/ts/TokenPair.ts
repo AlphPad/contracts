@@ -25,6 +25,11 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as TokenPairContractJson } from "../external/dummy/TokenPair.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -70,6 +75,10 @@ export namespace TokenPairTypes {
       params: CallContractParams<{ y: bigint }>;
       result: CallContractResult<bigint>;
     };
+    setFeeCollectorId: {
+      params: CallContractParams<{ id: HexString }>;
+      result: CallContractResult<null>;
+    };
     getTokenPair: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<[HexString, HexString]>;
@@ -103,12 +112,75 @@ export namespace TokenPairTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+
+  export interface SignExecuteMethodTable {
+    getSymbol: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getName: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getDecimals: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getTotalSupply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    uqdiv: {
+      params: SignExecuteContractMethodParams<{ a: bigint; b: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    sqrt: {
+      params: SignExecuteContractMethodParams<{ y: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    setFeeCollectorId: {
+      params: SignExecuteContractMethodParams<{ id: HexString }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getTokenPair: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getReserves: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getBlockTimeStampLast: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getPrice0CumulativeLast: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getPrice1CumulativeLast: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
   TokenPairInstance,
   TokenPairTypes.Fields
 > {
+  encodeFields(fields: TokenPairTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as TokenPairTypes.Fields;
   }
@@ -124,7 +196,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getSymbol", params);
+      return testMethod(this, "getSymbol", params, getContractByCodeHash);
     },
     getName: async (
       params: Omit<
@@ -132,7 +204,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getName", params);
+      return testMethod(this, "getName", params, getContractByCodeHash);
     },
     getDecimals: async (
       params: Omit<
@@ -140,7 +212,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getDecimals", params);
+      return testMethod(this, "getDecimals", params, getContractByCodeHash);
     },
     getTotalSupply: async (
       params: Omit<
@@ -148,7 +220,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getTotalSupply", params);
+      return testMethod(this, "getTotalSupply", params, getContractByCodeHash);
     },
     uqdiv: async (
       params: TestContractParamsWithoutMaps<
@@ -156,7 +228,7 @@ class Factory extends ContractFactory<
         { a: bigint; b: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "uqdiv", params);
+      return testMethod(this, "uqdiv", params, getContractByCodeHash);
     },
     sqrt: async (
       params: TestContractParamsWithoutMaps<
@@ -164,7 +236,7 @@ class Factory extends ContractFactory<
         { y: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "sqrt", params);
+      return testMethod(this, "sqrt", params, getContractByCodeHash);
     },
     setFeeCollectorId: async (
       params: TestContractParamsWithoutMaps<
@@ -172,7 +244,12 @@ class Factory extends ContractFactory<
         { id: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "setFeeCollectorId", params);
+      return testMethod(
+        this,
+        "setFeeCollectorId",
+        params,
+        getContractByCodeHash
+      );
     },
     getTokenPair: async (
       params: Omit<
@@ -180,7 +257,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<[HexString, HexString]>> => {
-      return testMethod(this, "getTokenPair", params);
+      return testMethod(this, "getTokenPair", params, getContractByCodeHash);
     },
     getReserves: async (
       params: Omit<
@@ -188,7 +265,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<[bigint, bigint]>> => {
-      return testMethod(this, "getReserves", params);
+      return testMethod(this, "getReserves", params, getContractByCodeHash);
     },
     pairName_: async (
       params: Omit<
@@ -196,7 +273,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "pairName_", params);
+      return testMethod(this, "pairName_", params, getContractByCodeHash);
     },
     getBlockTimeStampLast: async (
       params: Omit<
@@ -204,7 +281,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getBlockTimeStampLast", params);
+      return testMethod(
+        this,
+        "getBlockTimeStampLast",
+        params,
+        getContractByCodeHash
+      );
     },
     getPrice0CumulativeLast: async (
       params: Omit<
@@ -212,7 +294,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getPrice0CumulativeLast", params);
+      return testMethod(
+        this,
+        "getPrice0CumulativeLast",
+        params,
+        getContractByCodeHash
+      );
     },
     getPrice1CumulativeLast: async (
       params: Omit<
@@ -220,7 +307,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getPrice1CumulativeLast", params);
+      return testMethod(
+        this,
+        "getPrice1CumulativeLast",
+        params,
+        getContractByCodeHash
+      );
     },
   };
 }
@@ -230,7 +322,8 @@ export const TokenPair = new Factory(
   Contract.fromJson(
     TokenPairContractJson,
     "",
-    "2b98401ce86b160c0f357390bd72a4cf9eb66d57e490ac7d6553b40749b092ac"
+    "2b98401ce86b160c0f357390bd72a4cf9eb66d57e490ac7d6553b40749b092ac",
+    []
   )
 );
 
@@ -305,6 +398,17 @@ export class TokenPairInstance extends ContractInstance {
     ): Promise<TokenPairTypes.CallMethodResult<"sqrt">> => {
       return callMethod(TokenPair, this, "sqrt", params, getContractByCodeHash);
     },
+    setFeeCollectorId: async (
+      params: TokenPairTypes.CallMethodParams<"setFeeCollectorId">
+    ): Promise<TokenPairTypes.CallMethodResult<"setFeeCollectorId">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "setFeeCollectorId",
+        params,
+        getContractByCodeHash
+      );
+    },
     getTokenPair: async (
       params?: TokenPairTypes.CallMethodParams<"getTokenPair">
     ): Promise<TokenPairTypes.CallMethodResult<"getTokenPair">> => {
@@ -358,6 +462,92 @@ export class TokenPairInstance extends ContractInstance {
         "getPrice1CumulativeLast",
         params === undefined ? {} : params,
         getContractByCodeHash
+      );
+    },
+  };
+
+  view = this.methods;
+
+  transact = {
+    getSymbol: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getSymbol">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getSymbol">> => {
+      return signExecuteMethod(TokenPair, this, "getSymbol", params);
+    },
+    getName: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getName">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getName">> => {
+      return signExecuteMethod(TokenPair, this, "getName", params);
+    },
+    getDecimals: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getDecimals">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getDecimals">> => {
+      return signExecuteMethod(TokenPair, this, "getDecimals", params);
+    },
+    getTotalSupply: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getTotalSupply">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getTotalSupply">> => {
+      return signExecuteMethod(TokenPair, this, "getTotalSupply", params);
+    },
+    uqdiv: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"uqdiv">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"uqdiv">> => {
+      return signExecuteMethod(TokenPair, this, "uqdiv", params);
+    },
+    sqrt: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"sqrt">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"sqrt">> => {
+      return signExecuteMethod(TokenPair, this, "sqrt", params);
+    },
+    setFeeCollectorId: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"setFeeCollectorId">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"setFeeCollectorId">> => {
+      return signExecuteMethod(TokenPair, this, "setFeeCollectorId", params);
+    },
+    getTokenPair: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getTokenPair">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getTokenPair">> => {
+      return signExecuteMethod(TokenPair, this, "getTokenPair", params);
+    },
+    getReserves: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getReserves">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getReserves">> => {
+      return signExecuteMethod(TokenPair, this, "getReserves", params);
+    },
+    getBlockTimeStampLast: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getBlockTimeStampLast">
+    ): Promise<
+      TokenPairTypes.SignExecuteMethodResult<"getBlockTimeStampLast">
+    > => {
+      return signExecuteMethod(
+        TokenPair,
+        this,
+        "getBlockTimeStampLast",
+        params
+      );
+    },
+    getPrice0CumulativeLast: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getPrice0CumulativeLast">
+    ): Promise<
+      TokenPairTypes.SignExecuteMethodResult<"getPrice0CumulativeLast">
+    > => {
+      return signExecuteMethod(
+        TokenPair,
+        this,
+        "getPrice0CumulativeLast",
+        params
+      );
+    },
+    getPrice1CumulativeLast: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getPrice1CumulativeLast">
+    ): Promise<
+      TokenPairTypes.SignExecuteMethodResult<"getPrice1CumulativeLast">
+    > => {
+      return signExecuteMethod(
+        TokenPair,
+        this,
+        "getPrice1CumulativeLast",
+        params
       );
     },
   };

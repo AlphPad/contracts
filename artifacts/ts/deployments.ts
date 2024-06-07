@@ -23,12 +23,12 @@ import {
   TokenPairInstance,
   DummyToken,
   DummyTokenInstance,
-  BurnALPH,
-  BurnALPHInstance,
   SaleFlatPriceAlphV2,
   SaleFlatPriceAlphV2Instance,
   SaleManagerV2,
   SaleManagerV2Instance,
+  BurnALPH,
+  BurnALPHInstance,
 } from ".";
 import { default as mainnetDeployments } from "../.deployments.mainnet.json";
 import { default as testnetDeployments } from "../.deployments.testnet.json";
@@ -46,9 +46,9 @@ export type Deployments = {
     SaleManager: DeployContractExecutionResult<SaleManagerInstance>;
     TokenPair?: DeployContractExecutionResult<TokenPairInstance>;
     DummyToken?: DeployContractExecutionResult<DummyTokenInstance>;
-    BurnALPH?: DeployContractExecutionResult<BurnALPHInstance>;
     SaleFlatPriceAlphV2?: DeployContractExecutionResult<SaleFlatPriceAlphV2Instance>;
     SaleManagerV2?: DeployContractExecutionResult<SaleManagerV2Instance>;
+    BurnALPH?: DeployContractExecutionResult<BurnALPHInstance>;
   };
   scripts: { StakingStakeTX: RunScriptResult };
 };
@@ -115,15 +115,6 @@ function toDeployments(json: any): Deployments {
               json.contracts["DummyToken"].contractInstance.address
             ),
           },
-    BurnALPH:
-      json.contracts["BurnALPH"] === undefined
-        ? undefined
-        : {
-            ...json.contracts["BurnALPH"],
-            contractInstance: BurnALPH.at(
-              json.contracts["BurnALPH"].contractInstance.address
-            ),
-          },
     SaleFlatPriceAlphV2:
       json.contracts["SaleFlatPriceAlphV2"] === undefined
         ? undefined
@@ -140,6 +131,15 @@ function toDeployments(json: any): Deployments {
             ...json.contracts["SaleManagerV2"],
             contractInstance: SaleManagerV2.at(
               json.contracts["SaleManagerV2"].contractInstance.address
+            ),
+          },
+    BurnALPH:
+      json.contracts["BurnALPH"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["BurnALPH"],
+            contractInstance: BurnALPH.at(
+              json.contracts["BurnALPH"].contractInstance.address
             ),
           },
   };
@@ -165,7 +165,7 @@ export function loadDeployments(
   if (deployments === undefined) {
     throw Error("The contract has not been deployed to the " + networkId);
   }
-  const allDeployments = Array.isArray(deployments)
+  const allDeployments: any[] = Array.isArray(deployments)
     ? deployments
     : [deployments];
   if (deployerAddress === undefined) {
