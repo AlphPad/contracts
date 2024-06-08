@@ -1,0 +1,213 @@
+// SaleManager Contract
+// This contract is responsible for managing sales within a decentralized platform.
+// It interacts with a reward distributor, a DEX pool, and handles listing fees.
+Contract SaleManagerV2 (
+    rewardDistributor: RewardDistributor,   // Reference to RewardDistributor contract.
+    pair: DexPoolInterface,                 // DEX pool interface for ALPH/USDT pair.
+    alphTokenId: ByteVec,                   // Token ID for ALPH tokens.
+    usdtTokenId: ByteVec,                   // Token ID for USDT tokens.
+    listingFeeAmount: U256,                 // Required amount for listing a sale in USDT(100$).
+    upgradeDelay: U256,                     // The delay period required between initiating and applying an upgrade.
+    saleFlatPriceAlphTemplateId: ByteVec,   // Template ID used for creating the sale flat price contract.
+    accountTemplateId: ByteVec,             // Template ID for the account managing the sale.
+    mut saleCounter: U256,                  // Sale Counter keeps track of the number of sales it has initialized.
+    mut owner: Address,                     // Current owner's address of the contract.
+    mut newOwner: Address,                  // Address of the new owner, set during ownership transfer process.
+    mut upgradeCommenced: U256,             // Timestamp marking the start of an upgrade process.
+    mut newCode: ByteVec,                   // New contract code to be migrated to.
+    mut newImmFieldsEncoded: ByteVec,       // Encoded immutable fields for the new contract.
+    mut newMutFieldsEncoded: ByteVec        // Encoded mutable fields for the new contract.
+) extends Upgradable(upgradeDelay, owner, newOwner, upgradeCommenced, newCode, newImmFieldsEncoded, newMutFieldsEncoded) {
+    // Event declarations for tracking contract activities
+    event CreateSaleFlatPriceAlph(account: Address, saleIndex: U256, contractId: ByteVec)
+
+    // Error codes for contract operations
+    enum ErrorCodes {
+        ListingFeeMustBePaid = 501
+        PriceLargerThanMax = 502
+        PriceSmallerThanMin = 503
+        RaiseLargerThanMax = 504
+        RaiseSmallerThanMin = 505
+        SaleStartMustBeInFuture = 506
+        SaleEndMustBeAfterSaleStart = 507
+        SaleAmountSmallerThanMin = 508
+        SaleAmountLargerThanMax = 509
+        WLSaleStartMustBeSaleStart = 510
+        WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart = 511
+        WLSaleMaxBidLargerThanMinRaise = 512
+        WLSaleMaxBidSmallerThan1Alph = 513
+        WLSaleInvalidMerkleRootSize = 514
+        WLSaleMerkleRootMustNotBeZeroes = 515
+        IncorrectPairSetup = 516
+        CliffEndOutOfRange = 517
+        UpfrontReleaseOutOfRange= 518
+        VestingEndOutOfRange = 519
+        PublicSaleMaxBidMinimum = 520
+    }
+
+    // Function to create a flat price sale.
+    // Validates input parameters and creates a new sale.
+    @using(preapprovedAssets = true, assetsInContract = false, checkExternalCaller = false, updateFields = true)
+    pub fn createSaleFlatPriceAlph(
+        amountAlph: U256,                   // The amount of ALPH tokens used as the listing fee.
+        tokenPrice: U256,                   // The price per token in the sale.
+        publicSaleMaxBid: U256,             // The maximum bid per address on public sale
+        upfrontRelease: U256,               // Upfront release of tokens in basis points
+        vestingEnd: U256,                   // Vesting end time for linear vesting
+        cliffEnd: U256,                     // Cliff end time for linear vesting
+        saleStart: U256,                    // The start time of the sale as a UNIX timestamp.
+        saleEnd: U256,                      // The end time of the sale as a UNIX timestamp.
+        minRaise: U256,                     // Minimum amount of funds to be raised for the sale to be successful.
+        maxRaise: U256,                     // Maximum amount of funds that can be raised in the sale.
+        saleTokenId: ByteVec,               // The token ID of the tokens being sold.
+        saleTokenTotalAmount: U256,         // Total amount of sale tokens available in the sale.
+        isWLSale: Bool,                     // Flag to indicate if this is a whitelist sale.
+        whitelistSaleStart: U256,           // Start time of the whitelist sale as a UNIX timestamp.
+        whitelistSaleEnd: U256,             // End time of the whitelist sale as a UNIX timestamp.
+        whitelistBuyerMaxBid: U256,         // Maximum bid amount for a whitelist buyer.
+        merkleRoot: ByteVec                 // Merkle root used for whitelist verification.
+    ) -> () {
+        let caller = callerAddress!()
+        
+        assertListingFeePaid(amountAlph)
+        assertPriceInRange(tokenPrice)
+        assertSaleDates(saleStart, saleEnd)
+        assertAlphAmountInRange(minRaise)
+        assertAlphAmountInRange(maxRaise)
+        assertSaleAmountInRange(saleTokenTotalAmount)
+        assert!(cliffEnd >= saleEnd && cliffEnd <= vestingEnd, ErrorCodes.CliffEndOutOfRange)
+        assert!(upfrontRelease >= 0 && upfrontRelease <= 10000, ErrorCodes.UpfrontReleaseOutOfRange)
+        assert!(vestingEnd >= saleEnd && vestingEnd >= cliffEnd, ErrorCodes.VestingEndOutOfRange)
+        assert!(publicSaleMaxBid >= 1, ErrorCodes.PublicSaleMaxBidMinimum)
+
+        if(isWLSale) {
+            assert!(whitelistSaleStart == saleStart, ErrorCodes.WLSaleStartMustBeSaleStart) // WL Sale Start must always be at sale start date
+            assert!(whitelistSaleEnd > whitelistSaleStart && whitelistSaleEnd <= saleEnd, ErrorCodes.WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart) // WL Sale End may end before the sale (allowing an open sale to take place at the end) but must start after WL Sale Start
+            assert!(whitelistBuyerMaxBid <= minRaise, ErrorCodes.WLSaleMaxBidLargerThanMinRaise) // Max bid larger then min raise doesn't make sense
+            assert!(whitelistBuyerMaxBid >= 1 alph, ErrorCodes.WLSaleMaxBidSmallerThan1Alph) // Min bid for safety in calculations, 1 ALPH
+            assert!(size!(merkleRoot) == 32, ErrorCodes.WLSaleInvalidMerkleRootSize) // If the size of merkleRoot is not 32 it's not a valid merkleRoot
+            assert!(u256From32Byte!(merkleRoot) != 0, ErrorCodes.WLSaleMerkleRootMustNotBeZeroes) // Do not allow all zero root
+        }
+        
+        rewardDistributor.addRewards{caller -> ALPH: amountAlph}(caller, amountAlph)
+
+        let (encodedImmFields, encodedMutFields) = SaleFlatPriceAlphV2.encodeFields!(
+            rewardDistributor,
+            caller,
+            accountTemplateId,
+            tokenPrice,
+            minRaise,
+            maxRaise,
+            saleTokenId,
+            saleTokenTotalAmount,
+            alphTokenId,
+            saleStart,
+            saleEnd,
+            whitelistSaleStart,
+            whitelistSaleEnd,
+            whitelistBuyerMaxBid,
+            0,
+            0,
+            merkleRoot,
+            publicSaleMaxBid,
+            0,  
+            upfrontRelease, 
+            vestingEnd,          
+            cliffEnd
+        )
+        
+        let contractId = copyCreateSubContract!{caller -> ALPH: 1 alph, saleTokenId: saleTokenTotalAmount}(
+            toByteVec!(saleCounter),
+            saleFlatPriceAlphTemplateId,
+            encodedImmFields,
+            encodedMutFields
+        )
+
+        emit CreateSaleFlatPriceAlph(caller, saleCounter, contractId)
+        saleCounter = saleCounter + 1
+    }
+
+    // Note on: "Beware of Oracle manipulation: Don't use spot price from an AMM as an oracle."
+    // While that applies here, the cost & complexity of maintaining a TWAP Oracle for a small(100$) fixed listing fee seems impractical
+    @using(checkExternalCaller = false)
+    pub fn calculateListingFee() -> U256 {
+        let (reserve0, reserve1) = pair.getReserves()
+        let (token0, token1) = pair.getTokenPair()
+        assert!((token0 == alphTokenId && token1 == usdtTokenId) || (token1 == alphTokenId && token0 == usdtTokenId), ErrorCodes.IncorrectPairSetup)
+        let product = reserve0 * reserve1
+        if (token0 == alphTokenId) {
+            return reserve0 - (product / ( reserve1 + listingFeeAmount ))
+        } else {
+            return reserve1 - (product / ( reserve0 + listingFeeAmount ))
+        }
+    }
+
+    fn assertPriceInRange(tokenPrice: U256) -> () {
+        assert!(tokenPrice <= 1 * (10**32), ErrorCodes.PriceLargerThanMax) // price can't be bigger than 32 digits to avoid overflows on multiplication
+        assert!(tokenPrice >= 1, ErrorCodes.PriceSmallerThanMin) // price must be bigger than 0 to avoid dividing with 0
+    }
+    
+    fn assertAlphAmountInRange(alphAmount: U256) -> () {
+        assert!(alphAmount <= 10 * 1e6 * (10**18), ErrorCodes.RaiseLargerThanMax) // 10 million alph maximum raise for safety, with 18 decimal places
+        assert!(alphAmount >= 100 * (10**18), ErrorCodes.RaiseSmallerThanMin) // 10 ALPH minimum raise for safety, with 18 decimal places
+    }  
+
+    fn assertSaleAmountInRange(saleAmount: U256) -> () {
+        assert!(saleAmount >= 1 , ErrorCodes.SaleAmountSmallerThanMin) // Number must be 1 or larger
+        assert!(saleAmount <= 1 * (10**36), ErrorCodes.SaleAmountLargerThanMax) // Number with less than 36 digits
+    }  
+
+    fn assertSaleDates(saleStart: U256, saleEnd: U256) -> () {
+        assert!(blockTimeStamp!() < saleStart, ErrorCodes.SaleStartMustBeInFuture) // Must be a future date
+        assert!(saleStart < saleEnd, ErrorCodes.SaleEndMustBeAfterSaleStart) // End must be after start
+    }  
+    
+    fn assertListingFeePaid(amountAlph: U256) -> () {
+        let listingFee = calculateListingFee()
+        let slippage = listingFeeAmount / 50  // Allow a 2% slippage
+        assert!((amountAlph >= listingFee - slippage) && (amountAlph <= listingFee + slippage), ErrorCodes.ListingFeeMustBePaid) // Listing fee must be paid
+    } 
+}
+
+
+// Transaction script to create Flat Price Sale.
+TxScript SaleManagerCreateSaleFlatPriceTXV2(
+    saleManager: SaleManagerV2,
+    amountAlph: U256,                   
+    tokenPrice: U256,                  
+    publicSaleMaxBid: U256,  
+    upfrontRelease: U256,               
+    vestingEnd: U256,                   
+    cliffEnd: U256,                  
+    saleStart: U256,                    
+    saleEnd: U256,                     
+    minRaise: U256,                   
+    maxRaise: U256,               
+    saleTokenId: ByteVec,               
+    saleTokenTotalAmount: U256,      
+    isWLSale: Bool,           
+    whitelistSaleStart: U256,           
+    whitelistSaleEnd: U256,             
+    whitelistBuyerMaxBid: U256,         
+    merkleRoot: ByteVec                 
+) {
+    saleManager.createSaleFlatPriceAlph{callerAddress!() -> ALPH: 1 alph + amountAlph, saleTokenId: saleTokenTotalAmount}(
+        amountAlph,                   
+        tokenPrice,   
+        publicSaleMaxBid,  
+        upfrontRelease,               
+        vestingEnd,                   
+        cliffEnd,                              
+        saleStart,                    
+        saleEnd,                     
+        minRaise,                   
+        maxRaise,                     
+        saleTokenId,               
+        saleTokenTotalAmount,      
+        isWLSale,           
+        whitelistSaleStart,           
+        whitelistSaleEnd,             
+        whitelistBuyerMaxBid,         
+        merkleRoot     
+    )
+}

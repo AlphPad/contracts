@@ -1,7 +1,7 @@
 {
-  "fullNodeVersion": "v2.12.0",
+  "fullNodeVersion": "v3.0.1",
   "compilerOptionsUsed": {
-    "ignoreUnusedConstantsWarnings": true,
+    "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
     "ignoreUnusedFieldsWarnings": false,
     "ignoreUnusedPrivateFunctionsWarnings": false,
@@ -74,7 +74,7 @@
     },
     "IFungibleToken": {
       "sourceFile": "../node_modules/@alephium/web3/std/fungible_token_interface.ral",
-      "sourceCodeHash": "6809cb06fb20fa7edf529461998beeebd12b1636d439612cca2f84214dbf4a20",
+      "sourceCodeHash": "62910bf11e1eeb6cb2fd468626ff606a9b06306b2b81590c3b10f6deb5966bde",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -205,9 +205,23 @@
       "codeHashDebug": "",
       "warnings": []
     },
+    "SaleFlatPriceAlphBuyTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
     "SaleFlatPriceAlphClaimRefundTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphClaimRefundTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -219,9 +233,37 @@
       "codeHashDebug": "",
       "warnings": []
     },
+    "SaleFlatPriceAlphClaimTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphSetCliffEndTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
     "SaleFlatPriceAlphSetMerkleRootTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphSetMerkleRootTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphSetPublicSaleMaxBidTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -233,9 +275,51 @@
       "codeHashDebug": "",
       "warnings": []
     },
+    "SaleFlatPriceAlphSetSaleDatesTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphSetUpfrontReleaseTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphSetVestingEndTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
     "SaleFlatPriceAlphSetWLMaxBidTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphSetWLMaxBidTXV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleFlatPriceAlphV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
+      "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "435b5baddda909c3cda88982ee8d90d3f86313a5dddb1c28f9ce72b655df82ad",
+      "warnings": []
+    },
+    "SaleFlatPriceV2": {
+      "sourceFile": "launch_sale_v2/sale_flat_price_v2.ral",
+      "sourceCodeHash": "999864fff92b16fd8b93735fe603ba0d7d2c2d0b0e52e3f0f06d860d2b2f6d12",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -252,6 +336,20 @@
       "sourceCodeHash": "c5b1cec3ac4143238e31c8814393b8791b2a96f8a524466480e8e461c36b2493",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleManagerCreateSaleFlatPriceTXV2": {
+      "sourceFile": "launch_sale_v2/sale_manager_v2.ral",
+      "sourceCodeHash": "d8d63707f525132b5bbb8961638811baf0718d15a4a3ddcb40c16f6f17db7266",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "SaleManagerV2": {
+      "sourceFile": "launch_sale_v2/sale_manager_v2.ral",
+      "sourceCodeHash": "d8d63707f525132b5bbb8961638811baf0718d15a4a3ddcb40c16f6f17db7266",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "c77019c37fac837d133a28ee517ff6f60eb31d2a79ab2fcaa43189a13c9d5bf7",
       "warnings": []
     },
     "Staking": {

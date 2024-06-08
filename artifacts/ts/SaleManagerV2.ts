@@ -31,13 +31,12 @@ import {
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
-import { default as SaleManagerContractJson } from "../launch_sale/SaleManager.ral.json";
+import { default as SaleManagerV2ContractJson } from "../launch_sale_v2/SaleManagerV2.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
-export namespace SaleManagerTypes {
+export namespace SaleManagerV2Types {
   export type Fields = {
-    burnAlphContract: HexString;
     rewardDistributor: HexString;
     pair: HexString;
     alphTokenId: HexString;
@@ -156,6 +155,10 @@ export namespace SaleManagerTypes {
       params: CallContractParams<{
         amountAlph: bigint;
         tokenPrice: bigint;
+        publicSaleMaxBid: bigint;
+        upfrontRelease: bigint;
+        vestingEnd: bigint;
+        cliffEnd: bigint;
         saleStart: bigint;
         saleEnd: bigint;
         minRaise: bigint;
@@ -253,6 +256,10 @@ export namespace SaleManagerTypes {
       params: SignExecuteContractMethodParams<{
         amountAlph: bigint;
         tokenPrice: bigint;
+        publicSaleMaxBid: bigint;
+        upfrontRelease: bigint;
+        vestingEnd: bigint;
+        cliffEnd: bigint;
         saleStart: bigint;
         saleEnd: bigint;
         minRaise: bigint;
@@ -279,10 +286,10 @@ export namespace SaleManagerTypes {
 }
 
 class Factory extends ContractFactory<
-  SaleManagerInstance,
-  SaleManagerTypes.Fields
+  SaleManagerV2Instance,
+  SaleManagerV2Types.Fields
 > {
-  encodeFields(fields: SaleManagerTypes.Fields) {
+  encodeFields(fields: SaleManagerV2Types.Fields) {
     return encodeContractFields(
       addStdIdToFields(this.contract, fields),
       this.contract.fieldsSig,
@@ -291,7 +298,7 @@ class Factory extends ContractFactory<
   }
 
   getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as SaleManagerTypes.Fields;
+    return this.contract.getInitialFieldsWithDefaultValues() as SaleManagerV2Types.Fields;
   }
 
   eventIndex = {
@@ -330,17 +337,21 @@ class Factory extends ContractFactory<
       WLSaleInvalidMerkleRootSize: BigInt(514),
       WLSaleMerkleRootMustNotBeZeroes: BigInt(515),
       IncorrectPairSetup: BigInt(516),
+      CliffEndOutOfRange: BigInt(517),
+      UpfrontReleaseOutOfRange: BigInt(518),
+      VestingEndOutOfRange: BigInt(519),
+      PublicSaleMaxBidMinimum: BigInt(520),
     },
   };
 
-  at(address: string): SaleManagerInstance {
-    return new SaleManagerInstance(address);
+  at(address: string): SaleManagerV2Instance {
+    return new SaleManagerV2Instance(address);
   }
 
   tests = {
     changeOwner: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         { changeOwner: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -348,7 +359,7 @@ class Factory extends ContractFactory<
     },
     migrate: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         { changeCode: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -356,7 +367,7 @@ class Factory extends ContractFactory<
     },
     migrateWithFields: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         {
           changeCode: HexString;
           changeImmFieldsEncoded: HexString;
@@ -373,7 +384,7 @@ class Factory extends ContractFactory<
     },
     changeOwnerApply: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -386,7 +397,7 @@ class Factory extends ContractFactory<
     },
     migrateApply: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -394,7 +405,7 @@ class Factory extends ContractFactory<
     },
     migrateWithFieldsApply: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -407,7 +418,7 @@ class Factory extends ContractFactory<
     },
     resetUpgrade: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -415,7 +426,7 @@ class Factory extends ContractFactory<
     },
     getUpgradeDelay: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -423,7 +434,7 @@ class Factory extends ContractFactory<
     },
     getOwner: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
@@ -431,7 +442,7 @@ class Factory extends ContractFactory<
     },
     getNewOwner: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
@@ -439,7 +450,7 @@ class Factory extends ContractFactory<
     },
     getUpgradeCommenced: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -452,7 +463,7 @@ class Factory extends ContractFactory<
     },
     getNewCode: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -460,7 +471,7 @@ class Factory extends ContractFactory<
     },
     getNewImmFieldsEncoded: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -473,7 +484,7 @@ class Factory extends ContractFactory<
     },
     getNewMutFieldsEncoded: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -486,7 +497,7 @@ class Factory extends ContractFactory<
     },
     resetFields: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -494,7 +505,7 @@ class Factory extends ContractFactory<
     },
     assertOnlyOwner: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         { caller: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -502,7 +513,7 @@ class Factory extends ContractFactory<
     },
     assertUpgradeNotPending: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -515,7 +526,7 @@ class Factory extends ContractFactory<
     },
     assertUpgradeDelayElapsed: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -528,10 +539,14 @@ class Factory extends ContractFactory<
     },
     createSaleFlatPriceAlph: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         {
           amountAlph: bigint;
           tokenPrice: bigint;
+          publicSaleMaxBid: bigint;
+          upfrontRelease: bigint;
+          vestingEnd: bigint;
+          cliffEnd: bigint;
           saleStart: bigint;
           saleEnd: bigint;
           minRaise: bigint;
@@ -555,7 +570,7 @@ class Factory extends ContractFactory<
     },
     calculateListingFee: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleManagerTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleManagerV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -568,7 +583,7 @@ class Factory extends ContractFactory<
     },
     assertPriceInRange: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         { tokenPrice: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -581,7 +596,7 @@ class Factory extends ContractFactory<
     },
     assertAlphAmountInRange: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         { alphAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -594,7 +609,7 @@ class Factory extends ContractFactory<
     },
     assertSaleAmountInRange: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         { saleAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -607,7 +622,7 @@ class Factory extends ContractFactory<
     },
     assertSaleDates: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         { saleStart: bigint; saleEnd: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -615,7 +630,7 @@ class Factory extends ContractFactory<
     },
     assertListingFeePaid: async (
       params: TestContractParamsWithoutMaps<
-        SaleManagerTypes.Fields,
+        SaleManagerV2Types.Fields,
         { amountAlph: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -630,23 +645,23 @@ class Factory extends ContractFactory<
 }
 
 // Use this object to test and deploy the contract
-export const SaleManager = new Factory(
+export const SaleManagerV2 = new Factory(
   Contract.fromJson(
-    SaleManagerContractJson,
+    SaleManagerV2ContractJson,
     "",
-    "d6347b9ef1f6c73af3138b01ebba2990f078316aaa7f135be763c3bdd3851888",
+    "c77019c37fac837d133a28ee517ff6f60eb31d2a79ab2fcaa43189a13c9d5bf7",
     []
   )
 );
 
 // Use this class to interact with the blockchain
-export class SaleManagerInstance extends ContractInstance {
+export class SaleManagerV2Instance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
 
-  async fetchState(): Promise<SaleManagerTypes.State> {
-    return fetchContractState(SaleManager, this);
+  async fetchState(): Promise<SaleManagerV2Types.State> {
+    return fetchContractState(SaleManagerV2, this);
   }
 
   async getContractEventsCurrentCount(): Promise<number> {
@@ -654,11 +669,11 @@ export class SaleManagerInstance extends ContractInstance {
   }
 
   subscribeChangeOwnerCommenceEvent(
-    options: EventSubscribeOptions<SaleManagerTypes.ChangeOwnerCommenceEvent>,
+    options: EventSubscribeOptions<SaleManagerV2Types.ChangeOwnerCommenceEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleManager.contract,
+      SaleManagerV2.contract,
       this,
       options,
       "ChangeOwnerCommence",
@@ -667,11 +682,11 @@ export class SaleManagerInstance extends ContractInstance {
   }
 
   subscribeChangeOwnerApplyEvent(
-    options: EventSubscribeOptions<SaleManagerTypes.ChangeOwnerApplyEvent>,
+    options: EventSubscribeOptions<SaleManagerV2Types.ChangeOwnerApplyEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleManager.contract,
+      SaleManagerV2.contract,
       this,
       options,
       "ChangeOwnerApply",
@@ -680,11 +695,11 @@ export class SaleManagerInstance extends ContractInstance {
   }
 
   subscribeMigrateCommenceEvent(
-    options: EventSubscribeOptions<SaleManagerTypes.MigrateCommenceEvent>,
+    options: EventSubscribeOptions<SaleManagerV2Types.MigrateCommenceEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleManager.contract,
+      SaleManagerV2.contract,
       this,
       options,
       "MigrateCommence",
@@ -693,11 +708,11 @@ export class SaleManagerInstance extends ContractInstance {
   }
 
   subscribeMigrateApplyEvent(
-    options: EventSubscribeOptions<SaleManagerTypes.MigrateApplyEvent>,
+    options: EventSubscribeOptions<SaleManagerV2Types.MigrateApplyEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleManager.contract,
+      SaleManagerV2.contract,
       this,
       options,
       "MigrateApply",
@@ -706,11 +721,11 @@ export class SaleManagerInstance extends ContractInstance {
   }
 
   subscribeMigrateWithFieldsCommenceEvent(
-    options: EventSubscribeOptions<SaleManagerTypes.MigrateWithFieldsCommenceEvent>,
+    options: EventSubscribeOptions<SaleManagerV2Types.MigrateWithFieldsCommenceEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleManager.contract,
+      SaleManagerV2.contract,
       this,
       options,
       "MigrateWithFieldsCommence",
@@ -719,11 +734,11 @@ export class SaleManagerInstance extends ContractInstance {
   }
 
   subscribeMigrateWithFieldsApplyEvent(
-    options: EventSubscribeOptions<SaleManagerTypes.MigrateWithFieldsApplyEvent>,
+    options: EventSubscribeOptions<SaleManagerV2Types.MigrateWithFieldsApplyEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleManager.contract,
+      SaleManagerV2.contract,
       this,
       options,
       "MigrateWithFieldsApply",
@@ -732,11 +747,11 @@ export class SaleManagerInstance extends ContractInstance {
   }
 
   subscribeCreateSaleFlatPriceAlphEvent(
-    options: EventSubscribeOptions<SaleManagerTypes.CreateSaleFlatPriceAlphEvent>,
+    options: EventSubscribeOptions<SaleManagerV2Types.CreateSaleFlatPriceAlphEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleManager.contract,
+      SaleManagerV2.contract,
       this,
       options,
       "CreateSaleFlatPriceAlph",
@@ -746,18 +761,18 @@ export class SaleManagerInstance extends ContractInstance {
 
   subscribeAllEvents(
     options: EventSubscribeOptions<
-      | SaleManagerTypes.ChangeOwnerCommenceEvent
-      | SaleManagerTypes.ChangeOwnerApplyEvent
-      | SaleManagerTypes.MigrateCommenceEvent
-      | SaleManagerTypes.MigrateApplyEvent
-      | SaleManagerTypes.MigrateWithFieldsCommenceEvent
-      | SaleManagerTypes.MigrateWithFieldsApplyEvent
-      | SaleManagerTypes.CreateSaleFlatPriceAlphEvent
+      | SaleManagerV2Types.ChangeOwnerCommenceEvent
+      | SaleManagerV2Types.ChangeOwnerApplyEvent
+      | SaleManagerV2Types.MigrateCommenceEvent
+      | SaleManagerV2Types.MigrateApplyEvent
+      | SaleManagerV2Types.MigrateWithFieldsCommenceEvent
+      | SaleManagerV2Types.MigrateWithFieldsApplyEvent
+      | SaleManagerV2Types.CreateSaleFlatPriceAlphEvent
     >,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvents(
-      SaleManager.contract,
+      SaleManagerV2.contract,
       this,
       options,
       fromCount
@@ -766,10 +781,10 @@ export class SaleManagerInstance extends ContractInstance {
 
   methods = {
     changeOwner: async (
-      params: SaleManagerTypes.CallMethodParams<"changeOwner">
-    ): Promise<SaleManagerTypes.CallMethodResult<"changeOwner">> => {
+      params: SaleManagerV2Types.CallMethodParams<"changeOwner">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"changeOwner">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "changeOwner",
         params,
@@ -777,10 +792,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     migrate: async (
-      params: SaleManagerTypes.CallMethodParams<"migrate">
-    ): Promise<SaleManagerTypes.CallMethodResult<"migrate">> => {
+      params: SaleManagerV2Types.CallMethodParams<"migrate">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"migrate">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "migrate",
         params,
@@ -788,10 +803,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     migrateWithFields: async (
-      params: SaleManagerTypes.CallMethodParams<"migrateWithFields">
-    ): Promise<SaleManagerTypes.CallMethodResult<"migrateWithFields">> => {
+      params: SaleManagerV2Types.CallMethodParams<"migrateWithFields">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"migrateWithFields">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "migrateWithFields",
         params,
@@ -799,10 +814,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     changeOwnerApply: async (
-      params?: SaleManagerTypes.CallMethodParams<"changeOwnerApply">
-    ): Promise<SaleManagerTypes.CallMethodResult<"changeOwnerApply">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"changeOwnerApply">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"changeOwnerApply">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "changeOwnerApply",
         params === undefined ? {} : params,
@@ -810,10 +825,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     migrateApply: async (
-      params?: SaleManagerTypes.CallMethodParams<"migrateApply">
-    ): Promise<SaleManagerTypes.CallMethodResult<"migrateApply">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"migrateApply">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"migrateApply">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "migrateApply",
         params === undefined ? {} : params,
@@ -821,10 +836,12 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     migrateWithFieldsApply: async (
-      params?: SaleManagerTypes.CallMethodParams<"migrateWithFieldsApply">
-    ): Promise<SaleManagerTypes.CallMethodResult<"migrateWithFieldsApply">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"migrateWithFieldsApply">
+    ): Promise<
+      SaleManagerV2Types.CallMethodResult<"migrateWithFieldsApply">
+    > => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "migrateWithFieldsApply",
         params === undefined ? {} : params,
@@ -832,10 +849,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     resetUpgrade: async (
-      params?: SaleManagerTypes.CallMethodParams<"resetUpgrade">
-    ): Promise<SaleManagerTypes.CallMethodResult<"resetUpgrade">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"resetUpgrade">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"resetUpgrade">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "resetUpgrade",
         params === undefined ? {} : params,
@@ -843,10 +860,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     getUpgradeDelay: async (
-      params?: SaleManagerTypes.CallMethodParams<"getUpgradeDelay">
-    ): Promise<SaleManagerTypes.CallMethodResult<"getUpgradeDelay">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"getUpgradeDelay">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"getUpgradeDelay">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getUpgradeDelay",
         params === undefined ? {} : params,
@@ -854,10 +871,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     getOwner: async (
-      params?: SaleManagerTypes.CallMethodParams<"getOwner">
-    ): Promise<SaleManagerTypes.CallMethodResult<"getOwner">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"getOwner">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"getOwner">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getOwner",
         params === undefined ? {} : params,
@@ -865,10 +882,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     getNewOwner: async (
-      params?: SaleManagerTypes.CallMethodParams<"getNewOwner">
-    ): Promise<SaleManagerTypes.CallMethodResult<"getNewOwner">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"getNewOwner">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"getNewOwner">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getNewOwner",
         params === undefined ? {} : params,
@@ -876,10 +893,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     getUpgradeCommenced: async (
-      params?: SaleManagerTypes.CallMethodParams<"getUpgradeCommenced">
-    ): Promise<SaleManagerTypes.CallMethodResult<"getUpgradeCommenced">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"getUpgradeCommenced">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"getUpgradeCommenced">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getUpgradeCommenced",
         params === undefined ? {} : params,
@@ -887,10 +904,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     getNewCode: async (
-      params?: SaleManagerTypes.CallMethodParams<"getNewCode">
-    ): Promise<SaleManagerTypes.CallMethodResult<"getNewCode">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"getNewCode">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"getNewCode">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getNewCode",
         params === undefined ? {} : params,
@@ -898,10 +915,12 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     getNewImmFieldsEncoded: async (
-      params?: SaleManagerTypes.CallMethodParams<"getNewImmFieldsEncoded">
-    ): Promise<SaleManagerTypes.CallMethodResult<"getNewImmFieldsEncoded">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"getNewImmFieldsEncoded">
+    ): Promise<
+      SaleManagerV2Types.CallMethodResult<"getNewImmFieldsEncoded">
+    > => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getNewImmFieldsEncoded",
         params === undefined ? {} : params,
@@ -909,10 +928,12 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     getNewMutFieldsEncoded: async (
-      params?: SaleManagerTypes.CallMethodParams<"getNewMutFieldsEncoded">
-    ): Promise<SaleManagerTypes.CallMethodResult<"getNewMutFieldsEncoded">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"getNewMutFieldsEncoded">
+    ): Promise<
+      SaleManagerV2Types.CallMethodResult<"getNewMutFieldsEncoded">
+    > => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getNewMutFieldsEncoded",
         params === undefined ? {} : params,
@@ -920,12 +941,12 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     createSaleFlatPriceAlph: async (
-      params: SaleManagerTypes.CallMethodParams<"createSaleFlatPriceAlph">
+      params: SaleManagerV2Types.CallMethodParams<"createSaleFlatPriceAlph">
     ): Promise<
-      SaleManagerTypes.CallMethodResult<"createSaleFlatPriceAlph">
+      SaleManagerV2Types.CallMethodResult<"createSaleFlatPriceAlph">
     > => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "createSaleFlatPriceAlph",
         params,
@@ -933,10 +954,10 @@ export class SaleManagerInstance extends ContractInstance {
       );
     },
     calculateListingFee: async (
-      params?: SaleManagerTypes.CallMethodParams<"calculateListingFee">
-    ): Promise<SaleManagerTypes.CallMethodResult<"calculateListingFee">> => {
+      params?: SaleManagerV2Types.CallMethodParams<"calculateListingFee">
+    ): Promise<SaleManagerV2Types.CallMethodResult<"calculateListingFee">> => {
       return callMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "calculateListingFee",
         params === undefined ? {} : params,
@@ -949,126 +970,133 @@ export class SaleManagerInstance extends ContractInstance {
 
   transact = {
     changeOwner: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"changeOwner">
-    ): Promise<SaleManagerTypes.SignExecuteMethodResult<"changeOwner">> => {
-      return signExecuteMethod(SaleManager, this, "changeOwner", params);
+      params: SaleManagerV2Types.SignExecuteMethodParams<"changeOwner">
+    ): Promise<SaleManagerV2Types.SignExecuteMethodResult<"changeOwner">> => {
+      return signExecuteMethod(SaleManagerV2, this, "changeOwner", params);
     },
     migrate: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"migrate">
-    ): Promise<SaleManagerTypes.SignExecuteMethodResult<"migrate">> => {
-      return signExecuteMethod(SaleManager, this, "migrate", params);
+      params: SaleManagerV2Types.SignExecuteMethodParams<"migrate">
+    ): Promise<SaleManagerV2Types.SignExecuteMethodResult<"migrate">> => {
+      return signExecuteMethod(SaleManagerV2, this, "migrate", params);
     },
     migrateWithFields: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"migrateWithFields">
+      params: SaleManagerV2Types.SignExecuteMethodParams<"migrateWithFields">
     ): Promise<
-      SaleManagerTypes.SignExecuteMethodResult<"migrateWithFields">
-    > => {
-      return signExecuteMethod(SaleManager, this, "migrateWithFields", params);
-    },
-    changeOwnerApply: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"changeOwnerApply">
-    ): Promise<
-      SaleManagerTypes.SignExecuteMethodResult<"changeOwnerApply">
-    > => {
-      return signExecuteMethod(SaleManager, this, "changeOwnerApply", params);
-    },
-    migrateApply: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"migrateApply">
-    ): Promise<SaleManagerTypes.SignExecuteMethodResult<"migrateApply">> => {
-      return signExecuteMethod(SaleManager, this, "migrateApply", params);
-    },
-    migrateWithFieldsApply: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"migrateWithFieldsApply">
-    ): Promise<
-      SaleManagerTypes.SignExecuteMethodResult<"migrateWithFieldsApply">
+      SaleManagerV2Types.SignExecuteMethodResult<"migrateWithFields">
     > => {
       return signExecuteMethod(
-        SaleManager,
+        SaleManagerV2,
+        this,
+        "migrateWithFields",
+        params
+      );
+    },
+    changeOwnerApply: async (
+      params: SaleManagerV2Types.SignExecuteMethodParams<"changeOwnerApply">
+    ): Promise<
+      SaleManagerV2Types.SignExecuteMethodResult<"changeOwnerApply">
+    > => {
+      return signExecuteMethod(SaleManagerV2, this, "changeOwnerApply", params);
+    },
+    migrateApply: async (
+      params: SaleManagerV2Types.SignExecuteMethodParams<"migrateApply">
+    ): Promise<SaleManagerV2Types.SignExecuteMethodResult<"migrateApply">> => {
+      return signExecuteMethod(SaleManagerV2, this, "migrateApply", params);
+    },
+    migrateWithFieldsApply: async (
+      params: SaleManagerV2Types.SignExecuteMethodParams<"migrateWithFieldsApply">
+    ): Promise<
+      SaleManagerV2Types.SignExecuteMethodResult<"migrateWithFieldsApply">
+    > => {
+      return signExecuteMethod(
+        SaleManagerV2,
         this,
         "migrateWithFieldsApply",
         params
       );
     },
     resetUpgrade: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"resetUpgrade">
-    ): Promise<SaleManagerTypes.SignExecuteMethodResult<"resetUpgrade">> => {
-      return signExecuteMethod(SaleManager, this, "resetUpgrade", params);
+      params: SaleManagerV2Types.SignExecuteMethodParams<"resetUpgrade">
+    ): Promise<SaleManagerV2Types.SignExecuteMethodResult<"resetUpgrade">> => {
+      return signExecuteMethod(SaleManagerV2, this, "resetUpgrade", params);
     },
     getUpgradeDelay: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"getUpgradeDelay">
-    ): Promise<SaleManagerTypes.SignExecuteMethodResult<"getUpgradeDelay">> => {
-      return signExecuteMethod(SaleManager, this, "getUpgradeDelay", params);
+      params: SaleManagerV2Types.SignExecuteMethodParams<"getUpgradeDelay">
+    ): Promise<
+      SaleManagerV2Types.SignExecuteMethodResult<"getUpgradeDelay">
+    > => {
+      return signExecuteMethod(SaleManagerV2, this, "getUpgradeDelay", params);
     },
     getOwner: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"getOwner">
-    ): Promise<SaleManagerTypes.SignExecuteMethodResult<"getOwner">> => {
-      return signExecuteMethod(SaleManager, this, "getOwner", params);
+      params: SaleManagerV2Types.SignExecuteMethodParams<"getOwner">
+    ): Promise<SaleManagerV2Types.SignExecuteMethodResult<"getOwner">> => {
+      return signExecuteMethod(SaleManagerV2, this, "getOwner", params);
     },
     getNewOwner: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"getNewOwner">
-    ): Promise<SaleManagerTypes.SignExecuteMethodResult<"getNewOwner">> => {
-      return signExecuteMethod(SaleManager, this, "getNewOwner", params);
+      params: SaleManagerV2Types.SignExecuteMethodParams<"getNewOwner">
+    ): Promise<SaleManagerV2Types.SignExecuteMethodResult<"getNewOwner">> => {
+      return signExecuteMethod(SaleManagerV2, this, "getNewOwner", params);
     },
     getUpgradeCommenced: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"getUpgradeCommenced">
+      params: SaleManagerV2Types.SignExecuteMethodParams<"getUpgradeCommenced">
     ): Promise<
-      SaleManagerTypes.SignExecuteMethodResult<"getUpgradeCommenced">
+      SaleManagerV2Types.SignExecuteMethodResult<"getUpgradeCommenced">
     > => {
       return signExecuteMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getUpgradeCommenced",
         params
       );
     },
     getNewCode: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"getNewCode">
-    ): Promise<SaleManagerTypes.SignExecuteMethodResult<"getNewCode">> => {
-      return signExecuteMethod(SaleManager, this, "getNewCode", params);
+      params: SaleManagerV2Types.SignExecuteMethodParams<"getNewCode">
+    ): Promise<SaleManagerV2Types.SignExecuteMethodResult<"getNewCode">> => {
+      return signExecuteMethod(SaleManagerV2, this, "getNewCode", params);
     },
     getNewImmFieldsEncoded: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"getNewImmFieldsEncoded">
+      params: SaleManagerV2Types.SignExecuteMethodParams<"getNewImmFieldsEncoded">
     ): Promise<
-      SaleManagerTypes.SignExecuteMethodResult<"getNewImmFieldsEncoded">
+      SaleManagerV2Types.SignExecuteMethodResult<"getNewImmFieldsEncoded">
     > => {
       return signExecuteMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getNewImmFieldsEncoded",
         params
       );
     },
     getNewMutFieldsEncoded: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"getNewMutFieldsEncoded">
+      params: SaleManagerV2Types.SignExecuteMethodParams<"getNewMutFieldsEncoded">
     ): Promise<
-      SaleManagerTypes.SignExecuteMethodResult<"getNewMutFieldsEncoded">
+      SaleManagerV2Types.SignExecuteMethodResult<"getNewMutFieldsEncoded">
     > => {
       return signExecuteMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "getNewMutFieldsEncoded",
         params
       );
     },
     createSaleFlatPriceAlph: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"createSaleFlatPriceAlph">
+      params: SaleManagerV2Types.SignExecuteMethodParams<"createSaleFlatPriceAlph">
     ): Promise<
-      SaleManagerTypes.SignExecuteMethodResult<"createSaleFlatPriceAlph">
+      SaleManagerV2Types.SignExecuteMethodResult<"createSaleFlatPriceAlph">
     > => {
       return signExecuteMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "createSaleFlatPriceAlph",
         params
       );
     },
     calculateListingFee: async (
-      params: SaleManagerTypes.SignExecuteMethodParams<"calculateListingFee">
+      params: SaleManagerV2Types.SignExecuteMethodParams<"calculateListingFee">
     ): Promise<
-      SaleManagerTypes.SignExecuteMethodResult<"calculateListingFee">
+      SaleManagerV2Types.SignExecuteMethodResult<"calculateListingFee">
     > => {
       return signExecuteMethod(
-        SaleManager,
+        SaleManagerV2,
         this,
         "calculateListingFee",
         params
@@ -1076,14 +1104,14 @@ export class SaleManagerInstance extends ContractInstance {
     },
   };
 
-  async multicall<Calls extends SaleManagerTypes.MultiCallParams>(
+  async multicall<Calls extends SaleManagerV2Types.MultiCallParams>(
     calls: Calls
-  ): Promise<SaleManagerTypes.MultiCallResults<Calls>> {
+  ): Promise<SaleManagerV2Types.MultiCallResults<Calls>> {
     return (await multicallMethods(
-      SaleManager,
+      SaleManagerV2,
       this,
       calls,
       getContractByCodeHash
-    )) as SaleManagerTypes.MultiCallResults<Calls>;
+    )) as SaleManagerV2Types.MultiCallResults<Calls>;
   }
 }

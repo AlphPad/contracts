@@ -25,6 +25,11 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as StakingAccountContractJson } from "../rewards/StakingAccount.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -46,6 +51,10 @@ export namespace StakingAccountTypes {
   export type State = ContractState<Fields>;
 
   export interface CallMethodTable {
+    destroy: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
     isSafeToDestroy: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<boolean>;
@@ -61,6 +70,22 @@ export namespace StakingAccountTypes {
     calcVestedClaimable: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
+    };
+    stake: {
+      params: CallContractParams<{ amount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    unstake: {
+      params: CallContractParams<{ amount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    withdraw: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    setRewardPerToken: {
+      params: CallContractParams<{ newRewardPerToken: bigint }>;
+      result: CallContractResult<null>;
     };
     getVestedTotalAmount: {
       params: Omit<CallContractParams<{}>, "args">;
@@ -103,12 +128,91 @@ export namespace StakingAccountTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+
+  export interface SignExecuteMethodTable {
+    destroy: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    isSafeToDestroy: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getParentContractAddress: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAccountHolder: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    calcVestedClaimable: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    stake: {
+      params: SignExecuteContractMethodParams<{ amount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    unstake: {
+      params: SignExecuteContractMethodParams<{ amount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    withdraw: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    setRewardPerToken: {
+      params: SignExecuteContractMethodParams<{ newRewardPerToken: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getVestedTotalAmount: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getVestedTill: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getVestedStart: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAmountStaked: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAmountUnstaked: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getBeginUnstakeAt: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getRewardPerToken: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
   StakingAccountInstance,
   StakingAccountTypes.Fields
 > {
+  encodeFields(fields: StakingAccountTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as StakingAccountTypes.Fields;
   }
@@ -136,7 +240,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "destroy", params);
+      return testMethod(this, "destroy", params, getContractByCodeHash);
     },
     isSafeToDestroy: async (
       params: Omit<
@@ -144,7 +248,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "isSafeToDestroy", params);
+      return testMethod(this, "isSafeToDestroy", params, getContractByCodeHash);
     },
     assertIsSafeToDestroy: async (
       params: Omit<
@@ -152,7 +256,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertIsSafeToDestroy", params);
+      return testMethod(
+        this,
+        "assertIsSafeToDestroy",
+        params,
+        getContractByCodeHash
+      );
     },
     assertIsParentTheCaller: async (
       params: TestContractParamsWithoutMaps<
@@ -160,7 +269,12 @@ class Factory extends ContractFactory<
         { caller: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertIsParentTheCaller", params);
+      return testMethod(
+        this,
+        "assertIsParentTheCaller",
+        params,
+        getContractByCodeHash
+      );
     },
     getParentContractAddress: async (
       params: Omit<
@@ -168,7 +282,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getParentContractAddress", params);
+      return testMethod(
+        this,
+        "getParentContractAddress",
+        params,
+        getContractByCodeHash
+      );
     },
     getAccountHolder: async (
       params: Omit<
@@ -176,7 +295,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getAccountHolder", params);
+      return testMethod(
+        this,
+        "getAccountHolder",
+        params,
+        getContractByCodeHash
+      );
     },
     calcVestedClaimable: async (
       params: Omit<
@@ -184,7 +308,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "calcVestedClaimable", params);
+      return testMethod(
+        this,
+        "calcVestedClaimable",
+        params,
+        getContractByCodeHash
+      );
     },
     stake: async (
       params: TestContractParamsWithoutMaps<
@@ -192,7 +321,7 @@ class Factory extends ContractFactory<
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "stake", params);
+      return testMethod(this, "stake", params, getContractByCodeHash);
     },
     unstake: async (
       params: TestContractParamsWithoutMaps<
@@ -200,7 +329,7 @@ class Factory extends ContractFactory<
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "unstake", params);
+      return testMethod(this, "unstake", params, getContractByCodeHash);
     },
     withdraw: async (
       params: Omit<
@@ -208,7 +337,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "withdraw", params);
+      return testMethod(this, "withdraw", params, getContractByCodeHash);
     },
     setRewardPerToken: async (
       params: TestContractParamsWithoutMaps<
@@ -216,7 +345,12 @@ class Factory extends ContractFactory<
         { newRewardPerToken: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "setRewardPerToken", params);
+      return testMethod(
+        this,
+        "setRewardPerToken",
+        params,
+        getContractByCodeHash
+      );
     },
     getVestedTotalAmount: async (
       params: Omit<
@@ -224,7 +358,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getVestedTotalAmount", params);
+      return testMethod(
+        this,
+        "getVestedTotalAmount",
+        params,
+        getContractByCodeHash
+      );
     },
     getVestedTill: async (
       params: Omit<
@@ -232,7 +371,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getVestedTill", params);
+      return testMethod(this, "getVestedTill", params, getContractByCodeHash);
     },
     getVestedStart: async (
       params: Omit<
@@ -240,7 +379,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getVestedStart", params);
+      return testMethod(this, "getVestedStart", params, getContractByCodeHash);
     },
     getAmountStaked: async (
       params: Omit<
@@ -248,7 +387,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getAmountStaked", params);
+      return testMethod(this, "getAmountStaked", params, getContractByCodeHash);
     },
     getAmountUnstaked: async (
       params: Omit<
@@ -256,7 +395,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getAmountUnstaked", params);
+      return testMethod(
+        this,
+        "getAmountUnstaked",
+        params,
+        getContractByCodeHash
+      );
     },
     getBeginUnstakeAt: async (
       params: Omit<
@@ -264,7 +408,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getBeginUnstakeAt", params);
+      return testMethod(
+        this,
+        "getBeginUnstakeAt",
+        params,
+        getContractByCodeHash
+      );
     },
     getRewardPerToken: async (
       params: Omit<
@@ -272,7 +421,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getRewardPerToken", params);
+      return testMethod(
+        this,
+        "getRewardPerToken",
+        params,
+        getContractByCodeHash
+      );
     },
   };
 }
@@ -282,7 +436,8 @@ export const StakingAccount = new Factory(
   Contract.fromJson(
     StakingAccountContractJson,
     "",
-    "ce406d4e5e0bea3d9c89cc9fad8ff9140f3eafb69162d3ba97773c1a4df48a4f"
+    "ce406d4e5e0bea3d9c89cc9fad8ff9140f3eafb69162d3ba97773c1a4df48a4f",
+    []
   )
 );
 
@@ -297,6 +452,17 @@ export class StakingAccountInstance extends ContractInstance {
   }
 
   methods = {
+    destroy: async (
+      params?: StakingAccountTypes.CallMethodParams<"destroy">
+    ): Promise<StakingAccountTypes.CallMethodResult<"destroy">> => {
+      return callMethod(
+        StakingAccount,
+        this,
+        "destroy",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
     isSafeToDestroy: async (
       params?: StakingAccountTypes.CallMethodParams<"isSafeToDestroy">
     ): Promise<StakingAccountTypes.CallMethodResult<"isSafeToDestroy">> => {
@@ -340,6 +506,50 @@ export class StakingAccountInstance extends ContractInstance {
         this,
         "calcVestedClaimable",
         params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    stake: async (
+      params: StakingAccountTypes.CallMethodParams<"stake">
+    ): Promise<StakingAccountTypes.CallMethodResult<"stake">> => {
+      return callMethod(
+        StakingAccount,
+        this,
+        "stake",
+        params,
+        getContractByCodeHash
+      );
+    },
+    unstake: async (
+      params: StakingAccountTypes.CallMethodParams<"unstake">
+    ): Promise<StakingAccountTypes.CallMethodResult<"unstake">> => {
+      return callMethod(
+        StakingAccount,
+        this,
+        "unstake",
+        params,
+        getContractByCodeHash
+      );
+    },
+    withdraw: async (
+      params?: StakingAccountTypes.CallMethodParams<"withdraw">
+    ): Promise<StakingAccountTypes.CallMethodResult<"withdraw">> => {
+      return callMethod(
+        StakingAccount,
+        this,
+        "withdraw",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    setRewardPerToken: async (
+      params: StakingAccountTypes.CallMethodParams<"setRewardPerToken">
+    ): Promise<StakingAccountTypes.CallMethodResult<"setRewardPerToken">> => {
+      return callMethod(
+        StakingAccount,
+        this,
+        "setRewardPerToken",
+        params,
         getContractByCodeHash
       );
     },
@@ -420,6 +630,155 @@ export class StakingAccountInstance extends ContractInstance {
         "getRewardPerToken",
         params === undefined ? {} : params,
         getContractByCodeHash
+      );
+    },
+  };
+
+  view = this.methods;
+
+  transact = {
+    destroy: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"destroy">
+    ): Promise<StakingAccountTypes.SignExecuteMethodResult<"destroy">> => {
+      return signExecuteMethod(StakingAccount, this, "destroy", params);
+    },
+    isSafeToDestroy: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"isSafeToDestroy">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"isSafeToDestroy">
+    > => {
+      return signExecuteMethod(StakingAccount, this, "isSafeToDestroy", params);
+    },
+    getParentContractAddress: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"getParentContractAddress">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"getParentContractAddress">
+    > => {
+      return signExecuteMethod(
+        StakingAccount,
+        this,
+        "getParentContractAddress",
+        params
+      );
+    },
+    getAccountHolder: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"getAccountHolder">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"getAccountHolder">
+    > => {
+      return signExecuteMethod(
+        StakingAccount,
+        this,
+        "getAccountHolder",
+        params
+      );
+    },
+    calcVestedClaimable: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"calcVestedClaimable">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"calcVestedClaimable">
+    > => {
+      return signExecuteMethod(
+        StakingAccount,
+        this,
+        "calcVestedClaimable",
+        params
+      );
+    },
+    stake: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"stake">
+    ): Promise<StakingAccountTypes.SignExecuteMethodResult<"stake">> => {
+      return signExecuteMethod(StakingAccount, this, "stake", params);
+    },
+    unstake: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"unstake">
+    ): Promise<StakingAccountTypes.SignExecuteMethodResult<"unstake">> => {
+      return signExecuteMethod(StakingAccount, this, "unstake", params);
+    },
+    withdraw: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"withdraw">
+    ): Promise<StakingAccountTypes.SignExecuteMethodResult<"withdraw">> => {
+      return signExecuteMethod(StakingAccount, this, "withdraw", params);
+    },
+    setRewardPerToken: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"setRewardPerToken">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"setRewardPerToken">
+    > => {
+      return signExecuteMethod(
+        StakingAccount,
+        this,
+        "setRewardPerToken",
+        params
+      );
+    },
+    getVestedTotalAmount: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"getVestedTotalAmount">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"getVestedTotalAmount">
+    > => {
+      return signExecuteMethod(
+        StakingAccount,
+        this,
+        "getVestedTotalAmount",
+        params
+      );
+    },
+    getVestedTill: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"getVestedTill">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"getVestedTill">
+    > => {
+      return signExecuteMethod(StakingAccount, this, "getVestedTill", params);
+    },
+    getVestedStart: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"getVestedStart">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"getVestedStart">
+    > => {
+      return signExecuteMethod(StakingAccount, this, "getVestedStart", params);
+    },
+    getAmountStaked: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"getAmountStaked">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"getAmountStaked">
+    > => {
+      return signExecuteMethod(StakingAccount, this, "getAmountStaked", params);
+    },
+    getAmountUnstaked: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"getAmountUnstaked">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"getAmountUnstaked">
+    > => {
+      return signExecuteMethod(
+        StakingAccount,
+        this,
+        "getAmountUnstaked",
+        params
+      );
+    },
+    getBeginUnstakeAt: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"getBeginUnstakeAt">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"getBeginUnstakeAt">
+    > => {
+      return signExecuteMethod(
+        StakingAccount,
+        this,
+        "getBeginUnstakeAt",
+        params
+      );
+    },
+    getRewardPerToken: async (
+      params: StakingAccountTypes.SignExecuteMethodParams<"getRewardPerToken">
+    ): Promise<
+      StakingAccountTypes.SignExecuteMethodResult<"getRewardPerToken">
+    > => {
+      return signExecuteMethod(
+        StakingAccount,
+        this,
+        "getRewardPerToken",
+        params
       );
     },
   };

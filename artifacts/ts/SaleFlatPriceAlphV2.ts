@@ -31,13 +31,12 @@ import {
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
-import { default as SaleFlatPriceAlphContractJson } from "../launch_sale/SaleFlatPriceAlph.ral.json";
+import { default as SaleFlatPriceAlphV2ContractJson } from "../launch_sale_v2/SaleFlatPriceAlphV2.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
-export namespace SaleFlatPriceAlphTypes {
+export namespace SaleFlatPriceAlphV2Types {
   export type Fields = {
-    burnAlphContract: HexString;
     rewardDistributor: HexString;
     saleOwner: Address;
     accountTemplateId: HexString;
@@ -55,6 +54,11 @@ export namespace SaleFlatPriceAlphTypes {
     tokensSold: bigint;
     totalRaised: bigint;
     merkleRoot: HexString;
+    publicSaleMaxBid: bigint;
+    sellerClaimed: bigint;
+    upfrontRelease: bigint;
+    vestingEnd: bigint;
+    cliffEnd: bigint;
   };
 
   export type State = ContractState<Fields>;
@@ -66,8 +70,28 @@ export namespace SaleFlatPriceAlphTypes {
   }>;
   export type UpdateWhitelistBuyerMaxBidEvent = ContractEvent<{
     caller: Address;
-    newWhitelistBuyerMaxBid: bigint;
-    oldWhitelistBuyerMaxBid: bigint;
+    newPublicSaleMaxBid: bigint;
+    oldPublicSaleMaxBid: bigint;
+  }>;
+  export type UpdatePublicSaleMaxBidEvent = ContractEvent<{
+    caller: Address;
+    newSellerClaimed: bigint;
+    oldSellerClaimed: bigint;
+  }>;
+  export type UpdateUpfrontReleaseEvent = ContractEvent<{
+    caller: Address;
+    newUpfrontRelease: bigint;
+    oldUpfrontRelease: bigint;
+  }>;
+  export type UpdateVestingEndEvent = ContractEvent<{
+    caller: Address;
+    newVestingEnd: bigint;
+    oldVestingEnd: bigint;
+  }>;
+  export type UpdateCliffEndEvent = ContractEvent<{
+    caller: Address;
+    newCliffEnd: bigint;
+    oldCliffEnd: bigint;
   }>;
   export type AccountCreateEvent = ContractEvent<{
     account: Address;
@@ -120,6 +144,10 @@ export namespace SaleFlatPriceAlphTypes {
       }>;
       result: CallContractResult<null>;
     };
+    calculateClaimableAmount: {
+      params: CallContractParams<{ buyerAccount: HexString }>;
+      result: CallContractResult<bigint>;
+    };
     calculateSaleTokensReceivedPerBidTokens: {
       params: CallContractParams<{ bidAmount: bigint }>;
       result: CallContractResult<bigint>;
@@ -133,6 +161,22 @@ export namespace SaleFlatPriceAlphTypes {
     };
     setWhitelistBuyerMaxBid: {
       params: CallContractParams<{ newWhitelistBuyerMaxBid: bigint }>;
+      result: CallContractResult<null>;
+    };
+    setPublicSaleMaxBid: {
+      params: CallContractParams<{ newPublicSaleMaxBid: bigint }>;
+      result: CallContractResult<null>;
+    };
+    setVestingEnd: {
+      params: CallContractParams<{ newVestingEnd: bigint }>;
+      result: CallContractResult<null>;
+    };
+    setUpfrontRelease: {
+      params: CallContractParams<{ newUpfrontRelease: bigint }>;
+      result: CallContractResult<null>;
+    };
+    setCliffEnd: {
+      params: CallContractParams<{ newCliffEnd: bigint }>;
       result: CallContractResult<null>;
     };
     accountExists: {
@@ -258,6 +302,10 @@ export namespace SaleFlatPriceAlphTypes {
       }>;
       result: SignExecuteScriptTxResult;
     };
+    calculateClaimableAmount: {
+      params: SignExecuteContractMethodParams<{ buyerAccount: HexString }>;
+      result: SignExecuteScriptTxResult;
+    };
     calculateSaleTokensReceivedPerBidTokens: {
       params: SignExecuteContractMethodParams<{ bidAmount: bigint }>;
       result: SignExecuteScriptTxResult;
@@ -273,6 +321,22 @@ export namespace SaleFlatPriceAlphTypes {
       params: SignExecuteContractMethodParams<{
         newWhitelistBuyerMaxBid: bigint;
       }>;
+      result: SignExecuteScriptTxResult;
+    };
+    setPublicSaleMaxBid: {
+      params: SignExecuteContractMethodParams<{ newPublicSaleMaxBid: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    setVestingEnd: {
+      params: SignExecuteContractMethodParams<{ newVestingEnd: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    setUpfrontRelease: {
+      params: SignExecuteContractMethodParams<{ newUpfrontRelease: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    setCliffEnd: {
+      params: SignExecuteContractMethodParams<{ newCliffEnd: bigint }>;
       result: SignExecuteScriptTxResult;
     };
     accountExists: {
@@ -384,10 +448,10 @@ export namespace SaleFlatPriceAlphTypes {
 }
 
 class Factory extends ContractFactory<
-  SaleFlatPriceAlphInstance,
-  SaleFlatPriceAlphTypes.Fields
+  SaleFlatPriceAlphV2Instance,
+  SaleFlatPriceAlphV2Types.Fields
 > {
-  encodeFields(fields: SaleFlatPriceAlphTypes.Fields) {
+  encodeFields(fields: SaleFlatPriceAlphV2Types.Fields) {
     return encodeContractFields(
       addStdIdToFields(this.contract, fields),
       this.contract.fieldsSig,
@@ -396,21 +460,25 @@ class Factory extends ContractFactory<
   }
 
   getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as SaleFlatPriceAlphTypes.Fields;
+    return this.contract.getInitialFieldsWithDefaultValues() as SaleFlatPriceAlphV2Types.Fields;
   }
 
   eventIndex = {
     Buy: 0,
     UpdateWhitelistBuyerMaxBid: 1,
-    AccountCreate: 2,
-    AccountDestroy: 3,
-    ClaimBuyer: 4,
-    ClaimBuyerRefund: 5,
-    ClaimSeller: 6,
-    ClaimSellerRefund: 7,
-    SaleDatesUpdate: 8,
-    WhitelistSaleDatesUpdate: 9,
-    UpdateRoot: 10,
+    UpdatePublicSaleMaxBid: 2,
+    UpdateUpfrontRelease: 3,
+    UpdateVestingEnd: 4,
+    UpdateCliffEnd: 5,
+    AccountCreate: 6,
+    AccountDestroy: 7,
+    ClaimBuyer: 8,
+    ClaimBuyerRefund: 9,
+    ClaimSeller: 10,
+    ClaimSellerRefund: 11,
+    SaleDatesUpdate: 12,
+    WhitelistSaleDatesUpdate: 13,
+    UpdateRoot: 14,
   };
   consts = {
     ErrorCodes: {
@@ -425,6 +493,11 @@ class Factory extends ContractFactory<
       SaleTokenMoreThan18Decimal: BigInt(609),
       SaleAmountSmallerThanMin: BigInt(610),
       SaleAmountLargerThanMax: BigInt(611),
+      SellerAlreadyClaimed: BigInt(612),
+      ClaimsNotStarted: BigInt(613),
+      UpfrontReleaseOutOfRange: BigInt(614),
+      VestingEndOutOfRange: BigInt(615),
+      CliffEndOutOfRange: BigInt(616),
     },
     AccountErrorCodes: {
       AccountAlreadyExists: BigInt(12001),
@@ -450,14 +523,14 @@ class Factory extends ContractFactory<
     },
   };
 
-  at(address: string): SaleFlatPriceAlphInstance {
-    return new SaleFlatPriceAlphInstance(address);
+  at(address: string): SaleFlatPriceAlphV2Instance {
+    return new SaleFlatPriceAlphV2Instance(address);
   }
 
   tests = {
     claimBuyer: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { caller: Address; amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -465,7 +538,7 @@ class Factory extends ContractFactory<
     },
     claimBuyerRefund: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { caller: Address; amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -478,7 +551,7 @@ class Factory extends ContractFactory<
     },
     claimSeller: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -486,7 +559,7 @@ class Factory extends ContractFactory<
     },
     claimSellerRefund: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -499,15 +572,36 @@ class Factory extends ContractFactory<
     },
     buy: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { bidAmount: bigint; wlMerkleProof: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "buy", params, getContractByCodeHash);
     },
+    checkBidLimit: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphV2Types.Fields,
+        { account: Address; bidAmount: bigint; maxBid: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "checkBidLimit", params, getContractByCodeHash);
+    },
+    calculateClaimableAmount: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphV2Types.Fields,
+        { buyerAccount: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
+      return testMethod(
+        this,
+        "calculateClaimableAmount",
+        params,
+        getContractByCodeHash
+      );
+    },
     calculateSaleTokensReceivedPerBidTokens: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { bidAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -520,7 +614,7 @@ class Factory extends ContractFactory<
     },
     checkIsWhitelisted: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { account: Address; wlMerkleProof: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -533,7 +627,7 @@ class Factory extends ContractFactory<
     },
     setWhitelistBuyerMaxBid: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { newWhitelistBuyerMaxBid: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -544,9 +638,51 @@ class Factory extends ContractFactory<
         getContractByCodeHash
       );
     },
+    setPublicSaleMaxBid: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphV2Types.Fields,
+        { newPublicSaleMaxBid: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(
+        this,
+        "setPublicSaleMaxBid",
+        params,
+        getContractByCodeHash
+      );
+    },
+    setVestingEnd: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphV2Types.Fields,
+        { newVestingEnd: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "setVestingEnd", params, getContractByCodeHash);
+    },
+    setUpfrontRelease: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphV2Types.Fields,
+        { newUpfrontRelease: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(
+        this,
+        "setUpfrontRelease",
+        params,
+        getContractByCodeHash
+      );
+    },
+    setCliffEnd: async (
+      params: TestContractParamsWithoutMaps<
+        SaleFlatPriceAlphV2Types.Fields,
+        { newCliffEnd: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "setCliffEnd", params, getContractByCodeHash);
+    },
     assertPriceInRange: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -559,7 +695,7 @@ class Factory extends ContractFactory<
     },
     assertMaxBidAmountInRange: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { maxBidAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -572,7 +708,7 @@ class Factory extends ContractFactory<
     },
     assertBidAmountInRange: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { bidAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -585,7 +721,7 @@ class Factory extends ContractFactory<
     },
     assertSaleAmountInRange: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -598,7 +734,7 @@ class Factory extends ContractFactory<
     },
     createAccount: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         {
           account: Address;
           encodedImmFields: HexString;
@@ -610,7 +746,7 @@ class Factory extends ContractFactory<
     },
     destroyAccount: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -618,7 +754,7 @@ class Factory extends ContractFactory<
     },
     assertAccountExists: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -631,7 +767,7 @@ class Factory extends ContractFactory<
     },
     accountExists: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -639,7 +775,7 @@ class Factory extends ContractFactory<
     },
     getSubContractId: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -652,7 +788,7 @@ class Factory extends ContractFactory<
     },
     claim: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -660,7 +796,7 @@ class Factory extends ContractFactory<
     },
     claimRefund: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -668,7 +804,7 @@ class Factory extends ContractFactory<
     },
     setMerkleRoot: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { newMerkleRoot: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -676,7 +812,7 @@ class Factory extends ContractFactory<
     },
     setSaleDates: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         {
           newSaleStart: bigint;
           newSaleEnd: bigint;
@@ -689,7 +825,7 @@ class Factory extends ContractFactory<
     },
     assertSaleLive: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -697,7 +833,7 @@ class Factory extends ContractFactory<
     },
     assertSaleFinished: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -710,7 +846,7 @@ class Factory extends ContractFactory<
     },
     assertCanClaim: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -718,7 +854,7 @@ class Factory extends ContractFactory<
     },
     assertCanClaimRefund: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -731,7 +867,7 @@ class Factory extends ContractFactory<
     },
     assertSaleEditable: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -744,7 +880,7 @@ class Factory extends ContractFactory<
     },
     assertValidSaleDates: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { asSaleStart: bigint; asSaleEnd: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -757,7 +893,7 @@ class Factory extends ContractFactory<
     },
     assertValidWLSaleDates: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         {
           asSaleStart: bigint;
           asSaleEnd: bigint;
@@ -775,7 +911,7 @@ class Factory extends ContractFactory<
     },
     isSaleLive: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -783,7 +919,7 @@ class Factory extends ContractFactory<
     },
     isSaleFinished: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -791,7 +927,7 @@ class Factory extends ContractFactory<
     },
     isSaleSuccess: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -799,7 +935,7 @@ class Factory extends ContractFactory<
     },
     isWhitelistSaleLive: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -812,7 +948,7 @@ class Factory extends ContractFactory<
     },
     isWhitelistSale: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -820,7 +956,7 @@ class Factory extends ContractFactory<
     },
     isCallerSaleOwner: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { caller: Address }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -833,7 +969,7 @@ class Factory extends ContractFactory<
     },
     getSaleOwner: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
@@ -841,7 +977,7 @@ class Factory extends ContractFactory<
     },
     getSaleStart: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -849,7 +985,7 @@ class Factory extends ContractFactory<
     },
     getSaleEnd: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -857,7 +993,7 @@ class Factory extends ContractFactory<
     },
     getMinRaise: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -865,7 +1001,7 @@ class Factory extends ContractFactory<
     },
     getMaxRaise: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -873,7 +1009,7 @@ class Factory extends ContractFactory<
     },
     getSaleTokenId: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -881,7 +1017,7 @@ class Factory extends ContractFactory<
     },
     getBidTokenId: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -889,7 +1025,7 @@ class Factory extends ContractFactory<
     },
     getWhitelistSaleStart: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -902,7 +1038,7 @@ class Factory extends ContractFactory<
     },
     getWhitelistSaleEnd: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -915,7 +1051,7 @@ class Factory extends ContractFactory<
     },
     getTokensSold: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -923,7 +1059,7 @@ class Factory extends ContractFactory<
     },
     getTotalRaised: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -931,7 +1067,7 @@ class Factory extends ContractFactory<
     },
     getMerkleRoot: async (
       params: Omit<
-        TestContractParamsWithoutMaps<SaleFlatPriceAlphTypes.Fields, never>,
+        TestContractParamsWithoutMaps<SaleFlatPriceAlphV2Types.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -939,7 +1075,7 @@ class Factory extends ContractFactory<
     },
     updateRoot: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { newMerkleRoot: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -947,7 +1083,7 @@ class Factory extends ContractFactory<
     },
     verify: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { proof: HexString; dataHash: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -955,7 +1091,7 @@ class Factory extends ContractFactory<
     },
     hashPair: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { a: HexString; b: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -963,7 +1099,7 @@ class Factory extends ContractFactory<
     },
     hash: async (
       params: TestContractParamsWithoutMaps<
-        SaleFlatPriceAlphTypes.Fields,
+        SaleFlatPriceAlphV2Types.Fields,
         { dataToHash: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -973,23 +1109,23 @@ class Factory extends ContractFactory<
 }
 
 // Use this object to test and deploy the contract
-export const SaleFlatPriceAlph = new Factory(
+export const SaleFlatPriceAlphV2 = new Factory(
   Contract.fromJson(
-    SaleFlatPriceAlphContractJson,
+    SaleFlatPriceAlphV2ContractJson,
     "",
-    "7f2045736051296ec17e13d9a47d60ef2cd522fe14eece4a7fde340ba966c2b8",
+    "435b5baddda909c3cda88982ee8d90d3f86313a5dddb1c28f9ce72b655df82ad",
     []
   )
 );
 
 // Use this class to interact with the blockchain
-export class SaleFlatPriceAlphInstance extends ContractInstance {
+export class SaleFlatPriceAlphV2Instance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
 
-  async fetchState(): Promise<SaleFlatPriceAlphTypes.State> {
-    return fetchContractState(SaleFlatPriceAlph, this);
+  async fetchState(): Promise<SaleFlatPriceAlphV2Types.State> {
+    return fetchContractState(SaleFlatPriceAlphV2, this);
   }
 
   async getContractEventsCurrentCount(): Promise<number> {
@@ -997,11 +1133,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeBuyEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.BuyEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.BuyEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "Buy",
@@ -1010,11 +1146,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeUpdateWhitelistBuyerMaxBidEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.UpdateWhitelistBuyerMaxBidEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.UpdateWhitelistBuyerMaxBidEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "UpdateWhitelistBuyerMaxBid",
@@ -1022,12 +1158,64 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
     );
   }
 
-  subscribeAccountCreateEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.AccountCreateEvent>,
+  subscribeUpdatePublicSaleMaxBidEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.UpdatePublicSaleMaxBidEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
+      this,
+      options,
+      "UpdatePublicSaleMaxBid",
+      fromCount
+    );
+  }
+
+  subscribeUpdateUpfrontReleaseEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.UpdateUpfrontReleaseEvent>,
+    fromCount?: number
+  ): EventSubscription {
+    return subscribeContractEvent(
+      SaleFlatPriceAlphV2.contract,
+      this,
+      options,
+      "UpdateUpfrontRelease",
+      fromCount
+    );
+  }
+
+  subscribeUpdateVestingEndEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.UpdateVestingEndEvent>,
+    fromCount?: number
+  ): EventSubscription {
+    return subscribeContractEvent(
+      SaleFlatPriceAlphV2.contract,
+      this,
+      options,
+      "UpdateVestingEnd",
+      fromCount
+    );
+  }
+
+  subscribeUpdateCliffEndEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.UpdateCliffEndEvent>,
+    fromCount?: number
+  ): EventSubscription {
+    return subscribeContractEvent(
+      SaleFlatPriceAlphV2.contract,
+      this,
+      options,
+      "UpdateCliffEnd",
+      fromCount
+    );
+  }
+
+  subscribeAccountCreateEvent(
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.AccountCreateEvent>,
+    fromCount?: number
+  ): EventSubscription {
+    return subscribeContractEvent(
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "AccountCreate",
@@ -1036,11 +1224,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeAccountDestroyEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.AccountDestroyEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.AccountDestroyEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "AccountDestroy",
@@ -1049,11 +1237,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeClaimBuyerEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.ClaimBuyerEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.ClaimBuyerEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "ClaimBuyer",
@@ -1062,11 +1250,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeClaimBuyerRefundEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.ClaimBuyerRefundEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.ClaimBuyerRefundEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "ClaimBuyerRefund",
@@ -1075,11 +1263,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeClaimSellerEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.ClaimSellerEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.ClaimSellerEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "ClaimSeller",
@@ -1088,11 +1276,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeClaimSellerRefundEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.ClaimSellerRefundEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.ClaimSellerRefundEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "ClaimSellerRefund",
@@ -1101,11 +1289,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeSaleDatesUpdateEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.SaleDatesUpdateEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.SaleDatesUpdateEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "SaleDatesUpdate",
@@ -1114,11 +1302,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeWhitelistSaleDatesUpdateEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.WhitelistSaleDatesUpdateEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.WhitelistSaleDatesUpdateEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "WhitelistSaleDatesUpdate",
@@ -1127,11 +1315,11 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
   }
 
   subscribeUpdateRootEvent(
-    options: EventSubscribeOptions<SaleFlatPriceAlphTypes.UpdateRootEvent>,
+    options: EventSubscribeOptions<SaleFlatPriceAlphV2Types.UpdateRootEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       "UpdateRoot",
@@ -1141,22 +1329,26 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
 
   subscribeAllEvents(
     options: EventSubscribeOptions<
-      | SaleFlatPriceAlphTypes.BuyEvent
-      | SaleFlatPriceAlphTypes.UpdateWhitelistBuyerMaxBidEvent
-      | SaleFlatPriceAlphTypes.AccountCreateEvent
-      | SaleFlatPriceAlphTypes.AccountDestroyEvent
-      | SaleFlatPriceAlphTypes.ClaimBuyerEvent
-      | SaleFlatPriceAlphTypes.ClaimBuyerRefundEvent
-      | SaleFlatPriceAlphTypes.ClaimSellerEvent
-      | SaleFlatPriceAlphTypes.ClaimSellerRefundEvent
-      | SaleFlatPriceAlphTypes.SaleDatesUpdateEvent
-      | SaleFlatPriceAlphTypes.WhitelistSaleDatesUpdateEvent
-      | SaleFlatPriceAlphTypes.UpdateRootEvent
+      | SaleFlatPriceAlphV2Types.BuyEvent
+      | SaleFlatPriceAlphV2Types.UpdateWhitelistBuyerMaxBidEvent
+      | SaleFlatPriceAlphV2Types.UpdatePublicSaleMaxBidEvent
+      | SaleFlatPriceAlphV2Types.UpdateUpfrontReleaseEvent
+      | SaleFlatPriceAlphV2Types.UpdateVestingEndEvent
+      | SaleFlatPriceAlphV2Types.UpdateCliffEndEvent
+      | SaleFlatPriceAlphV2Types.AccountCreateEvent
+      | SaleFlatPriceAlphV2Types.AccountDestroyEvent
+      | SaleFlatPriceAlphV2Types.ClaimBuyerEvent
+      | SaleFlatPriceAlphV2Types.ClaimBuyerRefundEvent
+      | SaleFlatPriceAlphV2Types.ClaimSellerEvent
+      | SaleFlatPriceAlphV2Types.ClaimSellerRefundEvent
+      | SaleFlatPriceAlphV2Types.SaleDatesUpdateEvent
+      | SaleFlatPriceAlphV2Types.WhitelistSaleDatesUpdateEvent
+      | SaleFlatPriceAlphV2Types.UpdateRootEvent
     >,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvents(
-      SaleFlatPriceAlph.contract,
+      SaleFlatPriceAlphV2.contract,
       this,
       options,
       fromCount
@@ -1165,23 +1357,36 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
 
   methods = {
     buy: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"buy">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"buy">> => {
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"buy">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"buy">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "buy",
         params,
         getContractByCodeHash
       );
     },
-    calculateSaleTokensReceivedPerBidTokens: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"calculateSaleTokensReceivedPerBidTokens">
+    calculateClaimableAmount: async (
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"calculateClaimableAmount">
     ): Promise<
-      SaleFlatPriceAlphTypes.CallMethodResult<"calculateSaleTokensReceivedPerBidTokens">
+      SaleFlatPriceAlphV2Types.CallMethodResult<"calculateClaimableAmount">
     > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
+        this,
+        "calculateClaimableAmount",
+        params,
+        getContractByCodeHash
+      );
+    },
+    calculateSaleTokensReceivedPerBidTokens: async (
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"calculateSaleTokensReceivedPerBidTokens">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.CallMethodResult<"calculateSaleTokensReceivedPerBidTokens">
+    > => {
+      return callMethod(
+        SaleFlatPriceAlphV2,
         this,
         "calculateSaleTokensReceivedPerBidTokens",
         params,
@@ -1189,12 +1394,12 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     checkIsWhitelisted: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"checkIsWhitelisted">
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"checkIsWhitelisted">
     ): Promise<
-      SaleFlatPriceAlphTypes.CallMethodResult<"checkIsWhitelisted">
+      SaleFlatPriceAlphV2Types.CallMethodResult<"checkIsWhitelisted">
     > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "checkIsWhitelisted",
         params,
@@ -1202,23 +1407,71 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     setWhitelistBuyerMaxBid: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"setWhitelistBuyerMaxBid">
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"setWhitelistBuyerMaxBid">
     ): Promise<
-      SaleFlatPriceAlphTypes.CallMethodResult<"setWhitelistBuyerMaxBid">
+      SaleFlatPriceAlphV2Types.CallMethodResult<"setWhitelistBuyerMaxBid">
     > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "setWhitelistBuyerMaxBid",
         params,
         getContractByCodeHash
       );
     },
-    accountExists: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"accountExists">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"accountExists">> => {
+    setPublicSaleMaxBid: async (
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"setPublicSaleMaxBid">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.CallMethodResult<"setPublicSaleMaxBid">
+    > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
+        this,
+        "setPublicSaleMaxBid",
+        params,
+        getContractByCodeHash
+      );
+    },
+    setVestingEnd: async (
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"setVestingEnd">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"setVestingEnd">> => {
+      return callMethod(
+        SaleFlatPriceAlphV2,
+        this,
+        "setVestingEnd",
+        params,
+        getContractByCodeHash
+      );
+    },
+    setUpfrontRelease: async (
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"setUpfrontRelease">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.CallMethodResult<"setUpfrontRelease">
+    > => {
+      return callMethod(
+        SaleFlatPriceAlphV2,
+        this,
+        "setUpfrontRelease",
+        params,
+        getContractByCodeHash
+      );
+    },
+    setCliffEnd: async (
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"setCliffEnd">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"setCliffEnd">> => {
+      return callMethod(
+        SaleFlatPriceAlphV2,
+        this,
+        "setCliffEnd",
+        params,
+        getContractByCodeHash
+      );
+    },
+    accountExists: async (
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"accountExists">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"accountExists">> => {
+      return callMethod(
+        SaleFlatPriceAlphV2,
         this,
         "accountExists",
         params,
@@ -1226,10 +1479,12 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getSubContractId: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"getSubContractId">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSubContractId">> => {
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"getSubContractId">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.CallMethodResult<"getSubContractId">
+    > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getSubContractId",
         params,
@@ -1237,10 +1492,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     claim: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"claim">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"claim">> => {
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"claim">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"claim">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "claim",
         params,
@@ -1248,10 +1503,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     claimRefund: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"claimRefund">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"claimRefund">> => {
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"claimRefund">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"claimRefund">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "claimRefund",
         params,
@@ -1259,10 +1514,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     setMerkleRoot: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"setMerkleRoot">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"setMerkleRoot">> => {
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"setMerkleRoot">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"setMerkleRoot">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "setMerkleRoot",
         params,
@@ -1270,10 +1525,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     setSaleDates: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"setSaleDates">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"setSaleDates">> => {
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"setSaleDates">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"setSaleDates">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "setSaleDates",
         params,
@@ -1281,10 +1536,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     isSaleLive: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isSaleLive">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"isSaleLive">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"isSaleLive">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"isSaleLive">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isSaleLive",
         params === undefined ? {} : params,
@@ -1292,10 +1547,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     isSaleFinished: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isSaleFinished">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"isSaleFinished">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"isSaleFinished">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"isSaleFinished">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isSaleFinished",
         params === undefined ? {} : params,
@@ -1303,10 +1558,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     isSaleSuccess: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isSaleSuccess">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"isSaleSuccess">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"isSaleSuccess">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"isSaleSuccess">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isSaleSuccess",
         params === undefined ? {} : params,
@@ -1314,12 +1569,12 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     isWhitelistSaleLive: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isWhitelistSaleLive">
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"isWhitelistSaleLive">
     ): Promise<
-      SaleFlatPriceAlphTypes.CallMethodResult<"isWhitelistSaleLive">
+      SaleFlatPriceAlphV2Types.CallMethodResult<"isWhitelistSaleLive">
     > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isWhitelistSaleLive",
         params === undefined ? {} : params,
@@ -1327,10 +1582,12 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     isWhitelistSale: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"isWhitelistSale">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"isWhitelistSale">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"isWhitelistSale">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.CallMethodResult<"isWhitelistSale">
+    > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isWhitelistSale",
         params === undefined ? {} : params,
@@ -1338,12 +1595,12 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     isCallerSaleOwner: async (
-      params: SaleFlatPriceAlphTypes.CallMethodParams<"isCallerSaleOwner">
+      params: SaleFlatPriceAlphV2Types.CallMethodParams<"isCallerSaleOwner">
     ): Promise<
-      SaleFlatPriceAlphTypes.CallMethodResult<"isCallerSaleOwner">
+      SaleFlatPriceAlphV2Types.CallMethodResult<"isCallerSaleOwner">
     > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isCallerSaleOwner",
         params,
@@ -1351,10 +1608,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getSaleOwner: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getSaleOwner">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSaleOwner">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getSaleOwner">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getSaleOwner">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getSaleOwner",
         params === undefined ? {} : params,
@@ -1362,10 +1619,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getSaleStart: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getSaleStart">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSaleStart">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getSaleStart">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getSaleStart">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getSaleStart",
         params === undefined ? {} : params,
@@ -1373,10 +1630,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getSaleEnd: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getSaleEnd">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSaleEnd">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getSaleEnd">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getSaleEnd">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getSaleEnd",
         params === undefined ? {} : params,
@@ -1384,10 +1641,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getMinRaise: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getMinRaise">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getMinRaise">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getMinRaise">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getMinRaise">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getMinRaise",
         params === undefined ? {} : params,
@@ -1395,10 +1652,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getMaxRaise: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getMaxRaise">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getMaxRaise">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getMaxRaise">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getMaxRaise">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getMaxRaise",
         params === undefined ? {} : params,
@@ -1406,10 +1663,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getSaleTokenId: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getSaleTokenId">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getSaleTokenId">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getSaleTokenId">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getSaleTokenId">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getSaleTokenId",
         params === undefined ? {} : params,
@@ -1417,10 +1674,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getBidTokenId: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getBidTokenId">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getBidTokenId">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getBidTokenId">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getBidTokenId">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getBidTokenId",
         params === undefined ? {} : params,
@@ -1428,12 +1685,12 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getWhitelistSaleStart: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getWhitelistSaleStart">
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getWhitelistSaleStart">
     ): Promise<
-      SaleFlatPriceAlphTypes.CallMethodResult<"getWhitelistSaleStart">
+      SaleFlatPriceAlphV2Types.CallMethodResult<"getWhitelistSaleStart">
     > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getWhitelistSaleStart",
         params === undefined ? {} : params,
@@ -1441,12 +1698,12 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getWhitelistSaleEnd: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getWhitelistSaleEnd">
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getWhitelistSaleEnd">
     ): Promise<
-      SaleFlatPriceAlphTypes.CallMethodResult<"getWhitelistSaleEnd">
+      SaleFlatPriceAlphV2Types.CallMethodResult<"getWhitelistSaleEnd">
     > => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getWhitelistSaleEnd",
         params === undefined ? {} : params,
@@ -1454,10 +1711,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getTokensSold: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getTokensSold">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getTokensSold">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getTokensSold">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getTokensSold">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getTokensSold",
         params === undefined ? {} : params,
@@ -1465,10 +1722,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getTotalRaised: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getTotalRaised">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getTotalRaised">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getTotalRaised">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getTotalRaised">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getTotalRaised",
         params === undefined ? {} : params,
@@ -1476,10 +1733,10 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
       );
     },
     getMerkleRoot: async (
-      params?: SaleFlatPriceAlphTypes.CallMethodParams<"getMerkleRoot">
-    ): Promise<SaleFlatPriceAlphTypes.CallMethodResult<"getMerkleRoot">> => {
+      params?: SaleFlatPriceAlphV2Types.CallMethodParams<"getMerkleRoot">
+    ): Promise<SaleFlatPriceAlphV2Types.CallMethodResult<"getMerkleRoot">> => {
       return callMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getMerkleRoot",
         params === undefined ? {} : params,
@@ -1492,282 +1749,372 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
 
   transact = {
     buy: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"buy">
-    ): Promise<SaleFlatPriceAlphTypes.SignExecuteMethodResult<"buy">> => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "buy", params);
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"buy">
+    ): Promise<SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"buy">> => {
+      return signExecuteMethod(SaleFlatPriceAlphV2, this, "buy", params);
     },
-    calculateSaleTokensReceivedPerBidTokens: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"calculateSaleTokensReceivedPerBidTokens">
+    calculateClaimableAmount: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"calculateClaimableAmount">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"calculateSaleTokensReceivedPerBidTokens">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"calculateClaimableAmount">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
+        this,
+        "calculateClaimableAmount",
+        params
+      );
+    },
+    calculateSaleTokensReceivedPerBidTokens: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"calculateSaleTokensReceivedPerBidTokens">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"calculateSaleTokensReceivedPerBidTokens">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
         this,
         "calculateSaleTokensReceivedPerBidTokens",
         params
       );
     },
     checkIsWhitelisted: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"checkIsWhitelisted">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"checkIsWhitelisted">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"checkIsWhitelisted">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"checkIsWhitelisted">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "checkIsWhitelisted",
         params
       );
     },
     setWhitelistBuyerMaxBid: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"setWhitelistBuyerMaxBid">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"setWhitelistBuyerMaxBid">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"setWhitelistBuyerMaxBid">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"setWhitelistBuyerMaxBid">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "setWhitelistBuyerMaxBid",
         params
       );
     },
-    accountExists: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"accountExists">
+    setPublicSaleMaxBid: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"setPublicSaleMaxBid">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"accountExists">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"setPublicSaleMaxBid">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
+        this,
+        "setPublicSaleMaxBid",
+        params
+      );
+    },
+    setVestingEnd: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"setVestingEnd">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"setVestingEnd">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
+        this,
+        "setVestingEnd",
+        params
+      );
+    },
+    setUpfrontRelease: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"setUpfrontRelease">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"setUpfrontRelease">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
+        this,
+        "setUpfrontRelease",
+        params
+      );
+    },
+    setCliffEnd: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"setCliffEnd">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"setCliffEnd">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
+        this,
+        "setCliffEnd",
+        params
+      );
+    },
+    accountExists: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"accountExists">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"accountExists">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
         this,
         "accountExists",
         params
       );
     },
     getSubContractId: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSubContractId">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getSubContractId">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSubContractId">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getSubContractId">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getSubContractId",
         params
       );
     },
     claim: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"claim">
-    ): Promise<SaleFlatPriceAlphTypes.SignExecuteMethodResult<"claim">> => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "claim", params);
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"claim">
+    ): Promise<SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"claim">> => {
+      return signExecuteMethod(SaleFlatPriceAlphV2, this, "claim", params);
     },
     claimRefund: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"claimRefund">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"claimRefund">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"claimRefund">
-    > => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "claimRefund", params);
-    },
-    setMerkleRoot: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"setMerkleRoot">
-    ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"setMerkleRoot">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"claimRefund">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
+        this,
+        "claimRefund",
+        params
+      );
+    },
+    setMerkleRoot: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"setMerkleRoot">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"setMerkleRoot">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
         this,
         "setMerkleRoot",
         params
       );
     },
     setSaleDates: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"setSaleDates">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"setSaleDates">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"setSaleDates">
-    > => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "setSaleDates", params);
-    },
-    isSaleLive: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isSaleLive">
-    ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isSaleLive">
-    > => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "isSaleLive", params);
-    },
-    isSaleFinished: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isSaleFinished">
-    ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isSaleFinished">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"setSaleDates">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
+        this,
+        "setSaleDates",
+        params
+      );
+    },
+    isSaleLive: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"isSaleLive">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"isSaleLive">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlphV2, this, "isSaleLive", params);
+    },
+    isSaleFinished: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"isSaleFinished">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"isSaleFinished">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
         this,
         "isSaleFinished",
         params
       );
     },
     isSaleSuccess: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isSaleSuccess">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"isSaleSuccess">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isSaleSuccess">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"isSaleSuccess">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isSaleSuccess",
         params
       );
     },
     isWhitelistSaleLive: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isWhitelistSaleLive">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"isWhitelistSaleLive">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isWhitelistSaleLive">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"isWhitelistSaleLive">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isWhitelistSaleLive",
         params
       );
     },
     isWhitelistSale: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isWhitelistSale">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"isWhitelistSale">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isWhitelistSale">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"isWhitelistSale">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isWhitelistSale",
         params
       );
     },
     isCallerSaleOwner: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"isCallerSaleOwner">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"isCallerSaleOwner">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"isCallerSaleOwner">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"isCallerSaleOwner">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "isCallerSaleOwner",
         params
       );
     },
     getSaleOwner: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSaleOwner">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getSaleOwner">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSaleOwner">
-    > => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "getSaleOwner", params);
-    },
-    getSaleStart: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSaleStart">
-    ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSaleStart">
-    > => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "getSaleStart", params);
-    },
-    getSaleEnd: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSaleEnd">
-    ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSaleEnd">
-    > => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "getSaleEnd", params);
-    },
-    getMinRaise: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getMinRaise">
-    ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getMinRaise">
-    > => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "getMinRaise", params);
-    },
-    getMaxRaise: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getMaxRaise">
-    ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getMaxRaise">
-    > => {
-      return signExecuteMethod(SaleFlatPriceAlph, this, "getMaxRaise", params);
-    },
-    getSaleTokenId: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getSaleTokenId">
-    ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getSaleTokenId">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getSaleOwner">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
+        this,
+        "getSaleOwner",
+        params
+      );
+    },
+    getSaleStart: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getSaleStart">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getSaleStart">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
+        this,
+        "getSaleStart",
+        params
+      );
+    },
+    getSaleEnd: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getSaleEnd">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getSaleEnd">
+    > => {
+      return signExecuteMethod(SaleFlatPriceAlphV2, this, "getSaleEnd", params);
+    },
+    getMinRaise: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getMinRaise">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getMinRaise">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
+        this,
+        "getMinRaise",
+        params
+      );
+    },
+    getMaxRaise: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getMaxRaise">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getMaxRaise">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
+        this,
+        "getMaxRaise",
+        params
+      );
+    },
+    getSaleTokenId: async (
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getSaleTokenId">
+    ): Promise<
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getSaleTokenId">
+    > => {
+      return signExecuteMethod(
+        SaleFlatPriceAlphV2,
         this,
         "getSaleTokenId",
         params
       );
     },
     getBidTokenId: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getBidTokenId">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getBidTokenId">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getBidTokenId">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getBidTokenId">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getBidTokenId",
         params
       );
     },
     getWhitelistSaleStart: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getWhitelistSaleStart">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getWhitelistSaleStart">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getWhitelistSaleStart">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getWhitelistSaleStart">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getWhitelistSaleStart",
         params
       );
     },
     getWhitelistSaleEnd: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getWhitelistSaleEnd">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getWhitelistSaleEnd">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getWhitelistSaleEnd">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getWhitelistSaleEnd">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getWhitelistSaleEnd",
         params
       );
     },
     getTokensSold: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getTokensSold">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getTokensSold">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getTokensSold">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getTokensSold">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getTokensSold",
         params
       );
     },
     getTotalRaised: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getTotalRaised">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getTotalRaised">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getTotalRaised">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getTotalRaised">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getTotalRaised",
         params
       );
     },
     getMerkleRoot: async (
-      params: SaleFlatPriceAlphTypes.SignExecuteMethodParams<"getMerkleRoot">
+      params: SaleFlatPriceAlphV2Types.SignExecuteMethodParams<"getMerkleRoot">
     ): Promise<
-      SaleFlatPriceAlphTypes.SignExecuteMethodResult<"getMerkleRoot">
+      SaleFlatPriceAlphV2Types.SignExecuteMethodResult<"getMerkleRoot">
     > => {
       return signExecuteMethod(
-        SaleFlatPriceAlph,
+        SaleFlatPriceAlphV2,
         this,
         "getMerkleRoot",
         params
@@ -1775,14 +2122,14 @@ export class SaleFlatPriceAlphInstance extends ContractInstance {
     },
   };
 
-  async multicall<Calls extends SaleFlatPriceAlphTypes.MultiCallParams>(
+  async multicall<Calls extends SaleFlatPriceAlphV2Types.MultiCallParams>(
     calls: Calls
-  ): Promise<SaleFlatPriceAlphTypes.MultiCallResults<Calls>> {
+  ): Promise<SaleFlatPriceAlphV2Types.MultiCallResults<Calls>> {
     return (await multicallMethods(
-      SaleFlatPriceAlph,
+      SaleFlatPriceAlphV2,
       this,
       calls,
       getContractByCodeHash
-    )) as SaleFlatPriceAlphTypes.MultiCallResults<Calls>;
+    )) as SaleFlatPriceAlphV2Types.MultiCallResults<Calls>;
   }
 }

@@ -25,6 +25,11 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as RewardDistributorContractJson } from "../rewards/RewardDistributor.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -98,6 +103,38 @@ export namespace RewardDistributorTypes {
   }>;
 
   export interface CallMethodTable {
+    changeOwner: {
+      params: CallContractParams<{ changeOwner: Address }>;
+      result: CallContractResult<null>;
+    };
+    migrate: {
+      params: CallContractParams<{ changeCode: HexString }>;
+      result: CallContractResult<null>;
+    };
+    migrateWithFields: {
+      params: CallContractParams<{
+        changeCode: HexString;
+        changeImmFieldsEncoded: HexString;
+        changeMutFieldsEncoded: HexString;
+      }>;
+      result: CallContractResult<null>;
+    };
+    changeOwnerApply: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    migrateApply: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    migrateWithFieldsApply: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    resetUpgrade: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
     getUpgradeDelay: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
@@ -126,9 +163,17 @@ export namespace RewardDistributorTypes {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<HexString>;
     };
+    harvest: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
     canHarvest: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<boolean>;
+    };
+    addRewards: {
+      params: CallContractParams<{ sender: Address; amount: bigint }>;
+      result: CallContractResult<null>;
     };
     getTotalPendingRewards: {
       params: Omit<CallContractParams<{}>, "args">;
@@ -171,12 +216,130 @@ export namespace RewardDistributorTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+
+  export interface SignExecuteMethodTable {
+    changeOwner: {
+      params: SignExecuteContractMethodParams<{ changeOwner: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    migrate: {
+      params: SignExecuteContractMethodParams<{ changeCode: HexString }>;
+      result: SignExecuteScriptTxResult;
+    };
+    migrateWithFields: {
+      params: SignExecuteContractMethodParams<{
+        changeCode: HexString;
+        changeImmFieldsEncoded: HexString;
+        changeMutFieldsEncoded: HexString;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    changeOwnerApply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    migrateApply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    migrateWithFieldsApply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    resetUpgrade: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getUpgradeDelay: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getOwner: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewOwner: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getUpgradeCommenced: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewCode: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewImmFieldsEncoded: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewMutFieldsEncoded: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    harvest: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    canHarvest: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    addRewards: {
+      params: SignExecuteContractMethodParams<{
+        sender: Address;
+        amount: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getTotalPendingRewards: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getCurrentEpoch: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getGenesisDate: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getEpochDuration: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getTotalEpochs: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAccumulatedRewards: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getTotalRewards: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
   RewardDistributorInstance,
   RewardDistributorTypes.Fields
 > {
+  encodeFields(fields: RewardDistributorTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as RewardDistributorTypes.Fields;
   }
@@ -220,7 +383,7 @@ class Factory extends ContractFactory<
         { changeOwner: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "changeOwner", params);
+      return testMethod(this, "changeOwner", params, getContractByCodeHash);
     },
     migrate: async (
       params: TestContractParamsWithoutMaps<
@@ -228,7 +391,7 @@ class Factory extends ContractFactory<
         { changeCode: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrate", params);
+      return testMethod(this, "migrate", params, getContractByCodeHash);
     },
     migrateWithFields: async (
       params: TestContractParamsWithoutMaps<
@@ -240,7 +403,12 @@ class Factory extends ContractFactory<
         }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrateWithFields", params);
+      return testMethod(
+        this,
+        "migrateWithFields",
+        params,
+        getContractByCodeHash
+      );
     },
     changeOwnerApply: async (
       params: Omit<
@@ -248,7 +416,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "changeOwnerApply", params);
+      return testMethod(
+        this,
+        "changeOwnerApply",
+        params,
+        getContractByCodeHash
+      );
     },
     migrateApply: async (
       params: Omit<
@@ -256,7 +429,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrateApply", params);
+      return testMethod(this, "migrateApply", params, getContractByCodeHash);
     },
     migrateWithFieldsApply: async (
       params: Omit<
@@ -264,7 +437,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrateWithFieldsApply", params);
+      return testMethod(
+        this,
+        "migrateWithFieldsApply",
+        params,
+        getContractByCodeHash
+      );
     },
     resetUpgrade: async (
       params: Omit<
@@ -272,7 +450,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "resetUpgrade", params);
+      return testMethod(this, "resetUpgrade", params, getContractByCodeHash);
     },
     getUpgradeDelay: async (
       params: Omit<
@@ -280,7 +458,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getUpgradeDelay", params);
+      return testMethod(this, "getUpgradeDelay", params, getContractByCodeHash);
     },
     getOwner: async (
       params: Omit<
@@ -288,7 +466,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getOwner", params);
+      return testMethod(this, "getOwner", params, getContractByCodeHash);
     },
     getNewOwner: async (
       params: Omit<
@@ -296,7 +474,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getNewOwner", params);
+      return testMethod(this, "getNewOwner", params, getContractByCodeHash);
     },
     getUpgradeCommenced: async (
       params: Omit<
@@ -304,7 +482,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getUpgradeCommenced", params);
+      return testMethod(
+        this,
+        "getUpgradeCommenced",
+        params,
+        getContractByCodeHash
+      );
     },
     getNewCode: async (
       params: Omit<
@@ -312,7 +495,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getNewCode", params);
+      return testMethod(this, "getNewCode", params, getContractByCodeHash);
     },
     getNewImmFieldsEncoded: async (
       params: Omit<
@@ -320,7 +503,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getNewImmFieldsEncoded", params);
+      return testMethod(
+        this,
+        "getNewImmFieldsEncoded",
+        params,
+        getContractByCodeHash
+      );
     },
     getNewMutFieldsEncoded: async (
       params: Omit<
@@ -328,7 +516,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getNewMutFieldsEncoded", params);
+      return testMethod(
+        this,
+        "getNewMutFieldsEncoded",
+        params,
+        getContractByCodeHash
+      );
     },
     resetFields: async (
       params: Omit<
@@ -336,7 +529,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "resetFields", params);
+      return testMethod(this, "resetFields", params, getContractByCodeHash);
     },
     assertOnlyOwner: async (
       params: TestContractParamsWithoutMaps<
@@ -344,7 +537,7 @@ class Factory extends ContractFactory<
         { caller: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertOnlyOwner", params);
+      return testMethod(this, "assertOnlyOwner", params, getContractByCodeHash);
     },
     assertUpgradeNotPending: async (
       params: Omit<
@@ -352,7 +545,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertUpgradeNotPending", params);
+      return testMethod(
+        this,
+        "assertUpgradeNotPending",
+        params,
+        getContractByCodeHash
+      );
     },
     assertUpgradeDelayElapsed: async (
       params: Omit<
@@ -360,7 +558,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertUpgradeDelayElapsed", params);
+      return testMethod(
+        this,
+        "assertUpgradeDelayElapsed",
+        params,
+        getContractByCodeHash
+      );
     },
     harvest: async (
       params: Omit<
@@ -368,7 +571,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "harvest", params);
+      return testMethod(this, "harvest", params, getContractByCodeHash);
     },
     canHarvest: async (
       params: Omit<
@@ -376,7 +579,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "canHarvest", params);
+      return testMethod(this, "canHarvest", params, getContractByCodeHash);
     },
     addRewards: async (
       params: TestContractParamsWithoutMaps<
@@ -384,7 +587,7 @@ class Factory extends ContractFactory<
         { sender: Address; amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "addRewards", params);
+      return testMethod(this, "addRewards", params, getContractByCodeHash);
     },
     getTotalPendingRewards: async (
       params: Omit<
@@ -392,7 +595,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getTotalPendingRewards", params);
+      return testMethod(
+        this,
+        "getTotalPendingRewards",
+        params,
+        getContractByCodeHash
+      );
     },
     getCurrentEpoch: async (
       params: Omit<
@@ -400,7 +608,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getCurrentEpoch", params);
+      return testMethod(this, "getCurrentEpoch", params, getContractByCodeHash);
     },
     getGenesisDate: async (
       params: Omit<
@@ -408,7 +616,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getGenesisDate", params);
+      return testMethod(this, "getGenesisDate", params, getContractByCodeHash);
     },
     getEpochDuration: async (
       params: Omit<
@@ -416,7 +624,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getEpochDuration", params);
+      return testMethod(
+        this,
+        "getEpochDuration",
+        params,
+        getContractByCodeHash
+      );
     },
     getTotalEpochs: async (
       params: Omit<
@@ -424,7 +637,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getTotalEpochs", params);
+      return testMethod(this, "getTotalEpochs", params, getContractByCodeHash);
     },
     getAccumulatedRewards: async (
       params: Omit<
@@ -432,7 +645,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getAccumulatedRewards", params);
+      return testMethod(
+        this,
+        "getAccumulatedRewards",
+        params,
+        getContractByCodeHash
+      );
     },
     getTotalRewards: async (
       params: Omit<
@@ -440,7 +658,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getTotalRewards", params);
+      return testMethod(this, "getTotalRewards", params, getContractByCodeHash);
     },
     assertTotalRewardsIsInitialized: async (
       params: Omit<
@@ -448,7 +666,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertTotalRewardsIsInitialized", params);
+      return testMethod(
+        this,
+        "assertTotalRewardsIsInitialized",
+        params,
+        getContractByCodeHash
+      );
     },
     update: async (
       params: TestContractParamsWithoutMaps<
@@ -456,7 +679,7 @@ class Factory extends ContractFactory<
         { array: HexString; index: bigint; value: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "update", params);
+      return testMethod(this, "update", params, getContractByCodeHash);
     },
     get: async (
       params: TestContractParamsWithoutMaps<
@@ -464,7 +687,7 @@ class Factory extends ContractFactory<
         { array: HexString; index: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "get", params);
+      return testMethod(this, "get", params, getContractByCodeHash);
     },
   };
 }
@@ -474,7 +697,8 @@ export const RewardDistributor = new Factory(
   Contract.fromJson(
     RewardDistributorContractJson,
     "",
-    "b913efd25718eeda658a22dfdd9da1d6be770e05b97d607e54ea9f273f724c16"
+    "b913efd25718eeda658a22dfdd9da1d6be770e05b97d607e54ea9f273f724c16",
+    []
   )
 );
 
@@ -632,6 +856,87 @@ export class RewardDistributorInstance extends ContractInstance {
   }
 
   methods = {
+    changeOwner: async (
+      params: RewardDistributorTypes.CallMethodParams<"changeOwner">
+    ): Promise<RewardDistributorTypes.CallMethodResult<"changeOwner">> => {
+      return callMethod(
+        RewardDistributor,
+        this,
+        "changeOwner",
+        params,
+        getContractByCodeHash
+      );
+    },
+    migrate: async (
+      params: RewardDistributorTypes.CallMethodParams<"migrate">
+    ): Promise<RewardDistributorTypes.CallMethodResult<"migrate">> => {
+      return callMethod(
+        RewardDistributor,
+        this,
+        "migrate",
+        params,
+        getContractByCodeHash
+      );
+    },
+    migrateWithFields: async (
+      params: RewardDistributorTypes.CallMethodParams<"migrateWithFields">
+    ): Promise<
+      RewardDistributorTypes.CallMethodResult<"migrateWithFields">
+    > => {
+      return callMethod(
+        RewardDistributor,
+        this,
+        "migrateWithFields",
+        params,
+        getContractByCodeHash
+      );
+    },
+    changeOwnerApply: async (
+      params?: RewardDistributorTypes.CallMethodParams<"changeOwnerApply">
+    ): Promise<RewardDistributorTypes.CallMethodResult<"changeOwnerApply">> => {
+      return callMethod(
+        RewardDistributor,
+        this,
+        "changeOwnerApply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    migrateApply: async (
+      params?: RewardDistributorTypes.CallMethodParams<"migrateApply">
+    ): Promise<RewardDistributorTypes.CallMethodResult<"migrateApply">> => {
+      return callMethod(
+        RewardDistributor,
+        this,
+        "migrateApply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    migrateWithFieldsApply: async (
+      params?: RewardDistributorTypes.CallMethodParams<"migrateWithFieldsApply">
+    ): Promise<
+      RewardDistributorTypes.CallMethodResult<"migrateWithFieldsApply">
+    > => {
+      return callMethod(
+        RewardDistributor,
+        this,
+        "migrateWithFieldsApply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    resetUpgrade: async (
+      params?: RewardDistributorTypes.CallMethodParams<"resetUpgrade">
+    ): Promise<RewardDistributorTypes.CallMethodResult<"resetUpgrade">> => {
+      return callMethod(
+        RewardDistributor,
+        this,
+        "resetUpgrade",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
     getUpgradeDelay: async (
       params?: RewardDistributorTypes.CallMethodParams<"getUpgradeDelay">
     ): Promise<RewardDistributorTypes.CallMethodResult<"getUpgradeDelay">> => {
@@ -715,6 +1020,17 @@ export class RewardDistributorInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    harvest: async (
+      params?: RewardDistributorTypes.CallMethodParams<"harvest">
+    ): Promise<RewardDistributorTypes.CallMethodResult<"harvest">> => {
+      return callMethod(
+        RewardDistributor,
+        this,
+        "harvest",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
     canHarvest: async (
       params?: RewardDistributorTypes.CallMethodParams<"canHarvest">
     ): Promise<RewardDistributorTypes.CallMethodResult<"canHarvest">> => {
@@ -723,6 +1039,17 @@ export class RewardDistributorInstance extends ContractInstance {
         this,
         "canHarvest",
         params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    addRewards: async (
+      params: RewardDistributorTypes.CallMethodParams<"addRewards">
+    ): Promise<RewardDistributorTypes.CallMethodResult<"addRewards">> => {
+      return callMethod(
+        RewardDistributor,
+        this,
+        "addRewards",
+        params,
         getContractByCodeHash
       );
     },
@@ -805,6 +1132,243 @@ export class RewardDistributorInstance extends ContractInstance {
         "getTotalRewards",
         params === undefined ? {} : params,
         getContractByCodeHash
+      );
+    },
+  };
+
+  view = this.methods;
+
+  transact = {
+    changeOwner: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"changeOwner">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"changeOwner">
+    > => {
+      return signExecuteMethod(RewardDistributor, this, "changeOwner", params);
+    },
+    migrate: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"migrate">
+    ): Promise<RewardDistributorTypes.SignExecuteMethodResult<"migrate">> => {
+      return signExecuteMethod(RewardDistributor, this, "migrate", params);
+    },
+    migrateWithFields: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"migrateWithFields">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"migrateWithFields">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "migrateWithFields",
+        params
+      );
+    },
+    changeOwnerApply: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"changeOwnerApply">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"changeOwnerApply">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "changeOwnerApply",
+        params
+      );
+    },
+    migrateApply: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"migrateApply">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"migrateApply">
+    > => {
+      return signExecuteMethod(RewardDistributor, this, "migrateApply", params);
+    },
+    migrateWithFieldsApply: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"migrateWithFieldsApply">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"migrateWithFieldsApply">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "migrateWithFieldsApply",
+        params
+      );
+    },
+    resetUpgrade: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"resetUpgrade">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"resetUpgrade">
+    > => {
+      return signExecuteMethod(RewardDistributor, this, "resetUpgrade", params);
+    },
+    getUpgradeDelay: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getUpgradeDelay">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getUpgradeDelay">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getUpgradeDelay",
+        params
+      );
+    },
+    getOwner: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getOwner">
+    ): Promise<RewardDistributorTypes.SignExecuteMethodResult<"getOwner">> => {
+      return signExecuteMethod(RewardDistributor, this, "getOwner", params);
+    },
+    getNewOwner: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getNewOwner">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getNewOwner">
+    > => {
+      return signExecuteMethod(RewardDistributor, this, "getNewOwner", params);
+    },
+    getUpgradeCommenced: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getUpgradeCommenced">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getUpgradeCommenced">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getUpgradeCommenced",
+        params
+      );
+    },
+    getNewCode: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getNewCode">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getNewCode">
+    > => {
+      return signExecuteMethod(RewardDistributor, this, "getNewCode", params);
+    },
+    getNewImmFieldsEncoded: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getNewImmFieldsEncoded">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getNewImmFieldsEncoded">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getNewImmFieldsEncoded",
+        params
+      );
+    },
+    getNewMutFieldsEncoded: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getNewMutFieldsEncoded">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getNewMutFieldsEncoded">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getNewMutFieldsEncoded",
+        params
+      );
+    },
+    harvest: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"harvest">
+    ): Promise<RewardDistributorTypes.SignExecuteMethodResult<"harvest">> => {
+      return signExecuteMethod(RewardDistributor, this, "harvest", params);
+    },
+    canHarvest: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"canHarvest">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"canHarvest">
+    > => {
+      return signExecuteMethod(RewardDistributor, this, "canHarvest", params);
+    },
+    addRewards: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"addRewards">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"addRewards">
+    > => {
+      return signExecuteMethod(RewardDistributor, this, "addRewards", params);
+    },
+    getTotalPendingRewards: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getTotalPendingRewards">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getTotalPendingRewards">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getTotalPendingRewards",
+        params
+      );
+    },
+    getCurrentEpoch: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getCurrentEpoch">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getCurrentEpoch">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getCurrentEpoch",
+        params
+      );
+    },
+    getGenesisDate: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getGenesisDate">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getGenesisDate">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getGenesisDate",
+        params
+      );
+    },
+    getEpochDuration: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getEpochDuration">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getEpochDuration">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getEpochDuration",
+        params
+      );
+    },
+    getTotalEpochs: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getTotalEpochs">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getTotalEpochs">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getTotalEpochs",
+        params
+      );
+    },
+    getAccumulatedRewards: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getAccumulatedRewards">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getAccumulatedRewards">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getAccumulatedRewards",
+        params
+      );
+    },
+    getTotalRewards: async (
+      params: RewardDistributorTypes.SignExecuteMethodParams<"getTotalRewards">
+    ): Promise<
+      RewardDistributorTypes.SignExecuteMethodResult<"getTotalRewards">
+    > => {
+      return signExecuteMethod(
+        RewardDistributor,
+        this,
+        "getTotalRewards",
+        params
       );
     },
   };

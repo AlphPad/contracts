@@ -1,0 +1,79 @@
+{
+  "version": "v2.12.0",
+  "name": "SaleManagerCreateSaleFlatPriceTXV2",
+  "bytecodeTemplate": "0101030000001eb47a13c40de0b6b3a7640000{1}2aa2{11}{12}a3{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}{15}{16}{17}13110c{0}0112",
+  "fieldsSig": {
+    "names": [
+      "saleManager",
+      "amountAlph",
+      "tokenPrice",
+      "publicSaleMaxBid",
+      "upfrontRelease",
+      "vestingEnd",
+      "cliffEnd",
+      "saleStart",
+      "saleEnd",
+      "minRaise",
+      "maxRaise",
+      "saleTokenId",
+      "saleTokenTotalAmount",
+      "isWLSale",
+      "whitelistSaleStart",
+      "whitelistSaleEnd",
+      "whitelistBuyerMaxBid",
+      "merkleRoot"
+    ],
+    "types": [
+      "SaleManagerV2",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "ByteVec",
+      "U256",
+      "Bool",
+      "U256",
+      "U256",
+      "U256",
+      "ByteVec"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

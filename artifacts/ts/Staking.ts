@@ -25,6 +25,11 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as StakingContractJson } from "../rewards/Staking.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -105,6 +110,38 @@ export namespace StakingTypes {
   }>;
 
   export interface CallMethodTable {
+    changeOwner: {
+      params: CallContractParams<{ changeOwner: Address }>;
+      result: CallContractResult<null>;
+    };
+    migrate: {
+      params: CallContractParams<{ changeCode: HexString }>;
+      result: CallContractResult<null>;
+    };
+    migrateWithFields: {
+      params: CallContractParams<{
+        changeCode: HexString;
+        changeImmFieldsEncoded: HexString;
+        changeMutFieldsEncoded: HexString;
+      }>;
+      result: CallContractResult<null>;
+    };
+    changeOwnerApply: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    migrateApply: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    migrateWithFieldsApply: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    resetUpgrade: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
     accountExists: {
       params: CallContractParams<{ account: Address }>;
       result: CallContractResult<boolean>;
@@ -140,6 +177,26 @@ export namespace StakingTypes {
     getNewMutFieldsEncoded: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<HexString>;
+    };
+    stake: {
+      params: CallContractParams<{ amount: bigint; vestingPeriod: bigint }>;
+      result: CallContractResult<null>;
+    };
+    unstake: {
+      params: CallContractParams<{ amount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    withdraw: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    depositRewards: {
+      params: CallContractParams<{ amount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    claimRewards: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
     };
     getPendingRewards: {
       params: CallContractParams<{ staker: Address }>;
@@ -178,9 +235,139 @@ export namespace StakingTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+
+  export interface SignExecuteMethodTable {
+    changeOwner: {
+      params: SignExecuteContractMethodParams<{ changeOwner: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    migrate: {
+      params: SignExecuteContractMethodParams<{ changeCode: HexString }>;
+      result: SignExecuteScriptTxResult;
+    };
+    migrateWithFields: {
+      params: SignExecuteContractMethodParams<{
+        changeCode: HexString;
+        changeImmFieldsEncoded: HexString;
+        changeMutFieldsEncoded: HexString;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    changeOwnerApply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    migrateApply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    migrateWithFieldsApply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    resetUpgrade: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    accountExists: {
+      params: SignExecuteContractMethodParams<{ account: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getSubContractId: {
+      params: SignExecuteContractMethodParams<{ account: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getUpgradeDelay: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getOwner: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewOwner: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getUpgradeCommenced: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewCode: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewImmFieldsEncoded: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getNewMutFieldsEncoded: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    stake: {
+      params: SignExecuteContractMethodParams<{
+        amount: bigint;
+        vestingPeriod: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    unstake: {
+      params: SignExecuteContractMethodParams<{ amount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    withdraw: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    depositRewards: {
+      params: SignExecuteContractMethodParams<{ amount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    claimRewards: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getPendingRewards: {
+      params: SignExecuteContractMethodParams<{ staker: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getStakingTokenId: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getRewardsTokenId: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getUnstakeLockTime: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAmountStaked: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getRewardPerToken: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
+  encodeFields(fields: StakingTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as StakingTypes.Fields;
   }
@@ -232,7 +419,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { changeOwner: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "changeOwner", params);
+      return testMethod(this, "changeOwner", params, getContractByCodeHash);
     },
     migrate: async (
       params: TestContractParamsWithoutMaps<
@@ -240,7 +427,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { changeCode: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrate", params);
+      return testMethod(this, "migrate", params, getContractByCodeHash);
     },
     migrateWithFields: async (
       params: TestContractParamsWithoutMaps<
@@ -252,7 +439,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrateWithFields", params);
+      return testMethod(
+        this,
+        "migrateWithFields",
+        params,
+        getContractByCodeHash
+      );
     },
     changeOwnerApply: async (
       params: Omit<
@@ -260,7 +452,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "changeOwnerApply", params);
+      return testMethod(
+        this,
+        "changeOwnerApply",
+        params,
+        getContractByCodeHash
+      );
     },
     migrateApply: async (
       params: Omit<
@@ -268,7 +465,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrateApply", params);
+      return testMethod(this, "migrateApply", params, getContractByCodeHash);
     },
     migrateWithFieldsApply: async (
       params: Omit<
@@ -276,7 +473,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "migrateWithFieldsApply", params);
+      return testMethod(
+        this,
+        "migrateWithFieldsApply",
+        params,
+        getContractByCodeHash
+      );
     },
     resetUpgrade: async (
       params: Omit<
@@ -284,7 +486,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "resetUpgrade", params);
+      return testMethod(this, "resetUpgrade", params, getContractByCodeHash);
     },
     createAccount: async (
       params: TestContractParamsWithoutMaps<
@@ -296,7 +498,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "createAccount", params);
+      return testMethod(this, "createAccount", params, getContractByCodeHash);
     },
     destroyAccount: async (
       params: TestContractParamsWithoutMaps<
@@ -304,7 +506,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "destroyAccount", params);
+      return testMethod(this, "destroyAccount", params, getContractByCodeHash);
     },
     assertAccountExists: async (
       params: TestContractParamsWithoutMaps<
@@ -312,7 +514,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertAccountExists", params);
+      return testMethod(
+        this,
+        "assertAccountExists",
+        params,
+        getContractByCodeHash
+      );
     },
     accountExists: async (
       params: TestContractParamsWithoutMaps<
@@ -320,7 +527,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
-      return testMethod(this, "accountExists", params);
+      return testMethod(this, "accountExists", params, getContractByCodeHash);
     },
     getSubContractId: async (
       params: TestContractParamsWithoutMaps<
@@ -328,7 +535,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { account: Address }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getSubContractId", params);
+      return testMethod(
+        this,
+        "getSubContractId",
+        params,
+        getContractByCodeHash
+      );
     },
     getUpgradeDelay: async (
       params: Omit<
@@ -336,7 +548,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getUpgradeDelay", params);
+      return testMethod(this, "getUpgradeDelay", params, getContractByCodeHash);
     },
     getOwner: async (
       params: Omit<
@@ -344,7 +556,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getOwner", params);
+      return testMethod(this, "getOwner", params, getContractByCodeHash);
     },
     getNewOwner: async (
       params: Omit<
@@ -352,7 +564,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getNewOwner", params);
+      return testMethod(this, "getNewOwner", params, getContractByCodeHash);
     },
     getUpgradeCommenced: async (
       params: Omit<
@@ -360,7 +572,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getUpgradeCommenced", params);
+      return testMethod(
+        this,
+        "getUpgradeCommenced",
+        params,
+        getContractByCodeHash
+      );
     },
     getNewCode: async (
       params: Omit<
@@ -368,7 +585,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getNewCode", params);
+      return testMethod(this, "getNewCode", params, getContractByCodeHash);
     },
     getNewImmFieldsEncoded: async (
       params: Omit<
@@ -376,7 +593,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getNewImmFieldsEncoded", params);
+      return testMethod(
+        this,
+        "getNewImmFieldsEncoded",
+        params,
+        getContractByCodeHash
+      );
     },
     getNewMutFieldsEncoded: async (
       params: Omit<
@@ -384,7 +606,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getNewMutFieldsEncoded", params);
+      return testMethod(
+        this,
+        "getNewMutFieldsEncoded",
+        params,
+        getContractByCodeHash
+      );
     },
     resetFields: async (
       params: Omit<
@@ -392,7 +619,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "resetFields", params);
+      return testMethod(this, "resetFields", params, getContractByCodeHash);
     },
     assertOnlyOwner: async (
       params: TestContractParamsWithoutMaps<
@@ -400,7 +627,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { caller: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertOnlyOwner", params);
+      return testMethod(this, "assertOnlyOwner", params, getContractByCodeHash);
     },
     assertUpgradeNotPending: async (
       params: Omit<
@@ -408,7 +635,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertUpgradeNotPending", params);
+      return testMethod(
+        this,
+        "assertUpgradeNotPending",
+        params,
+        getContractByCodeHash
+      );
     },
     assertUpgradeDelayElapsed: async (
       params: Omit<
@@ -416,7 +648,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "assertUpgradeDelayElapsed", params);
+      return testMethod(
+        this,
+        "assertUpgradeDelayElapsed",
+        params,
+        getContractByCodeHash
+      );
     },
     stake: async (
       params: TestContractParamsWithoutMaps<
@@ -424,7 +661,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { amount: bigint; vestingPeriod: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "stake", params);
+      return testMethod(this, "stake", params, getContractByCodeHash);
     },
     unstake: async (
       params: TestContractParamsWithoutMaps<
@@ -432,7 +669,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "unstake", params);
+      return testMethod(this, "unstake", params, getContractByCodeHash);
     },
     withdraw: async (
       params: Omit<
@@ -440,7 +677,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "withdraw", params);
+      return testMethod(this, "withdraw", params, getContractByCodeHash);
     },
     depositRewards: async (
       params: TestContractParamsWithoutMaps<
@@ -448,7 +685,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "depositRewards", params);
+      return testMethod(this, "depositRewards", params, getContractByCodeHash);
     },
     claimRewards: async (
       params: Omit<
@@ -456,7 +693,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claimRewards", params);
+      return testMethod(this, "claimRewards", params, getContractByCodeHash);
     },
     getPendingRewards: async (
       params: TestContractParamsWithoutMaps<
@@ -464,7 +701,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { staker: Address }
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getPendingRewards", params);
+      return testMethod(
+        this,
+        "getPendingRewards",
+        params,
+        getContractByCodeHash
+      );
     },
     calcPendingRewards: async (
       params: TestContractParamsWithoutMaps<
@@ -472,7 +714,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { account: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "calcPendingRewards", params);
+      return testMethod(
+        this,
+        "calcPendingRewards",
+        params,
+        getContractByCodeHash
+      );
     },
     claimRewardsForAccount: async (
       params: TestContractParamsWithoutMaps<
@@ -480,7 +727,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         { account: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "claimRewardsForAccount", params);
+      return testMethod(
+        this,
+        "claimRewardsForAccount",
+        params,
+        getContractByCodeHash
+      );
     },
     getStakingTokenId: async (
       params: Omit<
@@ -488,7 +740,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getStakingTokenId", params);
+      return testMethod(
+        this,
+        "getStakingTokenId",
+        params,
+        getContractByCodeHash
+      );
     },
     getRewardsTokenId: async (
       params: Omit<
@@ -496,7 +753,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getRewardsTokenId", params);
+      return testMethod(
+        this,
+        "getRewardsTokenId",
+        params,
+        getContractByCodeHash
+      );
     },
     getUnstakeLockTime: async (
       params: Omit<
@@ -504,7 +766,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getUnstakeLockTime", params);
+      return testMethod(
+        this,
+        "getUnstakeLockTime",
+        params,
+        getContractByCodeHash
+      );
     },
     getAmountStaked: async (
       params: Omit<
@@ -512,7 +779,7 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getAmountStaked", params);
+      return testMethod(this, "getAmountStaked", params, getContractByCodeHash);
     },
     getRewardPerToken: async (
       params: Omit<
@@ -520,7 +787,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getRewardPerToken", params);
+      return testMethod(
+        this,
+        "getRewardPerToken",
+        params,
+        getContractByCodeHash
+      );
     },
     getRewardPerTokenScalingFactor: async (
       params: Omit<
@@ -528,7 +800,12 @@ class Factory extends ContractFactory<StakingInstance, StakingTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getRewardPerTokenScalingFactor", params);
+      return testMethod(
+        this,
+        "getRewardPerTokenScalingFactor",
+        params,
+        getContractByCodeHash
+      );
     },
   };
 }
@@ -538,7 +815,8 @@ export const Staking = new Factory(
   Contract.fromJson(
     StakingContractJson,
     "",
-    "b74ef76385018945cc0581cf1d680f5c1aea0ed05976c3b50d2a2e0c9fa752dc"
+    "b74ef76385018945cc0581cf1d680f5c1aea0ed05976c3b50d2a2e0c9fa752dc",
+    []
   )
 );
 
@@ -761,6 +1039,83 @@ export class StakingInstance extends ContractInstance {
   }
 
   methods = {
+    changeOwner: async (
+      params: StakingTypes.CallMethodParams<"changeOwner">
+    ): Promise<StakingTypes.CallMethodResult<"changeOwner">> => {
+      return callMethod(
+        Staking,
+        this,
+        "changeOwner",
+        params,
+        getContractByCodeHash
+      );
+    },
+    migrate: async (
+      params: StakingTypes.CallMethodParams<"migrate">
+    ): Promise<StakingTypes.CallMethodResult<"migrate">> => {
+      return callMethod(
+        Staking,
+        this,
+        "migrate",
+        params,
+        getContractByCodeHash
+      );
+    },
+    migrateWithFields: async (
+      params: StakingTypes.CallMethodParams<"migrateWithFields">
+    ): Promise<StakingTypes.CallMethodResult<"migrateWithFields">> => {
+      return callMethod(
+        Staking,
+        this,
+        "migrateWithFields",
+        params,
+        getContractByCodeHash
+      );
+    },
+    changeOwnerApply: async (
+      params?: StakingTypes.CallMethodParams<"changeOwnerApply">
+    ): Promise<StakingTypes.CallMethodResult<"changeOwnerApply">> => {
+      return callMethod(
+        Staking,
+        this,
+        "changeOwnerApply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    migrateApply: async (
+      params?: StakingTypes.CallMethodParams<"migrateApply">
+    ): Promise<StakingTypes.CallMethodResult<"migrateApply">> => {
+      return callMethod(
+        Staking,
+        this,
+        "migrateApply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    migrateWithFieldsApply: async (
+      params?: StakingTypes.CallMethodParams<"migrateWithFieldsApply">
+    ): Promise<StakingTypes.CallMethodResult<"migrateWithFieldsApply">> => {
+      return callMethod(
+        Staking,
+        this,
+        "migrateWithFieldsApply",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    resetUpgrade: async (
+      params?: StakingTypes.CallMethodParams<"resetUpgrade">
+    ): Promise<StakingTypes.CallMethodResult<"resetUpgrade">> => {
+      return callMethod(
+        Staking,
+        this,
+        "resetUpgrade",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
     accountExists: async (
       params: StakingTypes.CallMethodParams<"accountExists">
     ): Promise<StakingTypes.CallMethodResult<"accountExists">> => {
@@ -860,6 +1215,55 @@ export class StakingInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    stake: async (
+      params: StakingTypes.CallMethodParams<"stake">
+    ): Promise<StakingTypes.CallMethodResult<"stake">> => {
+      return callMethod(Staking, this, "stake", params, getContractByCodeHash);
+    },
+    unstake: async (
+      params: StakingTypes.CallMethodParams<"unstake">
+    ): Promise<StakingTypes.CallMethodResult<"unstake">> => {
+      return callMethod(
+        Staking,
+        this,
+        "unstake",
+        params,
+        getContractByCodeHash
+      );
+    },
+    withdraw: async (
+      params?: StakingTypes.CallMethodParams<"withdraw">
+    ): Promise<StakingTypes.CallMethodResult<"withdraw">> => {
+      return callMethod(
+        Staking,
+        this,
+        "withdraw",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    depositRewards: async (
+      params: StakingTypes.CallMethodParams<"depositRewards">
+    ): Promise<StakingTypes.CallMethodResult<"depositRewards">> => {
+      return callMethod(
+        Staking,
+        this,
+        "depositRewards",
+        params,
+        getContractByCodeHash
+      );
+    },
+    claimRewards: async (
+      params?: StakingTypes.CallMethodParams<"claimRewards">
+    ): Promise<StakingTypes.CallMethodResult<"claimRewards">> => {
+      return callMethod(
+        Staking,
+        this,
+        "claimRewards",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
     getPendingRewards: async (
       params: StakingTypes.CallMethodParams<"getPendingRewards">
     ): Promise<StakingTypes.CallMethodResult<"getPendingRewards">> => {
@@ -925,6 +1329,152 @@ export class StakingInstance extends ContractInstance {
         params === undefined ? {} : params,
         getContractByCodeHash
       );
+    },
+  };
+
+  view = this.methods;
+
+  transact = {
+    changeOwner: async (
+      params: StakingTypes.SignExecuteMethodParams<"changeOwner">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"changeOwner">> => {
+      return signExecuteMethod(Staking, this, "changeOwner", params);
+    },
+    migrate: async (
+      params: StakingTypes.SignExecuteMethodParams<"migrate">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"migrate">> => {
+      return signExecuteMethod(Staking, this, "migrate", params);
+    },
+    migrateWithFields: async (
+      params: StakingTypes.SignExecuteMethodParams<"migrateWithFields">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"migrateWithFields">> => {
+      return signExecuteMethod(Staking, this, "migrateWithFields", params);
+    },
+    changeOwnerApply: async (
+      params: StakingTypes.SignExecuteMethodParams<"changeOwnerApply">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"changeOwnerApply">> => {
+      return signExecuteMethod(Staking, this, "changeOwnerApply", params);
+    },
+    migrateApply: async (
+      params: StakingTypes.SignExecuteMethodParams<"migrateApply">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"migrateApply">> => {
+      return signExecuteMethod(Staking, this, "migrateApply", params);
+    },
+    migrateWithFieldsApply: async (
+      params: StakingTypes.SignExecuteMethodParams<"migrateWithFieldsApply">
+    ): Promise<
+      StakingTypes.SignExecuteMethodResult<"migrateWithFieldsApply">
+    > => {
+      return signExecuteMethod(Staking, this, "migrateWithFieldsApply", params);
+    },
+    resetUpgrade: async (
+      params: StakingTypes.SignExecuteMethodParams<"resetUpgrade">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"resetUpgrade">> => {
+      return signExecuteMethod(Staking, this, "resetUpgrade", params);
+    },
+    accountExists: async (
+      params: StakingTypes.SignExecuteMethodParams<"accountExists">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"accountExists">> => {
+      return signExecuteMethod(Staking, this, "accountExists", params);
+    },
+    getSubContractId: async (
+      params: StakingTypes.SignExecuteMethodParams<"getSubContractId">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getSubContractId">> => {
+      return signExecuteMethod(Staking, this, "getSubContractId", params);
+    },
+    getUpgradeDelay: async (
+      params: StakingTypes.SignExecuteMethodParams<"getUpgradeDelay">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getUpgradeDelay">> => {
+      return signExecuteMethod(Staking, this, "getUpgradeDelay", params);
+    },
+    getOwner: async (
+      params: StakingTypes.SignExecuteMethodParams<"getOwner">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getOwner">> => {
+      return signExecuteMethod(Staking, this, "getOwner", params);
+    },
+    getNewOwner: async (
+      params: StakingTypes.SignExecuteMethodParams<"getNewOwner">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getNewOwner">> => {
+      return signExecuteMethod(Staking, this, "getNewOwner", params);
+    },
+    getUpgradeCommenced: async (
+      params: StakingTypes.SignExecuteMethodParams<"getUpgradeCommenced">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getUpgradeCommenced">> => {
+      return signExecuteMethod(Staking, this, "getUpgradeCommenced", params);
+    },
+    getNewCode: async (
+      params: StakingTypes.SignExecuteMethodParams<"getNewCode">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getNewCode">> => {
+      return signExecuteMethod(Staking, this, "getNewCode", params);
+    },
+    getNewImmFieldsEncoded: async (
+      params: StakingTypes.SignExecuteMethodParams<"getNewImmFieldsEncoded">
+    ): Promise<
+      StakingTypes.SignExecuteMethodResult<"getNewImmFieldsEncoded">
+    > => {
+      return signExecuteMethod(Staking, this, "getNewImmFieldsEncoded", params);
+    },
+    getNewMutFieldsEncoded: async (
+      params: StakingTypes.SignExecuteMethodParams<"getNewMutFieldsEncoded">
+    ): Promise<
+      StakingTypes.SignExecuteMethodResult<"getNewMutFieldsEncoded">
+    > => {
+      return signExecuteMethod(Staking, this, "getNewMutFieldsEncoded", params);
+    },
+    stake: async (
+      params: StakingTypes.SignExecuteMethodParams<"stake">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"stake">> => {
+      return signExecuteMethod(Staking, this, "stake", params);
+    },
+    unstake: async (
+      params: StakingTypes.SignExecuteMethodParams<"unstake">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"unstake">> => {
+      return signExecuteMethod(Staking, this, "unstake", params);
+    },
+    withdraw: async (
+      params: StakingTypes.SignExecuteMethodParams<"withdraw">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"withdraw">> => {
+      return signExecuteMethod(Staking, this, "withdraw", params);
+    },
+    depositRewards: async (
+      params: StakingTypes.SignExecuteMethodParams<"depositRewards">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"depositRewards">> => {
+      return signExecuteMethod(Staking, this, "depositRewards", params);
+    },
+    claimRewards: async (
+      params: StakingTypes.SignExecuteMethodParams<"claimRewards">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"claimRewards">> => {
+      return signExecuteMethod(Staking, this, "claimRewards", params);
+    },
+    getPendingRewards: async (
+      params: StakingTypes.SignExecuteMethodParams<"getPendingRewards">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getPendingRewards">> => {
+      return signExecuteMethod(Staking, this, "getPendingRewards", params);
+    },
+    getStakingTokenId: async (
+      params: StakingTypes.SignExecuteMethodParams<"getStakingTokenId">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getStakingTokenId">> => {
+      return signExecuteMethod(Staking, this, "getStakingTokenId", params);
+    },
+    getRewardsTokenId: async (
+      params: StakingTypes.SignExecuteMethodParams<"getRewardsTokenId">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getRewardsTokenId">> => {
+      return signExecuteMethod(Staking, this, "getRewardsTokenId", params);
+    },
+    getUnstakeLockTime: async (
+      params: StakingTypes.SignExecuteMethodParams<"getUnstakeLockTime">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getUnstakeLockTime">> => {
+      return signExecuteMethod(Staking, this, "getUnstakeLockTime", params);
+    },
+    getAmountStaked: async (
+      params: StakingTypes.SignExecuteMethodParams<"getAmountStaked">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getAmountStaked">> => {
+      return signExecuteMethod(Staking, this, "getAmountStaked", params);
+    },
+    getRewardPerToken: async (
+      params: StakingTypes.SignExecuteMethodParams<"getRewardPerToken">
+    ): Promise<StakingTypes.SignExecuteMethodResult<"getRewardPerToken">> => {
+      return signExecuteMethod(Staking, this, "getRewardPerToken", params);
     },
   };
 

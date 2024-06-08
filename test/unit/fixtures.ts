@@ -18,7 +18,7 @@ import {
 import { expectAssertionError, randomContractId, testAddress, randomContractAddress } from '@alephium/web3-test'
 import { randomBytes } from 'crypto'
 import * as base58 from 'bs58'
-import { ApadToken, ApadTokenTypes, RewardDistributor, RewardDistributorTypes, Staking, StakingTypes, StakingAccount, StakingAccountTypes, SaleFlatPriceAlph, SaleBuyerAccount, TokenPair, SaleManager, TestUpgradable, DummyToken, BurnALPH } from '../../artifacts/ts'
+import { ApadToken, ApadTokenTypes, RewardDistributor, RewardDistributorTypes, Staking, StakingTypes, StakingAccount, StakingAccountTypes, SaleFlatPriceAlph, SaleBuyerAccount, TokenPair, SaleManager, TestUpgradable, DummyToken, BurnALPH, SaleFlatPriceAlphV2 } from '../../artifacts/ts'
 
 
 export class ContractFixture<F extends Fields> {
@@ -305,6 +305,66 @@ export function createSaleFlatPrice(
   return new ContractFixture(contractState, dependencies, address)
 }
 
+export function createSaleFlatPriceV2(
+  rewardDistributor: string,
+  saleOwner: string,
+  accountTemplateId: string,
+  tokenPrice: bigint,
+  saleStart: bigint,
+  saleEnd: bigint,
+  minRaise: bigint,
+  maxRaise: bigint,
+  saleTokenId: string,
+  saleTokenTotalAmount: bigint,
+  bidTokenId: string,
+  whitelistSaleStart: bigint,
+  whitelistSaleEnd: bigint,
+  whitelistBuyerMaxBid: bigint,
+  tokensSold: bigint,
+  totalRaised: bigint,
+  merkleRoot: string,
+  cliffEnd: bigint,
+  publicSaleMaxBid: bigint,
+  upfrontRelease: bigint,
+  vestingEnd: bigint,
+  dependencies: ContractState[],
+  contractId?: string
+) {
+  const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
+  const contractState = SaleFlatPriceAlphV2.stateForTest(
+    {
+      rewardDistributor,
+      saleOwner,
+      accountTemplateId,
+      tokenPrice,
+      saleStart,
+      saleEnd,
+      minRaise,
+      maxRaise,
+      saleTokenId,
+      saleTokenTotalAmount,
+      bidTokenId,
+      whitelistSaleStart,
+      whitelistSaleEnd,
+      whitelistBuyerMaxBid,
+      tokensSold,
+      totalRaised,
+      merkleRoot,
+      cliffEnd,
+      publicSaleMaxBid,
+      sellerClaimed: 0n,
+      upfrontRelease,
+      vestingEnd
+    },
+    {
+      alphAmount: ONE_ALPH,
+      tokens: [{ id: saleTokenId, amount: saleTokenTotalAmount }]
+    },
+    address
+  )
+  return new ContractFixture(contractState, dependencies, address)
+}
+
 export function createBurnAlph(
   dependencies: ContractState[],
   contractId?: string
@@ -365,7 +425,45 @@ export function createSaleManager(
       pair: paidContractId,
       alphTokenId: ALPH_TOKEN_ID,
       usdtTokenId: "556d9582463fe44fbd108aedc9f409f69086dc78d994b88ea6c9e65f8bf98e00",
-      listingFeeAmount: 100n * (10n**6n),
+      listingFeeAmount: 100n * (10n ** 6n),
+      rewardDistributor: rewardDistributorContractId,
+      accountTemplateId: accountTemplateId,
+      saleFlatPriceAlphTemplateId: saleFlatPriceAlphTemplateId,
+      saleCounter: 0n,
+      newCode: "",
+      newImmFieldsEncoded: "",
+      newMutFieldsEncoded: "",
+      newOwner: ZERO_ADDRESS,
+      owner: ZERO_ADDRESS,
+      upgradeCommenced: 0n,
+      upgradeDelay: 604800000n
+    },
+    {
+      alphAmount: ONE_ALPH,
+      tokens: []
+    },
+    address
+  )
+  return new ContractFixture(contractState, dependencies, address)
+}
+
+export function createSaleManagerV2(
+  burnAlph: string,
+  paidContractId: string,
+  rewardDistributorContractId: string,
+  saleFlatPriceAlphTemplateId: string,
+  accountTemplateId: string,
+  dependencies: ContractState[],
+  contractId?: string
+) {
+  const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
+  const contractState = SaleManager.stateForTest(
+    {
+      burnAlphContract: burnAlph,
+      pair: paidContractId,
+      alphTokenId: ALPH_TOKEN_ID,
+      usdtTokenId: "556d9582463fe44fbd108aedc9f409f69086dc78d994b88ea6c9e65f8bf98e00",
+      listingFeeAmount: 100n * (10n ** 6n),
       rewardDistributor: rewardDistributorContractId,
       accountTemplateId: accountTemplateId,
       saleFlatPriceAlphTemplateId: saleFlatPriceAlphTemplateId,

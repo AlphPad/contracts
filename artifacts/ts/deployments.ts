@@ -19,6 +19,10 @@ import {
   SaleFlatPriceAlphInstance,
   SaleManager,
   SaleManagerInstance,
+  SaleFlatPriceAlphV2,
+  SaleFlatPriceAlphV2Instance,
+  SaleManagerV2,
+  SaleManagerV2Instance,
   TokenPair,
   TokenPairInstance,
   DummyToken,
@@ -37,6 +41,8 @@ export type Deployments = {
     SaleBuyerAccount: DeployContractExecutionResult<SaleBuyerAccountInstance>;
     SaleFlatPriceAlph: DeployContractExecutionResult<SaleFlatPriceAlphInstance>;
     SaleManager: DeployContractExecutionResult<SaleManagerInstance>;
+    SaleFlatPriceAlphV2: DeployContractExecutionResult<SaleFlatPriceAlphV2Instance>;
+    SaleManagerV2: DeployContractExecutionResult<SaleManagerV2Instance>;
     TokenPair?: DeployContractExecutionResult<TokenPairInstance>;
     DummyToken?: DeployContractExecutionResult<DummyTokenInstance>;
   };
@@ -87,6 +93,18 @@ function toDeployments(json: any): Deployments {
         json.contracts["SaleManager"].contractInstance.address
       ),
     },
+    SaleFlatPriceAlphV2: {
+      ...json.contracts["SaleFlatPriceAlphV2"],
+      contractInstance: SaleFlatPriceAlphV2.at(
+        json.contracts["SaleFlatPriceAlphV2"].contractInstance.address
+      ),
+    },
+    SaleManagerV2: {
+      ...json.contracts["SaleManagerV2"],
+      contractInstance: SaleManagerV2.at(
+        json.contracts["SaleManagerV2"].contractInstance.address
+      ),
+    },
     TokenPair:
       json.contracts["TokenPair"] === undefined
         ? undefined
@@ -126,7 +144,7 @@ export function loadDeployments(
   if (deployments === undefined) {
     throw Error("The contract has not been deployed to the " + networkId);
   }
-  const allDeployments = Array.isArray(deployments)
+  const allDeployments: any[] = Array.isArray(deployments)
     ? deployments
     : [deployments];
   if (deployerAddress === undefined) {
