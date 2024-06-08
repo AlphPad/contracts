@@ -11,8 +11,11 @@ const deployStaking: DeployFunction<Settings> = async (
 
   const buyerTemplateAccount = deployer.getDeployContractResult('SaleBuyerAccount');
 
-  let tokenPair = deployer.getDeployContractResult('TokenPair');
-  let tokenPairAddress = tokenPair.contractInstance.address;
+  let tokenPairAddress = network.settings.sale.tokenPair;
+  if (tokenPairAddress == "") {
+    let tokenPair = deployer.getDeployContractResult('TokenPair');
+    tokenPairAddress = tokenPair.contractInstance.address;
+  }
 
   const flatpriceSaleAlphTemplate = await deployer.deployContract(SaleFlatPriceAlphV2, {
     initialFields: {
