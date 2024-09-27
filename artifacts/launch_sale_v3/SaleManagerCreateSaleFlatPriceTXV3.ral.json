@@ -1,0 +1,67 @@
+{
+  "version": "v3.6.3",
+  "name": "SaleManagerCreateSaleFlatPriceTXV3",
+  "bytecodeTemplate": "0101030000001bb47a13c40de0b6b3a7640000{1}2aa2{11}{12}a3{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}130e0c{0}0116",
+  "fieldsSig": {
+    "names": [
+      "saleManager",
+      "amountAlph",
+      "tokenPrice",
+      "publicSaleMaxBid",
+      "upfrontRelease",
+      "vestingEnd",
+      "cliffEnd",
+      "saleStart",
+      "saleEnd",
+      "minRaise",
+      "maxRaise",
+      "saleTokenId",
+      "saleTokenTotalAmount",
+      "whitelistSaleEnd",
+      "merkleRoot"
+    ],
+    "types": [
+      "SaleManagerV3",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "ByteVec",
+      "U256",
+      "U256",
+      "ByteVec"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { web3, Project, DUST_AMOUNT, ALPH_TOKEN_ID, ONE_ALPH, ContractInstance, addressFromContractId } from '@alephium/web3'
+import { web3, DUST_AMOUNT, ALPH_TOKEN_ID, ONE_ALPH, ContractInstance, addressFromContractId } from '@alephium/web3'
 import { getSigner, transfer } from '@alephium/web3-test'
 import { DeployContractExecutionResult, Deployments, deployToDevnet } from '@alephium/cli'
 import { PrivateKeyWallet } from '@alephium/web3-wallet';
@@ -28,7 +28,6 @@ describe('Sale Contracts Tests', () => {
 
   beforeAll(async () => {
     web3.setCurrentNodeProvider('http://127.0.0.1:22973', undefined, fetch)
-    await Project.build()
     seller = await getSigner(100n * ONE_ALPH, 0)
     seller2 = await getSigner(100n * ONE_ALPH, 0)
     seller3 = await getSigner(100n * ONE_ALPH, 0)
@@ -58,7 +57,7 @@ describe('Sale Contracts Tests', () => {
   }, 10000)
 
   it('Confirms successful sale max raise flow', async () => {
-    const listingFee = (await SaleManager.at(saleManager.contractInstance.address).methods.calculateListingFee()).returns
+    const listingFee = (await SaleManager.at(saleManager.contractInstance.address).view.calculateListingFee()).returns
     const res = await SaleManagerCreateSaleFlatPriceTX.execute(seller, {
       initialFields: {
         saleManager: saleManager.contractInstance.contractId,
@@ -86,7 +85,7 @@ describe('Sale Contracts Tests', () => {
     });
     await sleep(10000);
     const createEvent = await getEventByTxId(res.txId, SaleManager.contract.codeHash, 2);
-    const flatPriceSaleContractId = createEvent.fields.contractId.toString();
+    const flatPriceSaleContractId = createEvent.fields[0].value.toString();
     const flatPriceSaleInst = SaleFlatPriceAlph.at(addressFromContractId(flatPriceSaleContractId));
     
     await SaleFlatPriceAlphBuyTX.execute(buyer1, {
@@ -182,7 +181,7 @@ describe('Sale Contracts Tests', () => {
   }, 60000)
 
   it('Confirms successful sale min raise flow', async () => {
-    const listingFee = (await SaleManager.at(saleManager.contractInstance.address).methods.calculateListingFee()).returns
+    const listingFee = (await SaleManager.at(saleManager.contractInstance.address).view.calculateListingFee()).returns
     const res = await SaleManagerCreateSaleFlatPriceTX.execute(seller2, {
       initialFields: {
         saleManager: saleManager.contractInstance.contractId,
@@ -210,7 +209,7 @@ describe('Sale Contracts Tests', () => {
     });
     await sleep(10000);
     const createEvent = await getEventByTxId(res.txId, SaleManager.contract.codeHash, 2);
-    const flatPriceSaleContractId = createEvent.fields.contractId.toString();
+    const flatPriceSaleContractId = createEvent.fields[0].value.toString();
     const flatPriceSaleInst = SaleFlatPriceAlph.at(addressFromContractId(flatPriceSaleContractId));
 
     await SaleFlatPriceAlphBuyTX.execute(buyer4, {
@@ -274,7 +273,7 @@ describe('Sale Contracts Tests', () => {
   }, 60000)
 
   it('Confirms refund when sale min not reached', async () => {
-    const listingFee = (await SaleManager.at(saleManager.contractInstance.address).methods.calculateListingFee()).returns
+    const listingFee = (await SaleManager.at(saleManager.contractInstance.address).view.calculateListingFee()).returns
     const res = await SaleManagerCreateSaleFlatPriceTX.execute(seller3, {
       initialFields: {
         saleManager: saleManager.contractInstance.contractId,
@@ -302,7 +301,7 @@ describe('Sale Contracts Tests', () => {
     });
     await sleep(10000);
     const createEvent = await getEventByTxId(res.txId, SaleManager.contract.codeHash, 2);
-    const flatPriceSaleContractId = createEvent.fields.contractId.toString();
+    const flatPriceSaleContractId = createEvent.fields[0].value.toString();
     const flatPriceSaleInst = SaleFlatPriceAlph.at(addressFromContractId(flatPriceSaleContractId));
     await SaleFlatPriceAlphBuyTX.execute(buyer6, {
       initialFields: {

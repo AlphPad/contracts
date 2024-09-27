@@ -1,0 +1,266 @@
+// Contract SaleFlatPriceV3
+// - Manages a flat price token sale with optional whitelist.
+// - Extends AccountFactory for buyer account management and SaleBase for common sale functionalities.
+Abstract Contract SaleFlatPriceV3(
+    rewardDistributor: RewardDistributor,   // Reward distributor for managing rewards
+    saleOwner: Address,                     // Owner of the sale
+    accountTemplateId: ByteVec,             // Template ID for creating buyer accounts
+    tokenPrice: U256,                       // Price of the token in the sale
+    minRaise: U256,                         // Minimum amount to be raised
+    maxRaise: U256,                         // Maximum amount to be raised
+    saleTokenId: ByteVec,                   // ID of the token being sold
+    saleTokenTotalAmount: U256,             // Total amount of tokens available for sale
+    bidTokenId: ByteVec,                    // Token used for bidding
+    mut saleStart: U256,                    // Start time of the sale
+    mut saleEnd: U256,                      // End time of the sale
+    mut whitelistSaleStart: U256,           // Start time of the whitelist sale
+    mut whitelistSaleEnd: U256,             // End time of the whitelist sale
+    mut tokensSold: U256,                   // Amount of tokens sold
+    mut totalRaised: U256,                  // Total funds raised in the sale
+    mut merkleRoot: ByteVec,                // Merkle root for whitelist verification
+    mut publicSaleMaxBid: U256,             // The maximum bid per address on public sale
+    mut sellerClaimed: U256,                // Timestamp when seller claimed
+    mut upfrontRelease: U256,               // Upfront release of tokens in basis points
+    mut vestingEnd: U256,                   // Vesting end time for linear vesting
+    mut cliffEnd: U256                      // Cliff end time for linear vesting
+) extends AccountFactoryV2(accountTemplateId), 
+    SaleBase(
+        saleOwner,
+        minRaise, 
+        maxRaise, 
+        saleTokenId, 
+        bidTokenId, 
+        saleStart, 
+        saleEnd, 
+        whitelistSaleStart, 
+        whitelistSaleEnd, 
+        tokensSold,
+        totalRaised,
+        merkleRoot
+) {
+
+    // Event declarations
+    event Buy(account: Address, buyBidAmount: U256, buyTokenAmount: U256)
+    event UpdateWhitelistBuyerMaxBid(caller: Address, newPublicSaleMaxBid: U256, oldPublicSaleMaxBid: U256)
+    event UpdatePublicSaleMaxBid(caller: Address, newSellerClaimed: U256, oldSellerClaimed: U256)
+    event UpdateUpfrontRelease(caller: Address, newUpfrontRelease: U256, oldUpfrontRelease: U256)
+    event UpdateVestingEnd(caller: Address, newVestingEnd: U256, oldVestingEnd: U256)
+    event UpdateCliffEnd(caller: Address, newCliffEnd: U256, oldCliffEnd: U256)
+
+
+    // Error codes specific to claiming operations in this contract.
+    enum ErrorCodes {
+        PriceMoreThanMax = 601
+        PriceLessThanMin = 602
+        BidMoreThanMax = 603
+        BidLessThanMin = 604
+        InvalidClaimAmount = 605
+        SaleTokenTotalExceeded = 606
+        SaleOwnerCanNotBid = 607
+        BuyerNotWhitelisted = 608
+        SaleTokenMoreThan18Decimal = 609
+        SaleAmountSmallerThanMin = 610
+        SaleAmountLargerThanMax = 611
+        SellerAlreadyClaimed = 612
+        ClaimsNotStarted = 613
+        UpfrontReleaseOutOfRange=614
+        VestingEndOutOfRange=615
+        CliffEndOutOfRange=616
+    }
+
+    // Handles token purchasing by buyers. Validates sale conditions and processes token allocation.
+    @using(preapprovedAssets = true, assetsInContract = true, checkExternalCaller = false, updateFields = true)
+    pub fn buy(bidAmount: U256, wlPrice: U256, wlMaxBid: U256, wlMerkleProof: ByteVec, stateRentAmount:U256) -> () {
+        assertSaleLive()
+        let account = callerAddress!()
+        assert!(account != saleOwner, ErrorCodes.SaleOwnerCanNotBid)
+
+        let mut tokensReceived = 0
+        // If it's a whitelist sale, verifies the buyer's eligibility
+        if(isWhitelistSale() && isWhitelistSaleLive()){
+            assert!(checkIsWhitelisted(account, wlMerkleProof, wlPrice, wlMaxBid), ErrorCodes.BuyerNotWhitelisted)
+            checkBidLimit(account, bidAmount, wlMaxBid)
+            tokensReceived = calculateSaleTokensReceivedPerBidTokens(bidAmount, wlPrice)
+        } else {
+            checkBidLimit(account, bidAmount, publicSaleMaxBid)
+            tokensReceived = calculateSaleTokensReceivedPerBidTokens(bidAmount, tokenPrice)
+        }
+
+        assert!(totalRaised + bidAmount <= maxRaise, ErrorCodes.SaleTokenTotalExceeded)
+        assert!(tokensSold + tokensReceived <= saleTokenTotalAmount, ErrorCodes.SaleTokenTotalExceeded)
+
+        transferTokenToSelf!(account, bidTokenId, bidAmount)
+
+        // Manages buyer accounts and updates sale state
+        if (!accountExists(account)) {
+            let (encodedImmFieldsReg, encodedMutFieldsReg) = SaleBuyerAccount.encodeFields!(
+                selfAddress!(),
+                account, 
+                tokensReceived, bidAmount, 0, 0)
+            createAccount{account -> ALPH: stateRentAmount}(account,encodedImmFieldsReg, encodedMutFieldsReg, stateRentAmount)
+        } else {
+            let buyerAccount = SaleBuyerAccount(getSubContractId(account))
+            buyerAccount.buy(tokensReceived, bidAmount)
+        }
+
+        tokensSold = tokensSold + tokensReceived
+        totalRaised = totalRaised + bidAmount
+
+        emit Buy(account, bidAmount, tokensReceived)
+    }
+
+    fn checkBidLimit(account: Address, bidAmount: U256, maxBid: U256) -> () {
+        if (accountExists(account)) {
+            let buyerAccountCurrent = SaleBuyerAccount(getSubContractId(account))
+            assert!(bidAmount + buyerAccountCurrent.getAmountBid() <= maxBid, ErrorCodes.BidMoreThanMax)
+        } else {
+            assert!(bidAmount <= maxBid, ErrorCodes.BidMoreThanMax)
+        }
+    }
+    
+
+    // Allows buyers to claim their purchased tokens after the sale concludes.
+    @using(assetsInContract = true)
+    fn claimBuyer(caller: Address, amount: U256) -> () {
+        let buyerAccount = SaleBuyerAccount(getSubContractId(caller))
+        let netClaimable = calculateClaimableAmount(buyerAccount)
+        assert!(amount <= netClaimable, ErrorCodes.InvalidClaimAmount)
+        assert!(sellerClaimed != 0, ErrorCodes.ClaimsNotStarted)
+
+        buyerAccount.claim(amount)
+        transferTokenFromSelf!(caller, saleTokenId, amount)
+        if(buyerAccount.isSafeToDestroy()) {
+            destroyAccount(caller)
+        }
+    }
+
+    pub fn calculateClaimableAmount(buyerAccount: SaleBuyerAccount) -> U256 {
+        let totalTokens = buyerAccount.getAmountBuy()
+        let claimedTokens = buyerAccount.getAmountClaimed()
+        let currentTime = blockTimeStamp!()
+        let upfrontTokens = (totalTokens * upfrontRelease) / 10000
+
+        if (currentTime < cliffEnd) {
+            return upfrontTokens - claimedTokens
+        } 
+        if (currentTime >= vestingEnd) {
+            return totalTokens - claimedTokens
+        }
+
+        let vestingDuration = vestingEnd - saleEnd
+        if (vestingDuration == 0) {
+            return totalTokens - claimedTokens
+        }
+        
+        let timeSinceSaleEnd = currentTime - saleEnd
+        let vestedTokens = (totalTokens - upfrontTokens) * timeSinceSaleEnd / vestingDuration
+    
+        let claimableAmount = upfrontTokens + vestedTokens
+    
+        return claimableAmount - claimedTokens
+    }
+    
+
+    // Allows buyers to get a refund if the sale conditions are not met (e.g., min raise not achieved).
+    @using(assetsInContract = true)
+    fn claimBuyerRefund(caller: Address, amount: U256) -> () {
+        let buyerAccount = SaleBuyerAccount(getSubContractId(caller))
+        assert!(amount == buyerAccount.getAmountBid(), ErrorCodes.InvalidClaimAmount)
+        buyerAccount.claimRefund(amount)
+        transferTokenFromSelf!(caller, bidTokenId, amount)
+        if(buyerAccount.isSafeToDestroy()) {
+            destroyAccount(caller)
+        }
+    }
+
+    // Allows the sale owner to claim back the unsold tokens if the sale does not reach the min raise.
+    @using(assetsInContract = true)
+    fn claimSellerRefund(amount: U256) -> () {
+        assert!(amount == saleTokenTotalAmount, ErrorCodes.InvalidClaimAmount)
+        transferTokenFromSelf!(saleOwner, saleTokenId, saleTokenTotalAmount)
+    }
+
+    @using(checkExternalCaller = false)
+    pub fn calculateSaleTokensReceivedPerBidTokens(bidAmount: U256, pricePerToken: U256) -> U256 {
+        assertPriceInRange()
+        assertSaleAmountInRange()
+        assertBidAmountInRange(bidAmount)
+        let saleTokenDecimals = IFungibleToken(saleTokenId).getDecimals()
+        assert!(saleTokenDecimals <= 18, ErrorCodes.SaleTokenMoreThan18Decimal)
+        return bidAmount * (10 ** saleTokenDecimals) / pricePerToken
+    }
+
+    @using(checkExternalCaller = false)
+    pub fn checkIsWhitelisted(account: Address, wlMerkleProof: ByteVec, wlPrice: U256, wlMaxBid: U256) -> Bool {
+        if(isWhitelistSale()){
+            return verify(wlMerkleProof, keccak256!(toByteVec!(account)++b`;`++u256To32Byte!(wlPrice)++b`;`++u256To32Byte!(wlMaxBid)))
+        }
+        return false
+    }
+
+    @using(updateFields = true)
+    pub fn setAllFields(
+        newSaleStart: U256,                    // Start time of the sale
+        newSaleEnd: U256,                      // End time of the sale
+        newWhitelistSaleStart: U256,           // Start time of the whitelist sale
+        newWhitelistSaleEnd: U256,             // End time of the whitelist sale
+        newPublicSaleMaxBid: U256,             // The maximum bid per address on public sale
+        newUpfrontRelease: U256,               // Upfront release of tokens in basis points
+        newVestingEnd: U256,                   // Vesting end time for linear vesting
+        newCliffEnd: U256                      // Cliff end time for linear vesting
+    ) -> () {
+        let caller = callerAddress!() 
+        checkCaller!(caller == saleOwner, SaleBaseErrorCodes.SaleUpdateUnauthorized)
+        assertSaleEditable()
+
+        // Update public/wl sale dates
+        assertValidSaleDates(newSaleStart, newSaleEnd)
+        emit SaleDatesUpdate(caller, newSaleStart, saleStart, newSaleEnd, saleEnd)
+        saleStart = newSaleStart
+        saleEnd = newSaleEnd
+        if(isWhitelistSale()) {
+            assertValidWLSaleDates(newSaleStart, newSaleEnd, newWhitelistSaleStart, newWhitelistSaleEnd)
+            emit WhitelistSaleDatesUpdate(caller, newWhitelistSaleStart, whitelistSaleStart, newWhitelistSaleEnd, whitelistSaleEnd)
+            whitelistSaleStart = newWhitelistSaleStart
+            whitelistSaleEnd = newWhitelistSaleEnd
+        }
+
+        // Update Public Sale
+        assertMaxBidAmountInRange(newPublicSaleMaxBid)
+        emit UpdatePublicSaleMaxBid(caller, newPublicSaleMaxBid, publicSaleMaxBid)
+        publicSaleMaxBid = newPublicSaleMaxBid
+
+        // Update Vesting Settings
+        assert!(newVestingEnd >= saleEnd && newVestingEnd >= cliffEnd, ErrorCodes.VestingEndOutOfRange)
+        emit UpdateVestingEnd(caller, newVestingEnd, vestingEnd)
+        vestingEnd = newVestingEnd
+
+        assert!(newUpfrontRelease >= 0 && newUpfrontRelease <= 10000, ErrorCodes.UpfrontReleaseOutOfRange)
+        emit UpdateUpfrontRelease(caller, newUpfrontRelease, upfrontRelease)
+        upfrontRelease = newUpfrontRelease
+
+        assert!(newCliffEnd >= saleEnd && newCliffEnd <= vestingEnd, ErrorCodes.CliffEndOutOfRange)
+        emit UpdateCliffEnd(caller, newCliffEnd, cliffEnd)
+        cliffEnd = newCliffEnd
+    }
+
+    fn assertPriceInRange() -> () {
+        assert!(tokenPrice <= 1 * (10**32), ErrorCodes.PriceMoreThanMax) // price can't be bigger than 32 digits to avoid overflows on multiplication
+        assert!(tokenPrice >= 1, ErrorCodes.PriceLessThanMin) // price must be bigger than 0 to avoid dividing with 0
+    }
+
+    fn assertMaxBidAmountInRange(maxBidAmount: U256) -> () {
+        assert!(maxBidAmount <= minRaise, ErrorCodes.BidMoreThanMax) // max bid per wl must be equal or less than minRaise
+        assert!(maxBidAmount >= 1, ErrorCodes.BidLessThanMin) // bid must be bigger than 0 to avoid dividing with 0
+    }    
+    
+    fn assertBidAmountInRange(bidAmount: U256) -> () {
+        assert!(bidAmount <= 1 * (10**32), ErrorCodes.BidMoreThanMax) // bid can't be bigger than 32 digits to avoid overflows on multiplication
+        assert!(bidAmount >= 1, ErrorCodes.BidLessThanMin) // bid must be bigger than 0 to avoid dividing with 0
+    }    
+
+    fn assertSaleAmountInRange() -> () {
+        assert!(saleTokenTotalAmount >= 1000 , ErrorCodes.SaleAmountSmallerThanMin) // Number must be 1000 or larger
+        assert!(saleTokenTotalAmount <= 1 * (10**36), ErrorCodes.SaleAmountLargerThanMax) // Number with less than 36 digits
+    }  
+}

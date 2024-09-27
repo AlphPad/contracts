@@ -1,4 +1,4 @@
-import { web3, Project, DUST_AMOUNT, ALPH_TOKEN_ID, ONE_ALPH, ContractInstance } from '@alephium/web3'
+import { web3, DUST_AMOUNT, ALPH_TOKEN_ID, ONE_ALPH, ContractInstance } from '@alephium/web3'
 import { getSigner, transfer } from '@alephium/web3-test'
 import { DeployContractExecutionResult, Deployments, deployToDevnet } from '@alephium/cli'
 import { PrivateKeyWallet } from '@alephium/web3-wallet';
@@ -17,7 +17,6 @@ describe('APAD Token Tests', () => {
 
   beforeAll(async () => {
     web3.setCurrentNodeProvider('http://127.0.0.1:22973', undefined, fetch)
-    await Project.build()
     signer = await getSigner(100n * ONE_ALPH, 0)
     deployments = await deployToDevnet()
 
@@ -41,7 +40,7 @@ describe('APAD Token Tests', () => {
   }, 20000)
 
   it('Confirms burning APAD tokens reduces the total supply accordingly', async () => {
-    const supply = (await ApadToken.at(tokenAddress).methods.getTotalSupply()).returns;
+    const supply = (await ApadToken.at(tokenAddress).view.getTotalSupply()).returns;
     const apadBalance = await balanceOf(tokenId, testAddress);
     await ApadTokenBurnTX.execute(signer, {
       initialFields: {
@@ -56,7 +55,7 @@ describe('APAD Token Tests', () => {
         }
       ]
     })
-    const supplyAfterBurn = (await ApadToken.at(tokenAddress).methods.getTotalSupply()).returns;
+    const supplyAfterBurn = (await ApadToken.at(tokenAddress).view.getTotalSupply()).returns;
     const apadBalanceAfterBurn = await balanceOf(tokenId, testAddress);
     expect(supply).toBe(supplyAfterBurn + 10n * ONE_ALPH);
     expect(apadBalance).toBe(apadBalanceAfterBurn + 10n * ONE_ALPH);

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "ListingRecord",
+    "fieldNames": [
+      "owner",
+      "status",
+      "saleContractId"
+    ],
+    "fieldTypes": [
+      "Address",
+      "ByteVec",
+      "ByteVec"
+    ],
+    "isMutable": [
+      true,
+      true,
+      true
+    ]
+  }
+]

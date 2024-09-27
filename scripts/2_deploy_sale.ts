@@ -49,7 +49,7 @@ const deployStaking: DeployFunction<Settings> = async (
         name: stringToHex("12 Decimal Token"),
         symbol: stringToHex("12DT")
       }
-    })
+    }, "12DT")
 
     const testingTokenB = await deployer.deployContract(DummyToken, {
       issueTokenAmount: issueTokenAmount,
@@ -60,7 +60,7 @@ const deployStaking: DeployFunction<Settings> = async (
         name: stringToHex("6 Decimal Token"),
         symbol: stringToHex("6DT")
       }
-    })
+    }, "6DT")
 
     const testingTokenC = await deployer.deployContract(DummyToken, {
       issueTokenAmount: issueTokenAmount,
@@ -71,7 +71,7 @@ const deployStaking: DeployFunction<Settings> = async (
         name: stringToHex("2 Decimal Token"),
         symbol: stringToHex("2DT")
       }
-    })
+    }, "2DT")
 
     const testingTokenD = await deployer.deployContract(DummyToken, {
       issueTokenAmount: issueTokenAmount,
@@ -82,7 +82,7 @@ const deployStaking: DeployFunction<Settings> = async (
         name: stringToHex("0 Decimal Token"),
         symbol: stringToHex("0DT")
       }
-    })
+    }, "0DT")
   }
 
   let burnAlphAddress = network.settings.sale.burnAlph

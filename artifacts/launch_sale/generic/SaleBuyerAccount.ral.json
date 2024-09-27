@@ -1,8 +1,8 @@
 {
-  "version": "v2.12.0",
+  "version": "v3.6.3",
   "name": "SaleBuyerAccount",
-  "bytecode": "060d0e4020402c403b4044404d40644080409c40a540ae40b740c0010200000005b400030002ce01b0010000000108a002a0002fa003a0012f1b020000000000030001136f467b0000010100051600ce0045136f457b010000000102ce0002010000000102ce010201000202000ab40003a00016002aa100a00116012aa10101000102000db40003a00216002aa0003213444d7ba00216002aa10201000101000db40003a00316002aa0013213444e7ba00316002aa103010000000102a00002010000000102a00102010000000102a00202010000000102a00302",
-  "codeHash": "5b85bbcf941c0e29fa634eccc5c21a0545245218348b1c27c9c7fc3980f5913a",
+  "bytecode": "060d13402a4036404540534061407d409e40bf40cd40db40e940f7010200000006d38e18691cb400030002ce01b0010000000109d33b72fc46a002a0002fa003a0012f1b020000000000030001136f467b0000010100051600ce0045136f457b010000000103d399fb6e66ce0002010000000103d3879ae183ce010201000202000bd34e9322f2b40003a00016002aa100a00116012aa10101000102000ed390c29a6ab40003a00216002aa0003213444d7ba00216002aa10201000101000ed3443f510eb40003a00316002aa0013213444e7ba00316002aa103010000000103d32f6d6588a00002010000000103d3f36a26a7a00102010000000103d3b7ba88a7a00202010000000103d3c14a790ba00302",
+  "codeHash": "118309673b71af5f15da54e10f67b3944ae20d22a09c47ea7664250f7841834a",
   "fieldsSig": {
     "names": [
       "parentContractAddress",
@@ -33,9 +33,6 @@
   "functions": [
     {
       "name": "destroy",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -43,9 +40,6 @@
     },
     {
       "name": "isSafeToDestroy",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -55,9 +49,6 @@
     },
     {
       "name": "assertIsSafeToDestroy",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": false,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -65,9 +56,6 @@
     },
     {
       "name": "assertIsParentTheCaller",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": false,
       "paramNames": [
         "caller"
       ],
@@ -81,9 +69,6 @@
     },
     {
       "name": "getParentContractAddress",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -93,9 +78,6 @@
     },
     {
       "name": "getAccountHolder",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -105,9 +87,6 @@
     },
     {
       "name": "buy",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [
         "addAmountBuy",
         "addAmountBid"
@@ -124,9 +103,6 @@
     },
     {
       "name": "claim",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [
         "claimAmount"
       ],
@@ -140,9 +116,6 @@
     },
     {
       "name": "claimRefund",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [
         "claimAmount"
       ],
@@ -156,9 +129,6 @@
     },
     {
       "name": "getAmountBuy",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -168,9 +138,6 @@
     },
     {
       "name": "getAmountBid",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -180,9 +147,6 @@
     },
     {
       "name": "getAmountClaimed",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -192,9 +156,6 @@
     },
     {
       "name": "getAmountClaimedRefund",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -205,25 +166,6 @@
   ],
   "constants": [],
   "enums": [
-    {
-      "name": "ErrorCodes",
-      "fields": [
-        {
-          "name": "ClaimMoreThanBuy",
-          "value": {
-            "type": "U256",
-            "value": "1101"
-          }
-        },
-        {
-          "name": "ClaimMoreThanBid",
-          "value": {
-            "type": "U256",
-            "value": "1102"
-          }
-        }
-      ]
-    },
     {
       "name": "AccountBaseErrorCodes",
       "fields": [
@@ -239,6 +181,25 @@
           "value": {
             "type": "U256",
             "value": "12102"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "ClaimMoreThanBuy",
+          "value": {
+            "type": "U256",
+            "value": "1101"
+          }
+        },
+        {
+          "name": "ClaimMoreThanBid",
+          "value": {
+            "type": "U256",
+            "value": "1102"
           }
         }
       ]

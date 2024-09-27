@@ -1,433 +1,446 @@
 {
-  "fullNodeVersion": "v3.0.1",
+  "fullNodeVersion": "v3.6.3",
   "compilerOptionsUsed": {
     "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
     "ignoreUnusedFieldsWarnings": false,
     "ignoreUnusedPrivateFunctionsWarnings": false,
     "ignoreUpdateFieldsCheckWarnings": false,
-    "ignoreCheckExternalCallerWarnings": false
+    "ignoreCheckExternalCallerWarnings": false,
+    "ignoreUnusedFunctionReturnWarnings": false
   },
   "infos": {
     "AccountBase": {
       "sourceFile": "lib/account/account_base.ral",
       "sourceCodeHash": "4ee169d6736f083d3c77a31adaa6c2ff90c8af489545d9366b66cfe11f653cb4",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "AccountFactory": {
       "sourceFile": "lib/account/account_factory.ral",
       "sourceCodeHash": "3f06065e8990989ebb38dd5475c01762127f131410e263fbf720ed92095cb334",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
+    },
+    "AccountFactoryV2": {
+      "sourceFile": "lib/account/account_factory_v2.ral",
+      "sourceCodeHash": "e73961d7fb5da3dcbcd5aa96de917d8d0be137c4bc7582563eb237ebca37f478",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
     },
     "AccountInterface": {
       "sourceFile": "lib/account/account_interface.ral",
       "sourceCodeHash": "2b9201d845a816cedf4340cd394ba73962d202e10552d6ce006602059f97cf2d",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "ApadToken": {
       "sourceFile": "apad_token.ral",
       "sourceCodeHash": "4e1ae5f957992dd7bda54ea94b7dfabc551fb994d5919605dc5b0cc9e712b521",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "da7543ebc9e29ae7fe1d75043dedead5564b44998b4f5076c4eee829bc814ca3",
-      "warnings": []
+      "codeHashDebug": "2e1ee45f8eb16e21c278e895a0b9448198b05073ce054ec45b3ad7823bf366eb"
     },
     "ApadTokenBurnTX": {
       "sourceFile": "apad_token.ral",
       "sourceCodeHash": "4e1ae5f957992dd7bda54ea94b7dfabc551fb994d5919605dc5b0cc9e712b521",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "BurnALPH": {
       "sourceFile": "external/dummy/burn_alph.ral",
       "sourceCodeHash": "2d06e5c075f8784e0d1e913dbc4be4340579f1732470e95d2ad444d6afacdff6",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "59308e31f3f450eee919ae338ed0d477a49eaa19eac964c32b35438714207fb7",
-      "warnings": []
+      "codeHashDebug": "7d81692ec7f4241c894c49985ed3bcf3a16ce6ef95d97d7221a5566649f053f0"
     },
     "BurnAlphInterface": {
       "sourceFile": "external/burn_alph_interface.ral",
       "sourceCodeHash": "4f0f1ff71494686193626c4a1c70b88a5d84c7fc305fe78f1cce14ba91653342",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "DexPoolInterface": {
       "sourceFile": "external/dex_pool_interface.ral",
       "sourceCodeHash": "06ec29c72bcc78871b05d961a68dbd6c341b884e3dc850d0c7edd5336dbd7dd7",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "DummyToken": {
       "sourceFile": "external/dummy/dummy_token.ral",
       "sourceCodeHash": "dab2da72108949e6012451d4c20b11001b2f6b524a9d03487880bc97336cc9e2",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "a2800413eb2c5c23d48068db23df5f8eeaba04653e12c8ed59d589720d96dadd",
-      "warnings": []
+      "codeHashDebug": "a2800413eb2c5c23d48068db23df5f8eeaba04653e12c8ed59d589720d96dadd"
     },
     "IFungibleToken": {
       "sourceFile": "../node_modules/@alephium/web3/std/fungible_token_interface.ral",
       "sourceCodeHash": "62910bf11e1eeb6cb2fd468626ff606a9b06306b2b81590c3b10f6deb5966bde",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "IUpgradable": {
       "sourceFile": "lib/upgradable/iupgradable.ral",
       "sourceCodeHash": "10ef8b407563017824792123ea30f599b8f31edf2dc4e4d35c39482677653f05",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "IUpgradableChangeOwnerApplyTX": {
       "sourceFile": "lib/upgradable/iupgradable.ral",
       "sourceCodeHash": "10ef8b407563017824792123ea30f599b8f31edf2dc4e4d35c39482677653f05",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "IUpgradableChangeOwnerTX": {
       "sourceFile": "lib/upgradable/iupgradable.ral",
       "sourceCodeHash": "10ef8b407563017824792123ea30f599b8f31edf2dc4e4d35c39482677653f05",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "IUpgradableMigrateApplyTX": {
       "sourceFile": "lib/upgradable/iupgradable.ral",
       "sourceCodeHash": "10ef8b407563017824792123ea30f599b8f31edf2dc4e4d35c39482677653f05",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "IUpgradableMigrateTX": {
       "sourceFile": "lib/upgradable/iupgradable.ral",
       "sourceCodeHash": "10ef8b407563017824792123ea30f599b8f31edf2dc4e4d35c39482677653f05",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "IUpgradableMigrateWithFieldsApplyTX": {
       "sourceFile": "lib/upgradable/iupgradable.ral",
       "sourceCodeHash": "10ef8b407563017824792123ea30f599b8f31edf2dc4e4d35c39482677653f05",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "IUpgradableMigrateWithFieldsTX": {
       "sourceFile": "lib/upgradable/iupgradable.ral",
       "sourceCodeHash": "10ef8b407563017824792123ea30f599b8f31edf2dc4e4d35c39482677653f05",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "IUpgradableResetUpgradeTX": {
       "sourceFile": "lib/upgradable/iupgradable.ral",
       "sourceCodeHash": "10ef8b407563017824792123ea30f599b8f31edf2dc4e4d35c39482677653f05",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
+    },
+    "ListingRecord": {
+      "sourceFile": "launch_sale_v3/sale_manager_v3.ral",
+      "sourceCodeHash": "6b76f93ecffdb6b0b9fb952188290eb39a6348dfac4631f9ce107c3a6daaba82",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
     },
     "Math": {
       "sourceFile": "external/dummy/math.ral",
       "sourceCodeHash": "a466180187f2418982b536e4b14814375a25318cb09782e87976dcc1d5c438d7",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "MerkleProof": {
       "sourceFile": "lib/merkle_proof.ral",
       "sourceCodeHash": "80e0978cffc2ed3f323b05082da0503ea7fc50fb2419e2b6ad1578eed78731e4",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "RewardDistributor": {
       "sourceFile": "rewards/reward_distributor.ral",
       "sourceCodeHash": "7f62143511f4a4e69aa77d13edfb6390dcd6eae291b8b1c03fe9fdeddcbca4c5",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "b913efd25718eeda658a22dfdd9da1d6be770e05b97d607e54ea9f273f724c16",
-      "warnings": []
+      "codeHashDebug": "def65d0f3894410a109b5bdba9e94f10faad10305996402598d0ec95b6ff869b"
     },
     "RewardDistributorAddRewardsTX": {
       "sourceFile": "rewards/reward_distributor.ral",
       "sourceCodeHash": "7f62143511f4a4e69aa77d13edfb6390dcd6eae291b8b1c03fe9fdeddcbca4c5",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "RewardDistributorHarvestTX": {
       "sourceFile": "rewards/reward_distributor.ral",
       "sourceCodeHash": "7f62143511f4a4e69aa77d13edfb6390dcd6eae291b8b1c03fe9fdeddcbca4c5",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleBase": {
       "sourceFile": "launch_sale/generic/sale_base.ral",
       "sourceCodeHash": "b13a27f468750c3e1a6a462ad0db13f56e2eb2911806373b8ce7c525a4fcc344",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleBuyerAccount": {
       "sourceFile": "launch_sale/generic/sale_buyer_account.ral",
       "sourceCodeHash": "f12ede41067974ef7d977ab49bf308e629d44abf12c13e311730c339edbe28b8",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "5b85bbcf941c0e29fa634eccc5c21a0545245218348b1c27c9c7fc3980f5913a",
-      "warnings": []
+      "codeHashDebug": "118309673b71af5f15da54e10f67b3944ae20d22a09c47ea7664250f7841834a"
     },
     "SaleFlatPrice": {
       "sourceFile": "launch_sale/sale_flat_price.ral",
       "sourceCodeHash": "d005c99d6cbbc911a79a9ff83584912573d974e5b816c81353ffbd3eafeb694c",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlph": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "7f2045736051296ec17e13d9a47d60ef2cd522fe14eece4a7fde340ba966c2b8",
-      "warnings": []
+      "codeHashDebug": "d493e0d8d49c600ba7923eee3815e7db7b158eeef8a7469f3591205af0f7759c"
     },
     "SaleFlatPriceAlphBuyTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphBuyTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
+    },
+    "SaleFlatPriceAlphBuyTXV3": {
+      "sourceFile": "launch_sale_v3/sale_flat_price_alph_v3.ral",
+      "sourceCodeHash": "1a939a74fe9b0c663420b5fc43e9b97994d571aabb38c7c9f25e0b8495c31caa",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphClaimRefundTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphClaimRefundTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
+    },
+    "SaleFlatPriceAlphClaimRefundTXV3": {
+      "sourceFile": "launch_sale_v3/sale_flat_price_alph_v3.ral",
+      "sourceCodeHash": "1a939a74fe9b0c663420b5fc43e9b97994d571aabb38c7c9f25e0b8495c31caa",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphClaimTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphClaimTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
+    },
+    "SaleFlatPriceAlphClaimTXV3": {
+      "sourceFile": "launch_sale_v3/sale_flat_price_alph_v3.ral",
+      "sourceCodeHash": "1a939a74fe9b0c663420b5fc43e9b97994d571aabb38c7c9f25e0b8495c31caa",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
+    },
+    "SaleFlatPriceAlphSetAllTXV3": {
+      "sourceFile": "launch_sale_v3/sale_flat_price_alph_v3.ral",
+      "sourceCodeHash": "1a939a74fe9b0c663420b5fc43e9b97994d571aabb38c7c9f25e0b8495c31caa",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetCliffEndTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetMerkleRootTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetMerkleRootTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
+    },
+    "SaleFlatPriceAlphSetMerkleRootTXV3": {
+      "sourceFile": "launch_sale_v3/sale_flat_price_alph_v3.ral",
+      "sourceCodeHash": "1a939a74fe9b0c663420b5fc43e9b97994d571aabb38c7c9f25e0b8495c31caa",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetPublicSaleMaxBidTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetSaleDatesTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetSaleDatesTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
+    },
+    "SaleFlatPriceAlphSetSaleDatesTXV3": {
+      "sourceFile": "launch_sale_v3/sale_flat_price_alph_v3.ral",
+      "sourceCodeHash": "1a939a74fe9b0c663420b5fc43e9b97994d571aabb38c7c9f25e0b8495c31caa",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetUpfrontReleaseTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetVestingEndTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetWLMaxBidTX": {
       "sourceFile": "launch_sale/sale_flat_price_alph.ral",
       "sourceCodeHash": "4a2209c945d7661fcfbcfe8343f7684013c1fbd8d2feca274b047504b160b2f9",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphSetWLMaxBidTXV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleFlatPriceAlphV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_alph_v2.ral",
       "sourceCodeHash": "97d36920ebf153d65e721bddf17524fdf62eb2e3b9832f97947229e0150e63db",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "435b5baddda909c3cda88982ee8d90d3f86313a5dddb1c28f9ce72b655df82ad",
-      "warnings": []
+      "codeHashDebug": "f3dd0746cb4816a549a56b030278541e42bce0fde9bde8777e144c562d1492d5"
+    },
+    "SaleFlatPriceAlphV3": {
+      "sourceFile": "launch_sale_v3/sale_flat_price_alph_v3.ral",
+      "sourceCodeHash": "1a939a74fe9b0c663420b5fc43e9b97994d571aabb38c7c9f25e0b8495c31caa",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "f4faf01feb07f51142ee3b799a9e5b9581d59c765e7b054add11342210e7d18c"
     },
     "SaleFlatPriceV2": {
       "sourceFile": "launch_sale_v2/sale_flat_price_v2.ral",
       "sourceCodeHash": "999864fff92b16fd8b93735fe603ba0d7d2c2d0b0e52e3f0f06d860d2b2f6d12",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
+    },
+    "SaleFlatPriceV3": {
+      "sourceFile": "launch_sale_v3/sale_flat_price_v3.ral",
+      "sourceCodeHash": "cbbce535c53e1fb61aa330810b6227bc7a3dfdba7b31f859cfb590d6f8503292",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
     },
     "SaleManager": {
       "sourceFile": "launch_sale/sale_manager.ral",
       "sourceCodeHash": "c5b1cec3ac4143238e31c8814393b8791b2a96f8a524466480e8e461c36b2493",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "d6347b9ef1f6c73af3138b01ebba2990f078316aaa7f135be763c3bdd3851888",
-      "warnings": []
+      "codeHashDebug": "2cebef5ad341e94a2404bf04f8728d5c277935efedb94ef884eb705288320d5b"
     },
     "SaleManagerCreateSaleFlatPriceTX": {
       "sourceFile": "launch_sale/sale_manager.ral",
       "sourceCodeHash": "c5b1cec3ac4143238e31c8814393b8791b2a96f8a524466480e8e461c36b2493",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SaleManagerCreateSaleFlatPriceTXV2": {
       "sourceFile": "launch_sale_v2/sale_manager_v2.ral",
       "sourceCodeHash": "d8d63707f525132b5bbb8961638811baf0718d15a4a3ddcb40c16f6f17db7266",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
+    },
+    "SaleManagerCreateSaleFlatPriceTXV3": {
+      "sourceFile": "launch_sale_v3/sale_manager_v3.ral",
+      "sourceCodeHash": "6b76f93ecffdb6b0b9fb952188290eb39a6348dfac4631f9ce107c3a6daaba82",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
     },
     "SaleManagerV2": {
       "sourceFile": "launch_sale_v2/sale_manager_v2.ral",
       "sourceCodeHash": "d8d63707f525132b5bbb8961638811baf0718d15a4a3ddcb40c16f6f17db7266",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "c77019c37fac837d133a28ee517ff6f60eb31d2a79ab2fcaa43189a13c9d5bf7",
-      "warnings": []
+      "codeHashDebug": "1b1e76f8796647429283df68ceb7db56417556ed7cdda05914122215e73a5353"
+    },
+    "SaleManagerV3": {
+      "sourceFile": "launch_sale_v3/sale_manager_v3.ral",
+      "sourceCodeHash": "6b76f93ecffdb6b0b9fb952188290eb39a6348dfac4631f9ce107c3a6daaba82",
+      "bytecodeDebugPatch": "=78-2+3e=2-6+da=3-1=2-2+3=1+6=1-2+4b2=3-1+8=2+e4450=1-1=2-1=1+b=2+4=1-1=2-2+68=927-1+a=136+7a7e0214696e73657274206174206d617020706174683a2000=1654",
+      "codeHashDebug": "d36b0a881fce27ab1dc62a7b4676a88d14f4e2c2ae0663829c9af56c072a522d"
     },
     "Staking": {
       "sourceFile": "rewards/staking.ral",
       "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "b74ef76385018945cc0581cf1d680f5c1aea0ed05976c3b50d2a2e0c9fa752dc",
-      "warnings": []
+      "codeHashDebug": "fa6789e65154d9dbb626047e927de2dd3cf3b66eae2c43fdd1170cad13ca2c9f"
     },
     "StakingAccount": {
       "sourceFile": "rewards/staking_account.ral",
       "sourceCodeHash": "c7b6203f73a06c18ef961f1e07727a0a491ca506033d82463670842d876b545e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "ce406d4e5e0bea3d9c89cc9fad8ff9140f3eafb69162d3ba97773c1a4df48a4f",
-      "warnings": []
+      "codeHashDebug": "813156a19b3399c3839029ede936125e43e6f0f046ae978eacf9014d957c44bf"
     },
     "StakingClaimRewardsTX": {
       "sourceFile": "rewards/staking.ral",
       "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "StakingClaimTX": {
       "sourceFile": "rewards/staking.ral",
       "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "StakingDepositRewardsTX": {
       "sourceFile": "rewards/staking.ral",
       "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "StakingStakeTX": {
       "sourceFile": "rewards/staking.ral",
       "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "StakingUnstakeTX": {
       "sourceFile": "rewards/staking.ral",
       "sourceCodeHash": "00b279081704dbb72f48f77f4235865b936929984bf74c60680d48bf5506f43e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "TestUpgradable": {
       "sourceFile": "lib/dummy/test_upgradable.ral",
       "sourceCodeHash": "7964616cee2174c898a54cb97ff65b81c300d6eddd0c4a3be3dcf64a38176be5",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "9bf3009274456447b20ea932f5eb747e867b0977f8fb910075616925a3fb4c7e",
-      "warnings": []
+      "codeHashDebug": "d890e33d3b11b38958ae671d13cef73e36d1a0a75b6ec9d76c157fb98f91c12c"
     },
     "TestUpgradableV2": {
       "sourceFile": "lib/dummy/test_upgradable_v2.ral",
       "sourceCodeHash": "06af2fae1d0104dc00bc90af8cfa8ed10b009c3f550202b70a4776ff7139be1e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "acb86f28101a38a11d92aaad09ec4e4af2367ef7b61c319b28075d321677b0d5",
-      "warnings": []
+      "codeHashDebug": "92d18131ffbd131375b7cd197b29e744fcf29d9000a0449166d9dcb16fcd08f7"
     },
     "TokenPair": {
       "sourceFile": "external/dummy/token_pair.ral",
       "sourceCodeHash": "c4bdd6d198d3e8572356b29af08fb7cb5f8de7044b745e3703f40fa6cc053ab1",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "2b98401ce86b160c0f357390bd72a4cf9eb66d57e490ac7d6553b40749b092ac",
-      "warnings": []
+      "codeHashDebug": "a3cc4aca623eb49ed4f484bfd2cc8ae9e92f18c7cba4ffdb33b616e9f9a7a6da"
     },
     "Upgradable": {
       "sourceFile": "lib/upgradable/upgradable.ral",
       "sourceCodeHash": "6bc4b1ebca2769f444417809861be3504f7735b06a94ef9b1e7d3207014162ed",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     }
   }
 }

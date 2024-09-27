@@ -1,0 +1,112 @@
+// Contract SaleFlatPriceAlphV3
+// - Manages a flat price token sale with optional whitelist.
+// - Extends SaleFlatPrice for sale functionalities.
+Contract SaleFlatPriceAlphV3(
+    rewardDistributor: RewardDistributor,   // Reward distributor for managing rewards
+    saleOwner: Address,                     // Owner of the sale
+    accountTemplateId: ByteVec,             // Template ID for creating buyer accounts
+    tokenPrice: U256,                       // Price of the token in the sale
+    minRaise: U256,                         // Minimum amount to be raised
+    maxRaise: U256,                         // Maximum amount to be raised
+    saleTokenId: ByteVec,                   // ID of the token being sold
+    saleTokenTotalAmount: U256,             // Total amount of tokens available for sale
+    bidTokenId: ByteVec,                    // Token used for bidding (ALPH)
+    mut saleStart: U256,                    // Start time of the sale
+    mut saleEnd: U256,                      // End time of the sale
+    mut whitelistSaleStart: U256,           // Start time of the whitelist sale
+    mut whitelistSaleEnd: U256,             // End time of the whitelist sale
+    mut tokensSold: U256,                   // Amount of tokens sold
+    mut totalRaised: U256,                  // Total funds raised in the sale
+    mut merkleRoot: ByteVec,                // Merkle root for whitelist verification
+    mut publicSaleMaxBid: U256,             // The maximum bid per address on public sale
+    mut sellerClaimed: U256,                // Timestamp when seller claimed
+    mut upfrontRelease: U256,               // Upfront release of tokens in basis points
+    mut vestingEnd: U256,                   // Vesting end time for linear vesting
+    mut cliffEnd: U256                      // Cliff end time for linear vesting
+) extends SaleFlatPriceV3 (
+        rewardDistributor,
+        saleOwner,
+        accountTemplateId,
+        tokenPrice,
+        minRaise,
+        maxRaise,
+        saleTokenId,
+        saleTokenTotalAmount,
+        bidTokenId, 
+        saleStart,
+        saleEnd,
+        whitelistSaleStart, 
+        whitelistSaleEnd,
+        tokensSold, 
+        totalRaised,
+        merkleRoot,
+        publicSaleMaxBid,
+        sellerClaimed,
+        upfrontRelease,
+        vestingEnd,
+        cliffEnd
+) {
+
+    // Allows the sale owner to claim the raised funds and any unsold tokens after the sale concludes.
+    @using(assetsInContract = true, updateFields = true)
+    fn claimSeller(amount: U256) -> () {
+        assert!(amount == totalRaised, ErrorCodes.InvalidClaimAmount)
+        assert!(sellerClaimed == 0, ErrorCodes.SellerAlreadyClaimed)
+        let fee = totalRaised / 20 // apply a 5% fee for apad stakers
+
+        rewardDistributor.addRewards{selfAddress!() -> bidTokenId: fee}(selfAddress!(), fee)
+
+        transferTokenFromSelf!(saleOwner, bidTokenId, totalRaised - fee)
+        if(saleTokenTotalAmount > tokensSold) {
+            transferTokenFromSelf!(saleOwner, saleTokenId, saleTokenTotalAmount - tokensSold)
+        }
+        sellerClaimed = blockTimeStamp!() 
+    }
+}
+
+// Transaction scripts
+TxScript SaleFlatPriceAlphSetMerkleRootTXV3 (saleFlatPrice: SaleFlatPriceAlphV3, newMerkleRoot: ByteVec) {
+    saleFlatPrice.setMerkleRoot(newMerkleRoot)
+}
+TxScript SaleFlatPriceAlphSetSaleDatesTXV3 (saleFlatPrice: SaleFlatPriceAlphV3, newSaleStart: U256, newSaleEnd: U256, newWhitelistSaleStart: U256, newWhitelistSaleEnd: U256) {
+    saleFlatPrice.setSaleDates(newSaleStart, newSaleEnd, newWhitelistSaleStart, newWhitelistSaleEnd)
+}
+TxScript SaleFlatPriceAlphSetAllTXV3 (saleFlatPrice: SaleFlatPriceAlphV3, 
+    newSaleStart: U256,                    // Start time of the sale
+    newSaleEnd: U256,                      // End time of the sale
+    newWhitelistSaleStart: U256,           // Start time of the whitelist sale
+    newWhitelistSaleEnd: U256,             // End time of the whitelist sale
+    newPublicSaleMaxBid: U256,             // The maximum bid per address on public sale
+    newUpfrontRelease: U256,               // Upfront release of tokens in basis points
+    newVestingEnd: U256,                   // Vesting end time for linear vesting
+    newCliffEnd: U256                      // Cliff end time for linear vesting
+) {
+    saleFlatPrice.setAllFields(
+        newSaleStart,           
+        newSaleEnd,             
+        newWhitelistSaleStart,  
+        newWhitelistSaleEnd,    
+        newPublicSaleMaxBid,    
+        newUpfrontRelease,      
+        newVestingEnd,          
+        newCliffEnd             
+    )
+}
+
+TxScript SaleFlatPriceAlphBuyTXV3 (saleFlatPrice: SaleFlatPriceAlphV3, amountAlph: U256, wlPrice: U256, wlMaxBid: U256, merkleProof: ByteVec, stateRentAmount:U256) {
+    let buyer = callerAddress!()
+    let buyerAccExists = saleFlatPrice.accountExists(buyer)
+    if (buyerAccExists) {
+        saleFlatPrice.buy{buyer -> ALPH: amountAlph}(amountAlph, wlPrice, wlMaxBid, merkleProof, stateRentAmount)
+    } else {
+        saleFlatPrice.buy{buyer -> ALPH: amountAlph + stateRentAmount}(amountAlph, wlPrice, wlMaxBid, merkleProof, stateRentAmount)
+    }
+}
+
+TxScript SaleFlatPriceAlphClaimTXV3 (saleFlatPrice: SaleFlatPriceAlphV3, amount: U256) {
+    saleFlatPrice.claim(amount)
+}
+
+TxScript SaleFlatPriceAlphClaimRefundTXV3 (saleFlatPrice: SaleFlatPriceAlphV3, amount: U256) {
+    saleFlatPrice.claimRefund(amount)
+}

@@ -1,6 +1,6 @@
 import { expectAssertionError, testAddress, testPrivateKey } from '@alephium/web3-test'
 import { PrivateKeyWallet } from '@alephium/web3-wallet'
-import { Contract, ContractEvent, ContractInstance, encodeContractField, encodeI256, node, NodeProvider, TestContractResult, Val } from "@alephium/web3"
+import { Contract, ContractEvent, ContractInstance, encodeContractField, encodeVmI256, node, NodeProvider, TestContractResult, Val, waitForTxConfirmation } from "@alephium/web3"
 import {
   ALPH_TOKEN_ID,
   Address,
@@ -15,7 +15,7 @@ import {
 } from '@alephium/web3'
 import { randomBytes } from 'crypto'
 import * as base58 from 'bs58'
-import { DeployContractExecutionResult, waitTxConfirmed as _waitTxConfirmed } from '@alephium/cli'
+import { DeployContractExecutionResult } from '@alephium/cli'
 import * as blake from 'blakejs'
 
 web3.setCurrentNodeProvider('http://127.0.0.1:22973', undefined, fetch)
@@ -42,12 +42,6 @@ function isConfirmed(txStatus: node.TxStatus): txStatus is node.Confirmed {
   return txStatus.type === 'Confirmed'
 }
 
-export async function waitTxConfirmed<T extends { txId: string }>(promise: Promise<T>): Promise<T> {
-  const result = await promise
-  await _waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1, 1000)
-  return result
-}
-
 export function checkEvent<T>(result: TestContractResult<T>, eventName: string, fields?: object): Boolean {
   let event = result.events.find(x => x.name == eventName);
   if (event && fields) {
@@ -69,7 +63,7 @@ function _encodeField<T>(fieldName: string, encodeFunc: () => T): T {
 }
 
 export function encodeFields(fields: { name: string; type: string; value: Val }[]): string {
-  const prefix = binToHex(encodeI256(BigInt(fields.length)))
+  const prefix = binToHex(encodeVmI256(BigInt(fields.length)))
   const encoded = fields
     .map((field) => binToHex(_encodeField(field.name, () => encodeContractField(field.type, field.value))))
     .join('')
@@ -84,5 +78,6 @@ export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function getEventByTxId<T extends ContractEvent>(txId: string, codehash: string, eventIndex: number) {
   const result = await web3.getCurrentNodeProvider().events.getEventsTxIdTxid(txId)
-  return Contract.fromApiEvent(result.events[eventIndex], codehash, txId) as T
+  //return Contract.fromApiEvent(result.events[eventIndex], codehash, txId) as T
+  return result.events[0];
 }

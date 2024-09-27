@@ -1,0 +1,1194 @@
+{
+  "version": "v3.6.3",
+  "name": "SaleFlatPriceAlphV3",
+  "bytecode": "154034403f407340bf40d5419841c5423d426d42974350436c4383439f43bd43e444084416442744374469449b44c4451c45284534454345534567457e45a845bd45cd45de45f346054616462446324640464e465c466a46784686469446a246b046be46ce47224742474c00020207004020160000121702160200061703160116033213425d7ba0080c301342657b16010d0c160201071600ce061601ab0c0d160201014c021600000f00020203001b16000012170216010c0d1602010a2f13425d7b16010d0c160201081600ce081601ab0c0d160201014c021600000f0002010300402a1600a0052f13425d7ba0080c2f1342647ba00513142d1701b2ce081601a3b216010e0cce000114ce01ce08a00516012babce07a004334c06ce01ce06ce07a0042bab56a1080002010100091600ce072f13425d7bce01ce06ce07ab0101050a004067d3f0bd18ac0017b417051605ce014613425f7b0c1706002200211a4c10160516031601160200081342607b160516001602000516001601000717064a0816051600a00700051600ce0300071706a00516002ace053213425e7ba00416062ace073213425e7b1605ce081600ac160500114b15b21605130264160616000c0c1304641708170716051604a21605160716081604000e4a09160500121709160616000e0c16090106a00416062aa104a00516002aa1050516051600160660000003040016160000114c0e16000012170316010c0d1603010a2a16023213425b7b4a05160116023213425b7b01000109014043d30dc85bb20c0d1600010917010c0d1600010b17025617031601a0092c1367102d17041603a00b314c04160416022b021603a00a344c04160116022b02a00aa0012b170516050c2f4c04160116022b021603a0012b1706160116042b16062c16052d1707160416072a1708160816022b02010002030117d34e2badcc000a000d1600000c0c0dce060102170216021312321342617b1600130a1602832c16012d02010004040115d3df5e71de00224c10160116004714013b4416026b4414013b4416036b444f003102040201000809004062d361ed4c92b417081608ce01451343ee7b001b16001601001c120c16081600a0001601a001731600a1001601a10100224c101600160116021603001d120d16081602a0021603a003731602a1021603a1031604000b0716081604a007601604a1071606a001341606a00b341a1342677b0916081606a00a601606a10a16050c341605136710321a1342667b0816081605a009601605a1091607a001341607a00a321a1342687b0a16081607a00b601607a10b00000000000ece030d130a1320832c321342597bce030d3413425a7b00000101000a1600ce043213425b7b16000d3413425c7b00000101000e16000d130a1320832c3213425b7b16000d3413425c7b00000000000ece071343e8341342627bce070d130a1324832c321342637b0003040500131600001119136ee17b16001603a2160047ce0216011602c117041206160016045f00000103000f16000010160000121701160117020c0c1602d48e18691c1207160016015f00000101000416000011136ee27b010001010105d3aa589c9116000012c502010001010105d3c381ff1f160047cb020100010e0016d390c29a6a00180019b41701160100234c0716000002120a160116005f4a071601160000001208160116005f010001020016d3443f510e0018001ab41701160100234c0716000003120b160116005f4a071601160000011209160116005f010001010012d30a598af4b4ce01451343ee7b00221343ef7b16004313202f1343f47b001b1600003001000405004029d3729f48c0b417041604ce01451343ee7b001b16001601001c120c16041600a0001601a001731600a1001601a10100224c101600160116021603001d120d16041602a0021603a003731602a1021603a103000000000003001e1343e97b000000000003001f1343ea7b000000000005001f00201a1343eb7b000000000006001f0020191a1343ec7b000000000007a0005613801b77402a331343ed7b00000202000a561600311343f07b16001601321343f17b000004040016160216003416021601321a1343f27b160316003416031601321a16031602341a1343f37b010000000109d36617500fa000563156a001311a02010000000105d39cd0daa956a0013302010000000105d34d7496f8a005ce043402010000000109d334e3cf0ca002563156a003311a02010000000106d3fdae667ca0064313202f02010001010105d3047650231600ce014502010000000103d3cce750a8ce0102010000000103d3302ee957a00002010000000103d34f98d0a0a00102010000000103d3834463dcce0402010000000103d36688ce9ece0502010000000103d35f9855b7ce0602010000000103d38e879a61ce0802010000000103d3acf34474a00202010000000103d3f661c07da00302010000000103d3a586e42aa00402010000000103d3f67de360a00502010000000103d393f264e8a006020000010100061600a106120ea006b45f0000020601402e16014313202f136afa7b160117021600431703160313202e0c2f136af97b0c170416041603314c1016001604160413202a6217051605160200321702160413202a17044a2c160271a006712f02000002020110160071160171314c05160016014400334a04160116004400330200000103010316004f02",
+  "codeHash": "f4faf01feb07f51142ee3b799a9e5b9581d59c765e7b054add11342210e7d18c",
+  "fieldsSig": {
+    "names": [
+      "rewardDistributor",
+      "saleOwner",
+      "accountTemplateId",
+      "tokenPrice",
+      "minRaise",
+      "maxRaise",
+      "saleTokenId",
+      "saleTokenTotalAmount",
+      "bidTokenId",
+      "saleStart",
+      "saleEnd",
+      "whitelistSaleStart",
+      "whitelistSaleEnd",
+      "tokensSold",
+      "totalRaised",
+      "merkleRoot",
+      "publicSaleMaxBid",
+      "sellerClaimed",
+      "upfrontRelease",
+      "vestingEnd",
+      "cliffEnd"
+    ],
+    "types": [
+      "RewardDistributor",
+      "Address",
+      "ByteVec",
+      "U256",
+      "U256",
+      "U256",
+      "ByteVec",
+      "U256",
+      "ByteVec",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "ByteVec",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "eventsSig": [
+    {
+      "name": "Buy",
+      "fieldNames": [
+        "account",
+        "buyBidAmount",
+        "buyTokenAmount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "UpdateWhitelistBuyerMaxBid",
+      "fieldNames": [
+        "caller",
+        "newPublicSaleMaxBid",
+        "oldPublicSaleMaxBid"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "UpdatePublicSaleMaxBid",
+      "fieldNames": [
+        "caller",
+        "newSellerClaimed",
+        "oldSellerClaimed"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "UpdateUpfrontRelease",
+      "fieldNames": [
+        "caller",
+        "newUpfrontRelease",
+        "oldUpfrontRelease"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "UpdateVestingEnd",
+      "fieldNames": [
+        "caller",
+        "newVestingEnd",
+        "oldVestingEnd"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "UpdateCliffEnd",
+      "fieldNames": [
+        "caller",
+        "newCliffEnd",
+        "oldCliffEnd"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "AccountCreate",
+      "fieldNames": [
+        "account",
+        "contractId"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "AccountDestroy",
+      "fieldNames": [
+        "account",
+        "contractId"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "ClaimBuyer",
+      "fieldNames": [
+        "account",
+        "saleTokenAmount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "ClaimBuyerRefund",
+      "fieldNames": [
+        "account",
+        "bidTokenAmount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "ClaimSeller",
+      "fieldNames": [
+        "account",
+        "bidTokenAmount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "ClaimSellerRefund",
+      "fieldNames": [
+        "account",
+        "saleTokenAmount"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "SaleDatesUpdate",
+      "fieldNames": [
+        "caller",
+        "newSaleStartDate",
+        "oldSaleStartDate",
+        "newSaleEndDate",
+        "oldSaleEndDate"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "WhitelistSaleDatesUpdate",
+      "fieldNames": [
+        "caller",
+        "newWLSaleStartDate",
+        "oldWLSaleStartDate",
+        "newWLSaleEndDate",
+        "oldWLSaleEndDate"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "UpdateRoot",
+      "fieldNames": [
+        "newMerkleRoot",
+        "updatedBy"
+      ],
+      "fieldTypes": [
+        "ByteVec",
+        "Address"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "claimBuyer",
+      "paramNames": [
+        "caller",
+        "amount"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "claimBuyerRefund",
+      "paramNames": [
+        "caller",
+        "amount"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "claimSeller",
+      "paramNames": [
+        "amount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "claimSellerRefund",
+      "paramNames": [
+        "amount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "buy",
+      "paramNames": [
+        "bidAmount",
+        "wlPrice",
+        "wlMaxBid",
+        "wlMerkleProof",
+        "stateRentAmount"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256",
+        "U256",
+        "ByteVec",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "checkBidLimit",
+      "paramNames": [
+        "account",
+        "bidAmount",
+        "maxBid"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "calculateClaimableAmount",
+      "paramNames": [
+        "buyerAccount"
+      ],
+      "paramTypes": [
+        "SaleBuyerAccount"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "calculateSaleTokensReceivedPerBidTokens",
+      "paramNames": [
+        "bidAmount",
+        "pricePerToken"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "checkIsWhitelisted",
+      "paramNames": [
+        "account",
+        "wlMerkleProof",
+        "wlPrice",
+        "wlMaxBid"
+      ],
+      "paramTypes": [
+        "Address",
+        "ByteVec",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "setAllFields",
+      "paramNames": [
+        "newSaleStart",
+        "newSaleEnd",
+        "newWhitelistSaleStart",
+        "newWhitelistSaleEnd",
+        "newPublicSaleMaxBid",
+        "newUpfrontRelease",
+        "newVestingEnd",
+        "newCliffEnd"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256",
+        "U256",
+        "U256",
+        "U256",
+        "U256",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertPriceInRange",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertMaxBidAmountInRange",
+      "paramNames": [
+        "maxBidAmount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertBidAmountInRange",
+      "paramNames": [
+        "bidAmount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertSaleAmountInRange",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "createAccount",
+      "paramNames": [
+        "account",
+        "encodedImmFields",
+        "encodedMutFields",
+        "stateRentAmount"
+      ],
+      "paramTypes": [
+        "Address",
+        "ByteVec",
+        "ByteVec",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "destroyAccount",
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertAccountExists",
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "accountExists",
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "getSubContractId",
+      "paramNames": [
+        "account"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "claim",
+      "paramNames": [
+        "amount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "claimRefund",
+      "paramNames": [
+        "amount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "setMerkleRoot",
+      "paramNames": [
+        "newMerkleRoot"
+      ],
+      "paramTypes": [
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "setSaleDates",
+      "paramNames": [
+        "newSaleStart",
+        "newSaleEnd",
+        "newWhitelistSaleStart",
+        "newWhitelistSaleEnd"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertSaleLive",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertSaleFinished",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertCanClaim",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertCanClaimRefund",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertSaleEditable",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "assertValidSaleDates",
+      "paramNames": [
+        "asSaleStart",
+        "asSaleEnd"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "assertValidWLSaleDates",
+      "paramNames": [
+        "asSaleStart",
+        "asSaleEnd",
+        "asWLSaleStart",
+        "asWLSaleEnd"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "isSaleLive",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "isSaleFinished",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "isSaleSuccess",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "isWhitelistSaleLive",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "isWhitelistSale",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "isCallerSaleOwner",
+      "paramNames": [
+        "caller"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "getSaleOwner",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Address"
+      ]
+    },
+    {
+      "name": "getSaleStart",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getSaleEnd",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getMinRaise",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getMaxRaise",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getSaleTokenId",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getBidTokenId",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getWhitelistSaleStart",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getWhitelistSaleEnd",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getTokensSold",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getTotalRaised",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getMerkleRoot",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "updateRoot",
+      "paramNames": [
+        "newMerkleRoot"
+      ],
+      "paramTypes": [
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "verify",
+      "paramNames": [
+        "proof",
+        "dataHash"
+      ],
+      "paramTypes": [
+        "ByteVec",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "hashPair",
+      "paramNames": [
+        "a",
+        "b"
+      ],
+      "paramTypes": [
+        "ByteVec",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "hash",
+      "paramNames": [
+        "dataToHash"
+      ],
+      "paramTypes": [
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    }
+  ],
+  "constants": [],
+  "enums": [
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "PriceMoreThanMax",
+          "value": {
+            "type": "U256",
+            "value": "601"
+          }
+        },
+        {
+          "name": "PriceLessThanMin",
+          "value": {
+            "type": "U256",
+            "value": "602"
+          }
+        },
+        {
+          "name": "BidMoreThanMax",
+          "value": {
+            "type": "U256",
+            "value": "603"
+          }
+        },
+        {
+          "name": "BidLessThanMin",
+          "value": {
+            "type": "U256",
+            "value": "604"
+          }
+        },
+        {
+          "name": "InvalidClaimAmount",
+          "value": {
+            "type": "U256",
+            "value": "605"
+          }
+        },
+        {
+          "name": "SaleTokenTotalExceeded",
+          "value": {
+            "type": "U256",
+            "value": "606"
+          }
+        },
+        {
+          "name": "SaleOwnerCanNotBid",
+          "value": {
+            "type": "U256",
+            "value": "607"
+          }
+        },
+        {
+          "name": "BuyerNotWhitelisted",
+          "value": {
+            "type": "U256",
+            "value": "608"
+          }
+        },
+        {
+          "name": "SaleTokenMoreThan18Decimal",
+          "value": {
+            "type": "U256",
+            "value": "609"
+          }
+        },
+        {
+          "name": "SaleAmountSmallerThanMin",
+          "value": {
+            "type": "U256",
+            "value": "610"
+          }
+        },
+        {
+          "name": "SaleAmountLargerThanMax",
+          "value": {
+            "type": "U256",
+            "value": "611"
+          }
+        },
+        {
+          "name": "SellerAlreadyClaimed",
+          "value": {
+            "type": "U256",
+            "value": "612"
+          }
+        },
+        {
+          "name": "ClaimsNotStarted",
+          "value": {
+            "type": "U256",
+            "value": "613"
+          }
+        },
+        {
+          "name": "UpfrontReleaseOutOfRange",
+          "value": {
+            "type": "U256",
+            "value": "614"
+          }
+        },
+        {
+          "name": "VestingEndOutOfRange",
+          "value": {
+            "type": "U256",
+            "value": "615"
+          }
+        },
+        {
+          "name": "CliffEndOutOfRange",
+          "value": {
+            "type": "U256",
+            "value": "616"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AccountErrorCodes",
+      "fields": [
+        {
+          "name": "AccountAlreadyExists",
+          "value": {
+            "type": "U256",
+            "value": "12001"
+          }
+        },
+        {
+          "name": "AccountDoesNotExists",
+          "value": {
+            "type": "U256",
+            "value": "12002"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SaleBaseErrorCodes",
+      "fields": [
+        {
+          "name": "SaleNotLive",
+          "value": {
+            "type": "U256",
+            "value": "1001"
+          }
+        },
+        {
+          "name": "SaleNotFinished",
+          "value": {
+            "type": "U256",
+            "value": "1002"
+          }
+        },
+        {
+          "name": "SaleClaimNotAvailable",
+          "value": {
+            "type": "U256",
+            "value": "1003"
+          }
+        },
+        {
+          "name": "SaleRefundNotAvailable",
+          "value": {
+            "type": "U256",
+            "value": "1004"
+          }
+        },
+        {
+          "name": "SaleCanNotBeEditedAtThisTime",
+          "value": {
+            "type": "U256",
+            "value": "1005"
+          }
+        },
+        {
+          "name": "SaleUpdateUnauthorized",
+          "value": {
+            "type": "U256",
+            "value": "1006"
+          }
+        },
+        {
+          "name": "SaleIsNotWLSale",
+          "value": {
+            "type": "U256",
+            "value": "1007"
+          }
+        },
+        {
+          "name": "SaleStartMustBeInFuture",
+          "value": {
+            "type": "U256",
+            "value": "1008"
+          }
+        },
+        {
+          "name": "SaleEndMustBeAfterSaleStart",
+          "value": {
+            "type": "U256",
+            "value": "1009"
+          }
+        },
+        {
+          "name": "WLSaleStartMustBeWithinSaleDates",
+          "value": {
+            "type": "U256",
+            "value": "1010"
+          }
+        },
+        {
+          "name": "WLSaleEndMustBeWithinSaleDatesAndAfterWLSaleStart",
+          "value": {
+            "type": "U256",
+            "value": "1011"
+          }
+        },
+        {
+          "name": "InvalidMerkleRoot",
+          "value": {
+            "type": "U256",
+            "value": "1012"
+          }
+        }
+      ]
+    },
+    {
+      "name": "MerkleProofErrorCodes",
+      "fields": [
+        {
+          "name": "InvalidProofSize",
+          "value": {
+            "type": "U256",
+            "value": "11001"
+          }
+        },
+        {
+          "name": "InvalidDataHash",
+          "value": {
+            "type": "U256",
+            "value": "11002"
+          }
+        }
+      ]
+    }
+  ]
+}

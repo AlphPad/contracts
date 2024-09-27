@@ -33,6 +33,7 @@ import {
 } from "@alephium/web3";
 import { default as SaleBuyerAccountContractJson } from "../launch_sale/generic/SaleBuyerAccount.ral.json";
 import { getContractByCodeHash } from "./contracts";
+import { ListingRecord, AllStructs } from "./types";
 
 // Custom types for the contract
 export namespace SaleBuyerAccountTypes {
@@ -108,6 +109,10 @@ export namespace SaleBuyerAccountTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+  export type MulticallReturnType<Callss extends MultiCallParams[]> =
+    Callss["length"] extends 1
+      ? MultiCallResults<Callss[0]>
+      : { [index in keyof Callss]: MultiCallResults<Callss[index]> };
 
   export interface SignExecuteMethodTable {
     destroy: {
@@ -172,22 +177,18 @@ class Factory extends ContractFactory<
     return encodeContractFields(
       addStdIdToFields(this.contract, fields),
       this.contract.fieldsSig,
-      []
+      AllStructs
     );
   }
 
-  getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as SaleBuyerAccountTypes.Fields;
-  }
-
   consts = {
-    ErrorCodes: {
-      ClaimMoreThanBuy: BigInt(1101),
-      ClaimMoreThanBid: BigInt(1102),
-    },
     AccountBaseErrorCodes: {
-      UnauthorizedAccess: BigInt(12101),
-      UnsafeDestroy: BigInt(12102),
+      UnauthorizedAccess: BigInt("12101"),
+      UnsafeDestroy: BigInt("12102"),
+    },
+    ErrorCodes: {
+      ClaimMoreThanBuy: BigInt("1101"),
+      ClaimMoreThanBid: BigInt("1102"),
     },
   };
 
@@ -338,8 +339,8 @@ export const SaleBuyerAccount = new Factory(
   Contract.fromJson(
     SaleBuyerAccountContractJson,
     "",
-    "5b85bbcf941c0e29fa634eccc5c21a0545245218348b1c27c9c7fc3980f5913a",
-    []
+    "118309673b71af5f15da54e10f67b3944ae20d22a09c47ea7664250f7841834a",
+    AllStructs
   )
 );
 
@@ -353,7 +354,7 @@ export class SaleBuyerAccountInstance extends ContractInstance {
     return fetchContractState(SaleBuyerAccount, this);
   }
 
-  methods = {
+  view = {
     destroy: async (
       params?: SaleBuyerAccountTypes.CallMethodParams<"destroy">
     ): Promise<SaleBuyerAccountTypes.CallMethodResult<"destroy">> => {
@@ -481,8 +482,6 @@ export class SaleBuyerAccountInstance extends ContractInstance {
     },
   };
 
-  view = this.methods;
-
   transact = {
     destroy: async (
       params: SaleBuyerAccountTypes.SignExecuteMethodParams<"destroy">
@@ -582,14 +581,14 @@ export class SaleBuyerAccountInstance extends ContractInstance {
     },
   };
 
-  async multicall<Calls extends SaleBuyerAccountTypes.MultiCallParams>(
-    calls: Calls
-  ): Promise<SaleBuyerAccountTypes.MultiCallResults<Calls>> {
+  async multicall<Callss extends SaleBuyerAccountTypes.MultiCallParams[]>(
+    ...callss: Callss
+  ): Promise<SaleBuyerAccountTypes.MulticallReturnType<Callss>> {
     return (await multicallMethods(
       SaleBuyerAccount,
       this,
-      calls,
+      callss,
       getContractByCodeHash
-    )) as SaleBuyerAccountTypes.MultiCallResults<Calls>;
+    )) as SaleBuyerAccountTypes.MulticallReturnType<Callss>;
   }
 }
