@@ -1,0 +1,40 @@
+{
+  "version": "v3.6.3",
+  "name": "SaleFlatPriceAlphBuyTXV3",
+  "bytecodeTemplate": "0101030002004025b4170016000d0d{0}0111170116014c0d1600{1}a2{1}{2}{3}{4}{5}110c{0}01044a0e1600{1}{5}2aa2{1}{2}{3}{4}{5}110c{0}0104",
+  "fieldsSig": {
+    "names": [
+      "saleFlatPrice",
+      "amountAlph",
+      "wlPrice",
+      "wlMaxBid",
+      "merkleProof",
+      "stateRentAmount"
+    ],
+    "types": [
+      "SaleFlatPriceAlphV3",
+      "U256",
+      "U256",
+      "U256",
+      "ByteVec",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

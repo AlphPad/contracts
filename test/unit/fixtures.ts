@@ -1,24 +1,18 @@
 import {
-  Address,
   addressFromContractId,
   ALPH_TOKEN_ID,
-  Asset,
   binToHex,
-  contractIdFromAddress,
-  tokenIdFromAddress,
   ContractState,
   ONE_ALPH,
   Fields,
   groupOfAddress,
-  number256ToBigint,
-  Project,
   ZERO_ADDRESS,
   stringToHex
 } from '@alephium/web3'
-import { expectAssertionError, randomContractId, testAddress, randomContractAddress } from '@alephium/web3-test'
+import { randomContractAddress } from '@alephium/web3-test'
 import { randomBytes } from 'crypto'
 import * as base58 from 'bs58'
-import { ApadToken, ApadTokenTypes, RewardDistributor, RewardDistributorTypes, Staking, StakingTypes, StakingAccount, StakingAccountTypes, SaleFlatPriceAlph, SaleBuyerAccount, TokenPair, SaleManager, TestUpgradable, DummyToken, BurnALPH, SaleFlatPriceAlphV2 } from '../../artifacts/ts'
+import { ApadToken, RewardDistributor, Staking, StakingAccount, SaleFlatPriceAlph, SaleBuyerAccount, TokenPair, SaleManager, TestUpgradable, DummyToken, BurnALPH, SaleFlatPriceAlphV2, SaleManagerV3, SaleFlatPriceAlphV3 } from '../../artifacts/ts'
 
 
 export class ContractFixture<F extends Fields> {
@@ -40,9 +34,7 @@ export class ContractFixture<F extends Fields> {
 }
 
 export async function buildProject(): Promise<void> {
-  if (typeof Project.currentProject === 'undefined') {
-    await Project.build({ ignoreUnusedConstantsWarnings: true })
-  }
+  return Promise.resolve();
 }
 
 
@@ -241,7 +233,7 @@ export function createSaleBuyerTemplateAccount(
       amountBuy: 0n,
       amountClaimed: 0n,
       amountClaimedRefund: 0n,
-      parentContractAddress: ZERO_ADDRESS
+      parentContractAddress: ZERO_ADDRESS,
     },
     {
       alphAmount: ONE_ALPH,
@@ -365,6 +357,65 @@ export function createSaleFlatPriceV2(
   return new ContractFixture(contractState, dependencies, address)
 }
 
+export function createSaleFlatPriceV3(
+  rewardDistributor: string,
+  saleOwner: string,
+  accountTemplateId: string,
+  tokenPrice: bigint,
+  saleStart: bigint,
+  saleEnd: bigint,
+  minRaise: bigint,
+  maxRaise: bigint,
+  saleTokenId: string,
+  saleTokenTotalAmount: bigint,
+  bidTokenId: string,
+  whitelistSaleStart: bigint,
+  whitelistSaleEnd: bigint,
+  tokensSold: bigint,
+  totalRaised: bigint,
+  merkleRoot: string,
+  cliffEnd: bigint,
+  publicSaleMaxBid: bigint,
+  upfrontRelease: bigint,
+  vestingEnd: bigint,
+  dependencies: ContractState[],
+  contractId?: string
+) {
+  const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
+  const contractState = SaleFlatPriceAlphV3.stateForTest(
+    {
+      rewardDistributor,
+      saleOwner,
+      accountTemplateId,
+      tokenPrice,
+      saleStart,
+      saleEnd,
+      minRaise,
+      maxRaise,
+      saleTokenId,
+      saleTokenTotalAmount,
+      bidTokenId,
+      whitelistSaleStart,
+      whitelistSaleEnd,
+      tokensSold,
+      totalRaised,
+      merkleRoot,
+      cliffEnd,
+      publicSaleMaxBid,
+      sellerClaimed: 0n,
+      upfrontRelease,
+      vestingEnd
+    },
+    {
+      alphAmount: ONE_ALPH,
+      tokens: [{ id: saleTokenId, amount: saleTokenTotalAmount }]
+    },
+    address
+  )
+  return new ContractFixture(contractState, dependencies, address)
+}
+
+
 export function createBurnAlph(
   dependencies: ContractState[],
   contractId?: string
@@ -473,6 +524,43 @@ export function createSaleManagerV2(
       newMutFieldsEncoded: "",
       newOwner: ZERO_ADDRESS,
       owner: ZERO_ADDRESS,
+      upgradeCommenced: 0n,
+      upgradeDelay: 604800000n
+    },
+    {
+      alphAmount: ONE_ALPH,
+      tokens: []
+    },
+    address
+  )
+  return new ContractFixture(contractState, dependencies, address)
+}
+
+
+export function createSaleManagerV3(
+  owner: string,
+  rewardDistributorContractId: string,
+  saleFlatPriceAlphTemplateId: string,
+  accountTemplateId: string,
+  dependencies: ContractState[],
+  contractId?: string
+) {
+  const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
+  const contractState = SaleManagerV3.stateForTest(
+    {
+      alphTokenId: ALPH_TOKEN_ID,
+      listingFeeAmount: 100n * (10n ** 6n),
+      rewardDistributor: rewardDistributorContractId,
+      accountTemplateId: accountTemplateId,
+      saleFlatPriceAlphTemplateId: saleFlatPriceAlphTemplateId,
+      saleCounter: 0n,
+      listingCounter: 1000000n,
+      newCode: "",
+      newImmFieldsEncoded: "",
+      newMutFieldsEncoded: "",
+      newOwner: ZERO_ADDRESS,
+      owner: owner,
+      listingsReviewer: owner,
       upgradeCommenced: 0n,
       upgradeDelay: 604800000n
     },

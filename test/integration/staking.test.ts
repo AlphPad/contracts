@@ -1,4 +1,4 @@
-import { web3, Project, ALPH_TOKEN_ID, ONE_ALPH, ContractInstance, DUST_AMOUNT } from '@alephium/web3'
+import { web3, ALPH_TOKEN_ID, ONE_ALPH, ContractInstance, DUST_AMOUNT } from '@alephium/web3'
 import { transfer } from '@alephium/web3-test'
 import { DeployContractExecutionResult, Deployments, deployToDevnet } from '@alephium/cli'
 import { PrivateKeyWallet } from '@alephium/web3-wallet';
@@ -22,7 +22,6 @@ describe('Staking Contracts Tests', () => {
 
   beforeAll(async () => {
     web3.setCurrentNodeProvider('http://127.0.0.1:22973', undefined, fetch)
-    await Project.build()
     signer = await getSigner(100n * ONE_ALPH, 0)
     deployments = await deployToDevnet()
 
@@ -51,19 +50,19 @@ describe('Staking Contracts Tests', () => {
   }, 20000)
 
   it('Confirms Staking is deployed with staking token APAD and reward token ALPH', async () => {
-    const t = (await stakingContract.methods.getStakingTokenId()).returns;
+    const t = (await stakingContract.view.getStakingTokenId()).returns;
     expect(t).toBe(tokenId);
-    const r = (await stakingContract.methods.getRewardsTokenId()).returns;
+    const r = (await stakingContract.view.getRewardsTokenId()).returns;
     expect(r).toBe(ALPH_TOKEN_ID);
   }, 20000)
 
   it('Confirms staking account does not exist', async () => {
-    const res1 = (await stakingContract.methods.accountExists({ args: { account: testAddress } })).returns
+    const res1 = (await stakingContract.view.accountExists({ args: { account: testAddress } })).returns
     expect(res1).toBe(false);
   }, 20000)
 
   it('Confirms staking work and transfers balances', async () => {
-    let stakerExists = (await stakingContract.methods.accountExists({ args: { account: testAddress } })).returns
+    let stakerExists = (await stakingContract.view.accountExists({ args: { account: testAddress } })).returns
     expect(stakerExists).toBe(false)
     const apadBalance = await balanceOf(tokenId, testAddress);
     expect(apadBalance).toBeGreaterThan(0n);
@@ -82,7 +81,7 @@ describe('Staking Contracts Tests', () => {
         }
       ]
     })
-    stakerExists = (await stakingContract.methods.accountExists({ args: { account: testAddress } })).returns
+    stakerExists = (await stakingContract.view.accountExists({ args: { account: testAddress } })).returns
     expect(stakerExists).toBe(true)
     const apadBalanceAfter = await balanceOf(tokenId, testAddress);
     expect(apadBalance).toBe(apadBalanceAfter + tokenAmount);
@@ -96,11 +95,11 @@ describe('Staking Contracts Tests', () => {
       },
       attoAlphAmount: 1000n * ONE_ALPH
     });
-    const rdTotalRewardsAfter = (await rdInstance.methods.getTotalPendingRewards()).returns;
+    const rdTotalRewardsAfter = (await rdInstance.view.getTotalPendingRewards()).returns;
     expect(rdTotalRewardsAfter).toBe(add18Decimals(1000n));
 
 
-    const stakerRewards = (await stakingContract.methods.getRewardPerToken()).returns
+    const stakerRewards = (await stakingContract.view.getRewardPerToken()).returns
     expect(stakerRewards).toBe(0n);
     await sleep(10000);
     await RewardDistributorHarvestTX.execute(signer, {
@@ -109,11 +108,11 @@ describe('Staking Contracts Tests', () => {
       },
       attoAlphAmount: DUST_AMOUNT
     });
-    const stakerRewardsAfter = (await stakingContract.methods.getRewardPerToken()).returns
+    const stakerRewardsAfter = (await stakingContract.view.getRewardPerToken()).returns
     expect(stakerRewardsAfter).toBeGreaterThan(0n);
 
     const alphBalance = await balanceOf(ALPH_TOKEN_ID, testAddress);
-    const apadClaimable = (await stakingContract.methods.getPendingRewards({ args: { staker: testAddress } })).returns;
+    const apadClaimable = (await stakingContract.view.getPendingRewards({ args: { staker: testAddress } })).returns;
     expect(apadClaimable).toBeGreaterThan(0n);
     await StakingClaimRewardsTX.execute(signer, {
       initialFields: {
@@ -122,13 +121,13 @@ describe('Staking Contracts Tests', () => {
       attoAlphAmount: DUST_AMOUNT,
     })
     const alphBalanceAfter = await balanceOf(ALPH_TOKEN_ID, testAddress);
-    const apadClaimableAfter = (await stakingContract.methods.getPendingRewards({ args: { staker: testAddress } })).returns;
+    const apadClaimableAfter = (await stakingContract.view.getPendingRewards({ args: { staker: testAddress } })).returns;
     expect(apadClaimableAfter).toBe(0n);
     expect(alphBalanceAfter).toBeGreaterThan(alphBalance);
   }, 20000)
 
   it('Confirms unstake and withdraw work', async () => {
-    let stakerExists = (await stakingContract.methods.accountExists({ args: { account: testAddress } })).returns
+    let stakerExists = (await stakingContract.view.accountExists({ args: { account: testAddress } })).returns
     expect(stakerExists).toBe(true)
     const apadBalance = await balanceOf(tokenId, testAddress);
     const alphBalance = await balanceOf(ALPH_TOKEN_ID, testAddress);

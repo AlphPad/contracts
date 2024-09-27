@@ -1,0 +1,28 @@
+{
+  "version": "v3.6.3",
+  "name": "SaleFlatPriceAlphClaimTXV3",
+  "bytecodeTemplate": "01010300000005{1}0d0c{0}0113",
+  "fieldsSig": {
+    "names": [
+      "saleFlatPrice",
+      "amount"
+    ],
+    "types": [
+      "SaleFlatPriceAlphV3",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}
