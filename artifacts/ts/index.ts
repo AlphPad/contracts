@@ -13,6 +13,7 @@ export * from "./SaleFlatPriceAlphV3";
 export * from "./SaleManager";
 export * from "./SaleManagerV2";
 export * from "./SaleManagerV3";
+export * from "./SaleManagerV3x1";
 export * from "./Staking";
 export * from "./StakingAccount";
 export * from "./TestUpgradable";

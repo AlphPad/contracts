@@ -11,6 +11,7 @@ import {
   SignerProvider,
   HexString,
 } from "@alephium/web3";
+import { getContractByCodeHash } from "./contracts";
 import { default as ApadTokenBurnTXScriptJson } from "../ApadTokenBurnTX.ral.json";
 import { default as IUpgradableChangeOwnerApplyTXScriptJson } from "../lib/upgradable/IUpgradableChangeOwnerApplyTX.ral.json";
 import { default as IUpgradableChangeOwnerTXScriptJson } from "../lib/upgradable/IUpgradableChangeOwnerTX.ral.json";
@@ -23,126 +24,254 @@ import { default as RewardDistributorAddRewardsTXScriptJson } from "../rewards/R
 import { default as RewardDistributorHarvestTXScriptJson } from "../rewards/RewardDistributorHarvestTX.ral.json";
 import { default as SaleFlatPriceAlphBuyTXScriptJson } from "../launch_sale/SaleFlatPriceAlphBuyTX.ral.json";
 import { default as SaleFlatPriceAlphBuyTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphBuyTXV2.ral.json";
+import { default as SaleFlatPriceAlphBuyTXV3ScriptJson } from "../launch_sale_v3/SaleFlatPriceAlphBuyTXV3.ral.json";
 import { default as SaleFlatPriceAlphClaimRefundTXScriptJson } from "../launch_sale/SaleFlatPriceAlphClaimRefundTX.ral.json";
 import { default as SaleFlatPriceAlphClaimRefundTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphClaimRefundTXV2.ral.json";
+import { default as SaleFlatPriceAlphClaimRefundTXV3ScriptJson } from "../launch_sale_v3/SaleFlatPriceAlphClaimRefundTXV3.ral.json";
 import { default as SaleFlatPriceAlphClaimTXScriptJson } from "../launch_sale/SaleFlatPriceAlphClaimTX.ral.json";
 import { default as SaleFlatPriceAlphClaimTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphClaimTXV2.ral.json";
+import { default as SaleFlatPriceAlphClaimTXV3ScriptJson } from "../launch_sale_v3/SaleFlatPriceAlphClaimTXV3.ral.json";
+import { default as SaleFlatPriceAlphSetAllTXV3ScriptJson } from "../launch_sale_v3/SaleFlatPriceAlphSetAllTXV3.ral.json";
 import { default as SaleFlatPriceAlphSetCliffEndTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphSetCliffEndTXV2.ral.json";
 import { default as SaleFlatPriceAlphSetMerkleRootTXScriptJson } from "../launch_sale/SaleFlatPriceAlphSetMerkleRootTX.ral.json";
 import { default as SaleFlatPriceAlphSetMerkleRootTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphSetMerkleRootTXV2.ral.json";
+import { default as SaleFlatPriceAlphSetMerkleRootTXV3ScriptJson } from "../launch_sale_v3/SaleFlatPriceAlphSetMerkleRootTXV3.ral.json";
 import { default as SaleFlatPriceAlphSetPublicSaleMaxBidTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphSetPublicSaleMaxBidTXV2.ral.json";
 import { default as SaleFlatPriceAlphSetSaleDatesTXScriptJson } from "../launch_sale/SaleFlatPriceAlphSetSaleDatesTX.ral.json";
 import { default as SaleFlatPriceAlphSetSaleDatesTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphSetSaleDatesTXV2.ral.json";
+import { default as SaleFlatPriceAlphSetSaleDatesTXV3ScriptJson } from "../launch_sale_v3/SaleFlatPriceAlphSetSaleDatesTXV3.ral.json";
 import { default as SaleFlatPriceAlphSetUpfrontReleaseTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphSetUpfrontReleaseTXV2.ral.json";
 import { default as SaleFlatPriceAlphSetVestingEndTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphSetVestingEndTXV2.ral.json";
 import { default as SaleFlatPriceAlphSetWLMaxBidTXScriptJson } from "../launch_sale/SaleFlatPriceAlphSetWLMaxBidTX.ral.json";
 import { default as SaleFlatPriceAlphSetWLMaxBidTXV2ScriptJson } from "../launch_sale_v2/SaleFlatPriceAlphSetWLMaxBidTXV2.ral.json";
 import { default as SaleManagerCreateSaleFlatPriceTXScriptJson } from "../launch_sale/SaleManagerCreateSaleFlatPriceTX.ral.json";
 import { default as SaleManagerCreateSaleFlatPriceTXV2ScriptJson } from "../launch_sale_v2/SaleManagerCreateSaleFlatPriceTXV2.ral.json";
+import { default as SaleManagerCreateSaleFlatPriceTXV3ScriptJson } from "../launch_sale_v3/SaleManagerCreateSaleFlatPriceTXV3.ral.json";
+import { default as SaleManagerCreateSaleFlatPriceTXV3x1ScriptJson } from "../launch_sale_v3/SaleManagerCreateSaleFlatPriceTXV3x1.ral.json";
 import { default as StakingClaimRewardsTXScriptJson } from "../rewards/StakingClaimRewardsTX.ral.json";
 import { default as StakingClaimTXScriptJson } from "../rewards/StakingClaimTX.ral.json";
 import { default as StakingDepositRewardsTXScriptJson } from "../rewards/StakingDepositRewardsTX.ral.json";
 import { default as StakingStakeTXScriptJson } from "../rewards/StakingStakeTX.ral.json";
 import { default as StakingUnstakeTXScriptJson } from "../rewards/StakingUnstakeTX.ral.json";
+import { ListingRecord, AllStructs } from "./types";
 
 export const ApadTokenBurnTX = new ExecutableScript<{
   token: HexString;
   amount: bigint;
-}>(Script.fromJson(ApadTokenBurnTXScriptJson, "", []));
+}>(
+  Script.fromJson(ApadTokenBurnTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const IUpgradableChangeOwnerApplyTX = new ExecutableScript<{
   upgradable: HexString;
-}>(Script.fromJson(IUpgradableChangeOwnerApplyTXScriptJson, "", []));
+}>(
+  Script.fromJson(IUpgradableChangeOwnerApplyTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const IUpgradableChangeOwnerTX = new ExecutableScript<{
   upgradable: HexString;
   changeOwner: Address;
-}>(Script.fromJson(IUpgradableChangeOwnerTXScriptJson, "", []));
+}>(
+  Script.fromJson(IUpgradableChangeOwnerTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const IUpgradableMigrateApplyTX = new ExecutableScript<{
   upgradable: HexString;
-}>(Script.fromJson(IUpgradableMigrateApplyTXScriptJson, "", []));
+}>(
+  Script.fromJson(IUpgradableMigrateApplyTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const IUpgradableMigrateTX = new ExecutableScript<{
   upgradable: HexString;
   changeCode: HexString;
-}>(Script.fromJson(IUpgradableMigrateTXScriptJson, "", []));
+}>(
+  Script.fromJson(IUpgradableMigrateTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const IUpgradableMigrateWithFieldsApplyTX = new ExecutableScript<{
   upgradable: HexString;
-}>(Script.fromJson(IUpgradableMigrateWithFieldsApplyTXScriptJson, "", []));
+}>(
+  Script.fromJson(
+    IUpgradableMigrateWithFieldsApplyTXScriptJson,
+    "",
+    AllStructs
+  ),
+  getContractByCodeHash
+);
 
 export const IUpgradableMigrateWithFieldsTX = new ExecutableScript<{
   upgradable: HexString;
   changeCode: HexString;
   changeImmFieldsEncoded: HexString;
   changeMutFieldsEncoded: HexString;
-}>(Script.fromJson(IUpgradableMigrateWithFieldsTXScriptJson, "", []));
+}>(
+  Script.fromJson(IUpgradableMigrateWithFieldsTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const IUpgradableResetUpgradeTX = new ExecutableScript<{
   upgradable: HexString;
-}>(Script.fromJson(IUpgradableResetUpgradeTXScriptJson, "", []));
+}>(
+  Script.fromJson(IUpgradableResetUpgradeTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const RewardDistributorAddRewardsTX = new ExecutableScript<{
   rd: HexString;
   amount: bigint;
-}>(Script.fromJson(RewardDistributorAddRewardsTXScriptJson, "", []));
+}>(
+  Script.fromJson(RewardDistributorAddRewardsTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const RewardDistributorHarvestTX = new ExecutableScript<{
   rd: HexString;
-}>(Script.fromJson(RewardDistributorHarvestTXScriptJson, "", []));
+}>(
+  Script.fromJson(RewardDistributorHarvestTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphBuyTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   amountAlph: bigint;
   merkleProof: HexString;
-}>(Script.fromJson(SaleFlatPriceAlphBuyTXScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphBuyTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphBuyTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   amountAlph: bigint;
   merkleProof: HexString;
-}>(Script.fromJson(SaleFlatPriceAlphBuyTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphBuyTXV2ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
+
+export const SaleFlatPriceAlphBuyTXV3 = new ExecutableScript<{
+  saleFlatPrice: HexString;
+  amountAlph: bigint;
+  wlPrice: bigint;
+  wlMaxBid: bigint;
+  merkleProof: HexString;
+  stateRentAmount: bigint;
+}>(
+  Script.fromJson(SaleFlatPriceAlphBuyTXV3ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphClaimRefundTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphClaimRefundTXScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphClaimRefundTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphClaimRefundTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphClaimRefundTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphClaimRefundTXV2ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
+
+export const SaleFlatPriceAlphClaimRefundTXV3 = new ExecutableScript<{
+  saleFlatPrice: HexString;
+  amount: bigint;
+}>(
+  Script.fromJson(SaleFlatPriceAlphClaimRefundTXV3ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphClaimTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphClaimTXScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphClaimTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphClaimTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   amount: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphClaimTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphClaimTXV2ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
+
+export const SaleFlatPriceAlphClaimTXV3 = new ExecutableScript<{
+  saleFlatPrice: HexString;
+  amount: bigint;
+}>(
+  Script.fromJson(SaleFlatPriceAlphClaimTXV3ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
+
+export const SaleFlatPriceAlphSetAllTXV3 = new ExecutableScript<{
+  saleFlatPrice: HexString;
+  newSaleStart: bigint;
+  newSaleEnd: bigint;
+  newWhitelistSaleStart: bigint;
+  newWhitelistSaleEnd: bigint;
+  newPublicSaleMaxBid: bigint;
+  newUpfrontRelease: bigint;
+  newVestingEnd: bigint;
+  newCliffEnd: bigint;
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetAllTXV3ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetCliffEndTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newCliffEnd: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetCliffEndTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetCliffEndTXV2ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetMerkleRootTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   newMerkleRoot: HexString;
-}>(Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetMerkleRootTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newMerkleRoot: HexString;
-}>(Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXV2ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
+
+export const SaleFlatPriceAlphSetMerkleRootTXV3 = new ExecutableScript<{
+  saleFlatPrice: HexString;
+  newMerkleRoot: HexString;
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetMerkleRootTXV3ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetPublicSaleMaxBidTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newPublicSaleMaxBid: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetPublicSaleMaxBidTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(
+    SaleFlatPriceAlphSetPublicSaleMaxBidTXV2ScriptJson,
+    "",
+    AllStructs
+  ),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetSaleDatesTX = new ExecutableScript<{
   saleFlatPrice: HexString;
@@ -150,7 +279,10 @@ export const SaleFlatPriceAlphSetSaleDatesTX = new ExecutableScript<{
   newSaleEnd: bigint;
   newWhitelistSaleStart: bigint;
   newWhitelistSaleEnd: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetSaleDatesTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
@@ -158,27 +290,57 @@ export const SaleFlatPriceAlphSetSaleDatesTXV2 = new ExecutableScript<{
   newSaleEnd: bigint;
   newWhitelistSaleStart: bigint;
   newWhitelistSaleEnd: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXV2ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
+
+export const SaleFlatPriceAlphSetSaleDatesTXV3 = new ExecutableScript<{
+  saleFlatPrice: HexString;
+  newSaleStart: bigint;
+  newSaleEnd: bigint;
+  newWhitelistSaleStart: bigint;
+  newWhitelistSaleEnd: bigint;
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetSaleDatesTXV3ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetUpfrontReleaseTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newUpfrontRelease: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetUpfrontReleaseTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(
+    SaleFlatPriceAlphSetUpfrontReleaseTXV2ScriptJson,
+    "",
+    AllStructs
+  ),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetVestingEndTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newVestingEnd: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetVestingEndTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetVestingEndTXV2ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetWLMaxBidTX = new ExecutableScript<{
   saleFlatPrice: HexString;
   newWLMaxBid: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetWLMaxBidTXScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetWLMaxBidTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleFlatPriceAlphSetWLMaxBidTXV2 = new ExecutableScript<{
   saleFlatPrice: HexString;
   newWLMaxBid: bigint;
-}>(Script.fromJson(SaleFlatPriceAlphSetWLMaxBidTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(SaleFlatPriceAlphSetWLMaxBidTXV2ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleManagerCreateSaleFlatPriceTX = new ExecutableScript<{
   saleManager: HexString;
@@ -195,7 +357,10 @@ export const SaleManagerCreateSaleFlatPriceTX = new ExecutableScript<{
   whitelistSaleEnd: bigint;
   whitelistBuyerMaxBid: bigint;
   merkleRoot: HexString;
-}>(Script.fromJson(SaleManagerCreateSaleFlatPriceTXScriptJson, "", []));
+}>(
+  Script.fromJson(SaleManagerCreateSaleFlatPriceTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const SaleManagerCreateSaleFlatPriceTXV2 = new ExecutableScript<{
   saleManager: HexString;
@@ -216,28 +381,90 @@ export const SaleManagerCreateSaleFlatPriceTXV2 = new ExecutableScript<{
   whitelistSaleEnd: bigint;
   whitelistBuyerMaxBid: bigint;
   merkleRoot: HexString;
-}>(Script.fromJson(SaleManagerCreateSaleFlatPriceTXV2ScriptJson, "", []));
+}>(
+  Script.fromJson(SaleManagerCreateSaleFlatPriceTXV2ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
+
+export const SaleManagerCreateSaleFlatPriceTXV3 = new ExecutableScript<{
+  saleManager: HexString;
+  amountAlph: bigint;
+  tokenPrice: bigint;
+  publicSaleMaxBid: bigint;
+  upfrontRelease: bigint;
+  vestingEnd: bigint;
+  cliffEnd: bigint;
+  saleStart: bigint;
+  saleEnd: bigint;
+  minRaise: bigint;
+  maxRaise: bigint;
+  saleTokenId: HexString;
+  saleTokenTotalAmount: bigint;
+  whitelistSaleEnd: bigint;
+  merkleRoot: HexString;
+}>(
+  Script.fromJson(SaleManagerCreateSaleFlatPriceTXV3ScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
+
+export const SaleManagerCreateSaleFlatPriceTXV3x1 = new ExecutableScript<{
+  saleManager: HexString;
+  amountAlph: bigint;
+  tokenPrice: bigint;
+  publicSaleMaxBid: bigint;
+  upfrontRelease: bigint;
+  vestingEnd: bigint;
+  cliffEnd: bigint;
+  saleStart: bigint;
+  saleEnd: bigint;
+  minRaise: bigint;
+  maxRaise: bigint;
+  saleTokenId: HexString;
+  saleTokenTotalAmount: bigint;
+  whitelistSaleEnd: bigint;
+  merkleRoot: HexString;
+}>(
+  Script.fromJson(
+    SaleManagerCreateSaleFlatPriceTXV3x1ScriptJson,
+    "",
+    AllStructs
+  ),
+  getContractByCodeHash
+);
 
 export const StakingClaimRewardsTX = new ExecutableScript<{
   staking: HexString;
-}>(Script.fromJson(StakingClaimRewardsTXScriptJson, "", []));
+}>(
+  Script.fromJson(StakingClaimRewardsTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const StakingClaimTX = new ExecutableScript<{ staking: HexString }>(
-  Script.fromJson(StakingClaimTXScriptJson, "", [])
+  Script.fromJson(StakingClaimTXScriptJson, "", AllStructs),
+  getContractByCodeHash
 );
 
 export const StakingDepositRewardsTX = new ExecutableScript<{
   staking: HexString;
   amount: bigint;
-}>(Script.fromJson(StakingDepositRewardsTXScriptJson, "", []));
+}>(
+  Script.fromJson(StakingDepositRewardsTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const StakingStakeTX = new ExecutableScript<{
   staking: HexString;
   amount: bigint;
   vestingPeriod: bigint;
-}>(Script.fromJson(StakingStakeTXScriptJson, "", []));
+}>(
+  Script.fromJson(StakingStakeTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
 
 export const StakingUnstakeTX = new ExecutableScript<{
   staking: HexString;
   amount: bigint;
-}>(Script.fromJson(StakingUnstakeTXScriptJson, "", []));
+}>(
+  Script.fromJson(StakingUnstakeTXScriptJson, "", AllStructs),
+  getContractByCodeHash
+);
