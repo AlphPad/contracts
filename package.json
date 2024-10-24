@@ -10,8 +10,8 @@
     "devnet:stop": "npx --yes @alephium/cli devnet stop",
     "compile": "npx --yes @alephium/cli compile",
     "deploy": "npx --yes @alephium/cli deploy",
-    "deploy-testnet": "env $(cat ./testnet.env | xargs) npx --yes @alephium/cli deploy -n testnet -f 4",
-    "deploy-mainnet": "env $(cat ./mainnet.env | xargs) npx --yes @alephium/cli deploy -n mainnet -f 4",
+    "deploy-testnet": "env $(cat ./testnet.env | xargs) npx --yes @alephium/cli deploy -n testnet -f 5",
+    "deploy-mainnet": "env $(cat ./mainnet.env | xargs) npx --yes @alephium/cli deploy -n mainnet -f 5",
     "lint": "eslint . --ext ts",
     "lint:fix": "eslint . --fix --ext ts",
     "test": "jest -i --config ./jest-config.json --verbose"

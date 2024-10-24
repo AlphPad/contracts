@@ -364,6 +364,12 @@
       "bytecodeDebugPatch": "",
       "codeHashDebug": ""
     },
+    "SaleManagerCreateSaleFlatPriceTXV3x1": {
+      "sourceFile": "launch_sale_v3/sale_manager_v3_1.ral",
+      "sourceCodeHash": "b4d64ade9735dbeaef99430e98acfb40c7133431033fe21bac36f506b744a42f",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
+    },
     "SaleManagerV2": {
       "sourceFile": "launch_sale_v2/sale_manager_v2.ral",
       "sourceCodeHash": "d8d63707f525132b5bbb8961638811baf0718d15a4a3ddcb40c16f6f17db7266",
@@ -375,6 +381,12 @@
       "sourceCodeHash": "6b76f93ecffdb6b0b9fb952188290eb39a6348dfac4631f9ce107c3a6daaba82",
       "bytecodeDebugPatch": "=78-2+3e=2-6+da=3-1=2-2+3=1+6=1-2+4b2=3-1+8=2+e4450=1-1=2-1=1+b=2+4=1-1=2-2+68=927-1+a=136+7a7e0214696e73657274206174206d617020706174683a2000=1654",
       "codeHashDebug": "d36b0a881fce27ab1dc62a7b4676a88d14f4e2c2ae0663829c9af56c072a522d"
+    },
+    "SaleManagerV3x1": {
+      "sourceFile": "launch_sale_v3/sale_manager_v3_1.ral",
+      "sourceCodeHash": "b4d64ade9735dbeaef99430e98acfb40c7133431033fe21bac36f506b744a42f",
+      "bytecodeDebugPatch": "=78-2+3e=2+d1431=1-1=2-3=1-6+d=3-1+9=2-2+bf=2-1=1+b=3-1+6=3-1+2=2+39=1-1+55f=927-1+a=136+7a7e0214696e73657274206174206d617020706174683a2000=1636",
+      "codeHashDebug": "746939724f7640ecec7f5e555b322e9e2277bfddfe5d44ac31814c5393a3964a"
     },
     "Staking": {
       "sourceFile": "rewards/staking.ral",
